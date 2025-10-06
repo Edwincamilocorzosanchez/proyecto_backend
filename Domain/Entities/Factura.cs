@@ -14,4 +14,15 @@ public class Factura : BaseEntity
     // Relaciones
     public OrdenServicio OrdenServicio { get; set; } = null!;
     public ICollection<Pago> Pagos { get; set; } = new List<Pago>();
+
+    public Factura() { }
+    public Factura(IdVO id, IdVO ordenServicioId, DineroVO montoRepuestos, DineroVO manoObra, DineroVO total, FechaHistoricaVO fechaGeneracion)
+    {
+        Id = id;
+        OrdenServicioId = ordenServicioId;
+        MontoRepuestos = montoRepuestos;
+        ManoObra = manoObra;
+        Total = total;
+        FechaGeneracion = fechaGeneracion;
+    }
 }

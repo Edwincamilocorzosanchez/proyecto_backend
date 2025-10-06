@@ -179,3 +179,26 @@ ReportesController
 | `GET` | `/api/reportes/mecanicos`  | Rendimiento por mecánico             |
 | `GET` | `/api/reportes/inventario` | Repuestos con bajo stock             |
 | `GET` | `/api/reportes/clientes`   | Clientes más frecuentes              |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### Cosas que quizas se pueden hacer mejor
+- En la base de datos agregar la tabla inventario y anidarla con repuestos, historial_inventario...
+
+
+# Preguntas
+- Saber si la ruta de las configuracione de autenticación es Configurations/ o Configurations/Auth

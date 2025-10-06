@@ -16,4 +16,16 @@ public class HistorialInventario
     public Repuesto Repuesto { get; set; } = null!;
     public Administrador? Administrador { get; set; }
     public TipoMovimiento TipoMovimiento { get; set; } = null!;
+
+    public HistorialInventario() { }
+    public HistorialInventario(IdVO id, IdVO repuestoId, IdVO? adminId, IdVO tipoMovimientoId, CantidadVO cantidad, FechaHistoricaVO fechaMovimiento, DescripcionVO? observaciones)
+    {
+        Id = id;
+        RepuestoId = repuestoId;
+        AdminId = adminId;
+        TipoMovimientoId = tipoMovimientoId;
+        Cantidad = cantidad;
+        FechaMovimiento = fechaMovimiento;
+        Observaciones = observaciones;
+    }
 }

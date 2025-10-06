@@ -16,4 +16,17 @@ public class Vehiculo : BaseEntity
     public Cliente Cliente { get; set; } = null!;
     public ICollection<Cita> Citas { get; set; } = new List<Cita>();
     public ICollection<OrdenServicio> OrdenesServicio { get; set; } = new List<OrdenServicio>();
+
+    // constructores
+    public Vehiculo() { }
+    public Vehiculo(IdVO id, Cliente cliente, NombreVO marca, NombreVO modelo, AnioVehiculoVO anio, VinVO vin, KilometrajeVO kilometraje)
+    {
+        Id = id;
+        Cliente = cliente;
+        Marca = marca;
+        Modelo = modelo;
+        Anio = anio;
+        Vin = vin;
+        Kilometraje = kilometraje;
+    }
 }

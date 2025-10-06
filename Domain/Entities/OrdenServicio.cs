@@ -20,4 +20,17 @@ public class OrdenServicio : BaseEntity
 
     public ICollection<DetalleOrden> Detalles { get; set; } = new List<DetalleOrden>();
     public ICollection<Factura> Facturas { get; set; } = new List<Factura>();
+
+    // constructores
+    public OrdenServicio() { }
+    public OrdenServicio(IdVO id, Vehiculo vehiculo, Mecanico mecanico, TipoServicio tipoServicio, EstadoOrden estado, FechaHistoricaVO fechaIngreso, FechaHistoricaVO fechaEntregaEstimada)
+    {
+        Id = id;
+        Vehiculo = vehiculo;
+        Mecanico = mecanico;
+        TipoServicio = tipoServicio;
+        Estado = estado;
+        FechaIngreso = fechaIngreso;
+        FechaEntregaEstimada = fechaEntregaEstimada;
+    }
 }

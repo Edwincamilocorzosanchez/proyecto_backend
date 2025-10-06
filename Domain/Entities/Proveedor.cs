@@ -14,4 +14,18 @@ public class Proveedor : BaseEntity
 
     // relaciones
     public UserMember User { get; set; } = null!;
+    // relacion uno a muchos
+    public ICollection<Repuesto> Repuestos { get; set; } = new List<Repuesto>();    
+
+    // constructores
+    public Proveedor() { }
+    public Proveedor(IdVO id, NombreVO nombre, TelefonoVO? telefono, CorreoVO? correo, DireccionVO? direccion, EstadoVO isActive)
+    {
+        Id = id;
+        Nombre = nombre;
+        Telefono = telefono;
+        Correo = correo;
+        Direccion = direccion;
+        IsActive = isActive;
+    }
 }

@@ -15,4 +15,16 @@ public class Pago : BaseEntity
     public Factura Factura { get; set; } = null!;
     public MetodoPago MetodoPago { get; set; } = null!;
     public EstadoPago EstadoPago { get; set; } = null!;
+
+    // constructores
+    public Pago() { }
+    public Pago(IdVO id, Factura factura, MetodoPago metodoPago, EstadoPago estadoPago, DineroVO monto, FechaHistoricaVO fechaPago)
+    {
+        Id = id;
+        Factura = factura;
+        MetodoPago = metodoPago;
+        EstadoPago = estadoPago;
+        Monto = monto;
+        FechaPago = fechaPago;
+    }
 }

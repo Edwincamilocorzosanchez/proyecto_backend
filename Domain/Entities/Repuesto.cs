@@ -15,4 +15,15 @@ public class Repuesto : BaseEntity
     public Proveedor? Proveedor { get; set; }
     public ICollection<HistorialInventario> Historiales { get; set; } = new List<HistorialInventario>();
     public ICollection<DetalleOrden> DetallesOrden { get; set; } = new List<DetalleOrden>();
+
+    // constructores
+    public Repuesto() { }
+    public Repuesto(CodigoRepuestoVO codigo, DescripcionVO descripcion, CantidadVO cantidadStock, DineroVO precioUnitario, IdVO? proveedorId)
+    {
+        Codigo = codigo;
+        Descripcion = descripcion;
+        CantidadStock = cantidadStock;
+        PrecioUnitario = precioUnitario;
+        ProveedorId = proveedorId;
+    }
 }

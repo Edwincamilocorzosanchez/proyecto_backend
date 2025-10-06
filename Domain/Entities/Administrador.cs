@@ -12,5 +12,17 @@ public class Administrador : BaseEntity
     public DescripcionVO? AreaResponsabilidad { get; set; }
     public EstadoVO IsActive { get; set; } = null!;
 
+    // relaciones
     public UserMember User { get; set; } = null!;
+    // constructores 
+    public Administrador() { }
+    public Administrador(IdVO id, NombreVO nombre, TelefonoVO? telefono, NivelAccesoVO? nivelAcceso, DescripcionVO? areaResponsabilidad, EstadoVO isActive)
+    {
+        Id = id;
+        Nombre = nombre;
+        Telefono = telefono;
+        NivelAcceso = nivelAcceso;
+        AreaResponsabilidad = areaResponsabilidad;
+        IsActive = isActive;
+    }
 }

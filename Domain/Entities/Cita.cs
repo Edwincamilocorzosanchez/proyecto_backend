@@ -15,4 +15,16 @@ public class Cita : BaseEntity
     public Cliente Cliente { get; set; } = null!;
     public Vehiculo Vehiculo { get; set; } = null!;
     public EstadoCita Estado { get; set; } = null!;
+
+    // constructores
+    public Cita() { }
+    public Cita(IdVO id, IdVO clienteId, IdVO vehiculoId, FechaCitaVO fechaCita, DescripcionVO? motivo, IdVO estadoId)
+    {
+        Id = id;
+        ClienteId = clienteId;
+        VehiculoId = vehiculoId;
+        FechaCita = fechaCita;
+        Motivo = motivo;
+        EstadoId = estadoId;
+    }
 }

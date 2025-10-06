@@ -12,4 +12,14 @@ public class DetalleOrden
     // Relaciones
     public OrdenServicio OrdenServicio { get; set; } = null!;
     public Repuesto Repuesto { get; set; } = null!;
+
+    // constructores
+    public DetalleOrden() { }
+    public DetalleOrden(IdVO ordenServicioId, IdVO repuestoId, CantidadVO cantidad, DineroVO costo)
+    {
+        OrdenServicioId = ordenServicioId;
+        RepuestoId = repuestoId;
+        Cantidad = cantidad;
+        Costo = costo;
+    }
 }

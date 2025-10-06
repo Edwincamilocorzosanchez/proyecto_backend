@@ -26,8 +26,6 @@ CREATE TABLE roles (
 CREATE TABLE user_member_rol (
     user_id INT NOT NULL,
     rol_id INT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (user_id, rol_id),
     CONSTRAINT fk_umr_user FOREIGN KEY (user_id) REFERENCES users_members(id) ON DELETE CASCADE,
     CONSTRAINT fk_umr_rol FOREIGN KEY (rol_id) REFERENCES roles(id) ON DELETE CASCADE
@@ -75,6 +73,8 @@ CREATE TABLE estados_pago (
 );
 
 -- EXTENSIONES DE USERS
+-- ========================================================================
+-- tabla de clientes
 CREATE TABLE clientes (
     id INT PRIMARY KEY,
     telefono VARCHAR(20),
@@ -86,6 +86,7 @@ CREATE TABLE clientes (
     CONSTRAINT fk_cliente_user FOREIGN KEY (id) REFERENCES users_members(id) ON DELETE CASCADE
 );
 
+-- tabla de proveedores
 CREATE TABLE proveedores (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(255) NOT NULL,
@@ -99,7 +100,7 @@ CREATE TABLE proveedores (
     CONSTRAINT fk_proveedor_user FOREIGN KEY (id) REFERENCES users_members(id) ON DELETE CASCADE
 );
 
-
+-- tabla de mecanicos
 CREATE TABLE mecanicos (
     id INT PRIMARY KEY,
     nombre VARCHAR(255) NOT NULL,
@@ -112,6 +113,7 @@ CREATE TABLE mecanicos (
     CONSTRAINT fk_mecanico_user FOREIGN KEY (id) REFERENCES users_members(id) ON DELETE CASCADE
 );
 
+-- tabla de administradores
 CREATE TABLE administradores (
     id INT PRIMARY KEY,
     nombre VARCHAR(255) NOT NULL,
@@ -136,6 +138,8 @@ CREATE TABLE vehiculos (
     anio SMALLINT NOT NULL,
     vin VARCHAR(50) NOT NULL UNIQUE,
     kilometraje INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_vehiculo_cliente FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE
 );
 
@@ -147,6 +151,7 @@ CREATE TABLE citas (
     motivo VARCHAR(255),
     estado_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_cita_cliente FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE,
     CONSTRAINT fk_cita_vehiculo FOREIGN KEY (vehiculo_id) REFERENCES vehiculos(id) ON DELETE CASCADE,
     CONSTRAINT fk_cita_estado FOREIGN KEY (estado_id) REFERENCES estados_cita(id)
@@ -154,7 +159,7 @@ CREATE TABLE citas (
 -- =========================================================
 -- SERVICIOS Y ORDENES
 -- =========================================================
-CREATE TABLE tipo_servicio (
+CREATE TABLE tipos_servicio (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(100) NOT NULL,
     descripcion VARCHAR(255),
@@ -170,9 +175,10 @@ CREATE TABLE orden_servicio (
     fecha_ingreso TIMESTAMP NOT NULL,
     fecha_entrega_estimada TIMESTAMP NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_os_vehiculo FOREIGN KEY (vehiculo_id) REFERENCES vehiculos(id) ON DELETE CASCADE,
     CONSTRAINT fk_os_mecanico FOREIGN KEY (mecanico_id) REFERENCES mecanicos(id) ON DELETE CASCADE,
-    CONSTRAINT fk_os_tipo_serv FOREIGN KEY (tipo_servicio_id) REFERENCES tipo_servicio(id),
+    CONSTRAINT fk_os_tipo_serv FOREIGN KEY (tipo_servicio_id) REFERENCES tipos_servicio(id),
     CONSTRAINT fk_os_estado FOREIGN KEY (estado_id) REFERENCES estados_orden(id)
 );
 
@@ -186,6 +192,8 @@ CREATE TABLE repuestos (
     cantidad_stock INT NOT NULL,
     precio_unitario DECIMAL(10,2) NOT NULL,
     proveedor_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_repuesto_proveedor FOREIGN KEY (proveedor_id) REFERENCES proveedores(id) ON DELETE SET NULL
 );
 
@@ -222,6 +230,8 @@ CREATE TABLE facturas (
     mano_obra DECIMAL(10,2) NOT NULL,
     total DECIMAL(10,2) NOT NULL,
     fecha_generacion DATETIME NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_factura_orden FOREIGN KEY (orden_servicio_id) REFERENCES orden_servicio(id)
 );
 
@@ -232,6 +242,8 @@ CREATE TABLE pagos (
     estado_pago_id INT NOT NULL,
     monto DECIMAL(10,2) NOT NULL,
     fecha_pago TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_pago_factura FOREIGN KEY (factura_id) REFERENCES facturas(id) ON DELETE CASCADE,
     CONSTRAINT fk_pago_metodo FOREIGN KEY (metodo_pago_id) REFERENCES metodos_pago(id),
     CONSTRAINT fk_pago_estado FOREIGN KEY (estado_pago_id) REFERENCES estados_pago(id)

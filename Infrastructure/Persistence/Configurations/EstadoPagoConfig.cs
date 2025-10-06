@@ -1,4 +1,5 @@
 using Domain.Entities;
+using Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -13,12 +14,12 @@ public class EstadoPagoConfig : IEntityTypeConfiguration<EstadoPago>
         builder.HasKey(e => e.Id);
 
         builder.Property(e => e.Id)
-            .HasConversion(id => id.Value, value => new(value))
+            .HasConversion(id => id.Value, value => new IdVO(value))
             .HasColumnName("id")
             .ValueGeneratedOnAdd();
 
         builder.Property(e => e.Nombre)
-            .HasConversion(n => n.Value, value => new(value))
+            .HasConversion(n => n.Value, value => new NombreVO(value))
             .HasColumnName("nombre")
             .HasMaxLength(100)
             .IsRequired();

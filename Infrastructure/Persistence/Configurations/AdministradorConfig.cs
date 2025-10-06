@@ -22,24 +22,15 @@ public class AdministradorConfig : IEntityTypeConfiguration<Administrador>
             .IsRequired();
 
         builder.Property(a => a.Telefono)
-            .HasConversion(
-                v => v == null ? null : v.Value,
-                v => v == null ? null : new TelefonoVO(v)
-            )
+            .HasConversion(v => v.Value, v => new TelefonoVO(v))
             .HasColumnName("telefono");
 
         builder.Property(a => a.NivelAcceso)
-            .HasConversion(
-                v => v == null ? null : v.Value,
-                v => v == null ? null : new NivelAccesoVO(v)
-            )
+            .HasConversion(v => v.Value, v => new NivelAccesoVO(v))
             .HasColumnName("nivel_acceso");
 
         builder.Property(a => a.AreaResponsabilidad)
-            .HasConversion(
-                v => v == null ? null : v.Value,
-                v => v == null ? null : new DescripcionVO(v)
-            )
+            .HasConversion(v => v.Value, v => new DescripcionVO(v))
             .HasColumnName("area_responsabilidad");
 
         builder.Property(a => a.IsActive)

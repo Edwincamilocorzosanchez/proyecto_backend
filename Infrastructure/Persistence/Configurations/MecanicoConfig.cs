@@ -1,4 +1,5 @@
 using Domain.Entities;
+using Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -13,29 +14,39 @@ public class MecanicoConfig : IEntityTypeConfiguration<Mecanico>
         builder.HasKey(m => m.Id);
 
         builder.Property(m => m.Id)
-            .HasConversion(id => id.Value, value => new(value))
-            .HasColumnName("id");
+            .HasConversion(
+                id => id.Value,
+                value => new IdVO(value)
+            )
+            .HasColumnName("id")
+            .ValueGeneratedOnAdd();
 
         builder.Property(m => m.Nombre)
-            .HasConversion(n => n.Value, value => new(value))
+            .HasConversion(
+                nombre => nombre.Value,
+                value => new NombreVO(value)
+            )
             .HasColumnName("nombre")
-            .HasMaxLength(100);
+            .HasMaxLength(100)
+            .IsRequired();
 
         builder.Property(m => m.Telefono)
-            .HasConversion(t => t == null ? null : t.Value,
-                            value => value == null ? null : new(value))
+            .HasConversion(
+                t => t == null ? null : t.Value,
+                value => value == null ? null : new TelefonoVO(value)
+            )
             .HasColumnName("telefono")
             .HasMaxLength(20);
 
         builder.Property(m => m.Especialidad)
-            .HasConversion(e => e == null ? null : e.Value,
-                            value => value == null ? null : new(value))
+            .HasConversion(e => e == null ? null : e.Value, value => value == null ? null : new EspecialidadVO(value))
             .HasColumnName("especialidad")
             .HasMaxLength(60);
 
         builder.Property(m => m.IsActive)
-            .HasConversion(a => a.Value, value => new(value))
-            .HasColumnName("is_active");
+            .HasConversion(e => e.Value, value => new EstadoVO(value))
+            .HasColumnName("is_active")
+            .IsRequired();
 
         builder.HasOne(m => m.User)
             .WithOne()

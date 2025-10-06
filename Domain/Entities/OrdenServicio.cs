@@ -1,14 +1,16 @@
+using Domain.ValueObjects;
+
 namespace Domain.Entities;
 
 public class OrdenServicio : BaseEntity
 {
-    public int Id { get; set; }
-    public int VehiculoId { get; set; }
-    public int MecanicoId { get; set; }
-    public int TipoServicioId { get; set; }
-    public int EstadoId { get; set; }
-    public DateTime FechaIngreso { get; set; }
-    public DateTime FechaEntregaEstimada { get; set; }
+    public IdVO Id { get; set; } = null!;
+    public IdVO VehiculoId { get; set; } = null!;
+    public IdVO MecanicoId { get; set; } = null!;
+    public IdVO TipoServicioId { get; set; } = null!;
+    public IdVO EstadoId { get; set; } = null!;
+    public FechaHistoricaVO FechaIngreso { get; set; } = null!;
+    public FechaHistoricaVO FechaEntregaEstimada { get; set; } = null!;
 
     // Relaciones
     public Vehiculo Vehiculo { get; set; } = null!;

@@ -1,11 +1,13 @@
+using Domain.ValueObjects;
+
 namespace Domain.Entities;
 
 public class DetalleOrden
 {
-    public int OrdenServicioId { get; set; }
-    public int RepuestoId { get; set; }
-    public int Cantidad { get; set; }
-    public decimal Costo { get; set; }
+    public IdVO OrdenServicioId { get; set; } = null!;
+    public IdVO RepuestoId { get; set; } = null!;
+    public CantidadVO Cantidad { get; set; } = null!;
+    public DineroVO Costo { get; set; } = null!;
 
     // Relaciones
     public OrdenServicio OrdenServicio { get; set; } = null!;

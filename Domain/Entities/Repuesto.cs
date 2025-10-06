@@ -1,13 +1,15 @@
+using Domain.ValueObjects;
+
 namespace Domain.Entities;
 
 public class Repuesto : BaseEntity
 {
-    public int Id { get; set; }
-    public string Codigo { get; set; } = null!;
-    public string Descripcion { get; set; } = null!;
-    public int CantidadStock { get; set; }
-    public decimal PrecioUnitario { get; set; }
-    public int? ProveedorId { get; set; }
+    public IdVO Id { get; set; } = null!;
+    public CodigoRepuestoVO Codigo { get; set; } = null!;
+    public DescripcionVO Descripcion { get; set; } = null!;
+    public CantidadVO CantidadStock { get; set; } = null!;
+    public DineroVO PrecioUnitario { get; set; } = null!;
+    public IdVO? ProveedorId { get; set; }
 
     // Relaciones
     public Proveedor? Proveedor { get; set; }

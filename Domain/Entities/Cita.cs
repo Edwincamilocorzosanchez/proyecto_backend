@@ -1,13 +1,15 @@
+using Domain.ValueObjects;
+
 namespace Domain.Entities;
 
 public class Cita : BaseEntity
 {
-    public int Id { get; set; }
-    public int ClienteId { get; set; }
-    public int VehiculoId { get; set; }
-    public DateTime FechaCita { get; set; }
-    public string? Motivo { get; set; }
-    public int EstadoId { get; set; }
+    public IdVO Id { get; set; } = null!;
+    public IdVO ClienteId { get; set; } = null!;
+    public IdVO VehiculoId { get; set; } = null!;
+    public FechaCitaVO FechaCita { get; set; } = null!;
+    public DescripcionVO? Motivo { get; set; }
+    public IdVO EstadoId { get; set; } = null!;
 
     // Relaciones
     public Cliente Cliente { get; set; } = null!;

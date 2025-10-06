@@ -1,13 +1,15 @@
+using Domain.ValueObjects;
+
 namespace Domain.Entities;
 
 public class Pago : BaseEntity
 {
-    public int Id { get; set; }
-    public int FacturaId { get; set; }
-    public int MetodoPagoId { get; set; }
-    public int EstadoPagoId { get; set; }
-    public decimal Monto { get; set; }
-    public DateTime FechaPago { get; set; }
+    public IdVO Id { get; set; } = null!;
+    public IdVO FacturaId { get; set; } = null!;
+    public IdVO MetodoPagoId { get; set; } = null!;
+    public IdVO EstadoPagoId { get; set; } = null!;
+    public DineroVO Monto { get; set; } = null!;
+    public FechaHistoricaVO FechaPago { get; set; } = null!;
 
     // Relaciones
     public Factura Factura { get; set; } = null!;

@@ -1,13 +1,15 @@
+using Domain.ValueObjects;
+
 namespace Domain.Entities;
 
 public class Factura : BaseEntity
 {
-    public int Id { get; set; }
-    public int OrdenServicioId { get; set; }
-    public decimal MontoRepuestos { get; set; }
-    public decimal ManoObra { get; set; }
-    public decimal Total { get; set; }
-    public DateTime FechaGeneracion { get; set; }
+    public IdVO Id { get; set; } = null!;
+    public IdVO OrdenServicioId { get; set; } = null!;
+    public DineroVO MontoRepuestos { get; set; } = null!;
+    public DineroVO ManoObra { get; set; } = null!;
+    public DineroVO Total { get; set; } = null!;
+    public FechaHistoricaVO FechaGeneracion { get; set; } = null!;
 
     // Relaciones
     public OrdenServicio OrdenServicio { get; set; } = null!;

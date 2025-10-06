@@ -49,27 +49,27 @@ CREATE TABLE refresh_tokens (
 -- =========================================================
 CREATE TABLE estados_cita (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    nombre VARCHAR(50) NOT NULL UNIQUE
+    nombre VARCHAR(100) NOT NULL UNIQUE
 );
 
 CREATE TABLE estados_orden (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    nombre VARCHAR(50) NOT NULL UNIQUE
+    nombre VARCHAR(100) NOT NULL UNIQUE
 );
 
 CREATE TABLE tipos_movimiento (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    nombre VARCHAR(50) NOT NULL UNIQUE
+    nombre VARCHAR(100) NOT NULL UNIQUE
 );
 
 CREATE TABLE metodos_pago (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    nombre VARCHAR(50) NOT NULL UNIQUE
+    nombre VARCHAR(100) NOT NULL UNIQUE
 );
 
 CREATE TABLE estados_pago (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    nombre VARCHAR(50) NOT NULL UNIQUE
+    nombre VARCHAR(100) NOT NULL UNIQUE
 );
 
 -- EXTENSIONES DE USERS
@@ -89,7 +89,7 @@ CREATE TABLE clientes (
 -- tabla de proveedores
 CREATE TABLE proveedores (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    nombre VARCHAR(255) NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
     telefono VARCHAR(20),
     correo VARCHAR(100),
     direccion VARCHAR(255),
@@ -103,7 +103,7 @@ CREATE TABLE proveedores (
 -- tabla de mecanicos
 CREATE TABLE mecanicos (
     id INT PRIMARY KEY,
-    nombre VARCHAR(255) NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
     telefono VARCHAR(20),
     especialidad VARCHAR(60),
     -- si es false no puede hacer login
@@ -116,10 +116,10 @@ CREATE TABLE mecanicos (
 -- tabla de administradores
 CREATE TABLE administradores (
     id INT PRIMARY KEY,
-    nombre VARCHAR(255) NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
     telefono VARCHAR(20),
     nivel_acceso VARCHAR(50),
-    area_responsabilidad VARCHAR(120),
+    area_responsabilidad VARCHAR(255),
     -- si es false no puede hacer login
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

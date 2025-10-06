@@ -1,7 +1,9 @@
+using Domain.ValueObjects;
+
 namespace Domain.Entities;
 
 public class TipoMovimiento
 {
-    public int Id { get; set; }
-    public string Nombre { get; set; } = null!;
+    public IdVO Id { get; set; } = null!;
+    public NombreVO Nombre { get; set; } = null!;
 }

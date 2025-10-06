@@ -1,14 +1,16 @@
+using Domain.ValueObjects;
+
 namespace Domain.Entities;
 
 public class HistorialInventario
 {
-    public int Id { get; set; }
-    public int RepuestoId { get; set; }
-    public int? AdminId { get; set; }
-    public int TipoMovimientoId { get; set; }
-    public int Cantidad { get; set; }
-    public DateTime FechaMovimiento { get; set; }
-    public string? Observaciones { get; set; }
+    public IdVO Id { get; set; } = null!;
+    public IdVO RepuestoId { get; set; } = null!;
+    public IdVO? AdminId { get; set; }
+    public IdVO TipoMovimientoId { get; set; } = null!;
+    public CantidadVO Cantidad { get; set; } = null!;
+    public FechaHistoricaVO FechaMovimiento { get; set; } = null!;
+    public DescripcionVO? Observaciones { get; set; }
 
     // Relaciones
     public Repuesto Repuesto { get; set; } = null!;

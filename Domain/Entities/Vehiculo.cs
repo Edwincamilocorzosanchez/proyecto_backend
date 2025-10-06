@@ -1,14 +1,16 @@
+using Domain.ValueObjects;
+
 namespace Domain.Entities;
 
 public class Vehiculo : BaseEntity
 {
-    public int Id { get; set; }
-    public int ClienteId { get; set; }
-    public string Marca { get; set; } = null!;
-    public string Modelo { get; set; } = null!;
-    public short Anio { get; set; }
-    public string Vin { get; set; } = null!;
-    public int Kilometraje { get; set; }
+    public IdVO Id { get; set; } = null!;
+    public IdVO ClienteId { get; set; } = null!;
+    public NombreVO Marca { get; set; } = null!;
+    public NombreVO Modelo { get; set; } = null!;
+    public AnioVehiculoVO Anio { get; set; } = null!;
+    public VinVO Vin { get; set; } = null!;
+    public KilometrajeVO Kilometraje { get; set; } = null!;
 
     // Relaciones
     public Cliente Cliente { get; set; } = null!;

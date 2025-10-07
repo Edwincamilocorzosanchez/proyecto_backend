@@ -8,5 +8,6 @@ public sealed record CreateProveedor(
     TelefonoVO? Telefono,
     CorreoVO? Correo,
     DireccionVO? Direccion,
-    EstadoVO IsActive
+    EstadoVO IsActive,
+    int UserId
 ) : IRequest<IdVO>;

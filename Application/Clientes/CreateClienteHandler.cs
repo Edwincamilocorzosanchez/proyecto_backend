@@ -21,7 +21,8 @@ public class CreateClienteHandler : IRequestHandler<CreateCliente, IdVO>
             id: IdVO.CreateNew(),
             telefono: request.Telefono,
             direccion: request.Direccion,
-            isActive: request.IsActive
+            isActive: request.IsActive,
+            userId: request.UserId
         );
 
         await _repository.AddAsync(cliente, cancellationToken);

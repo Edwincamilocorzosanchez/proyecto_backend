@@ -7,5 +7,6 @@ namespace Application.Clientes;
 public sealed record CreateCliente(
     TelefonoVO Telefono,
     DireccionVO Direccion,
-    EstadoVO IsActive
+    EstadoVO IsActive,
+    int UserId
 ) : IRequest<IdVO>;

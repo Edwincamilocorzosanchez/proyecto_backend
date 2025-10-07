@@ -48,7 +48,6 @@ public class AdministradorConfig : IEntityTypeConfiguration<Administrador>
         builder.HasOne(a => a.User)
             .WithOne()
             .HasForeignKey<Administrador>(a => a.UserId)
-            .HasConstraintName("fk_admin_user")
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

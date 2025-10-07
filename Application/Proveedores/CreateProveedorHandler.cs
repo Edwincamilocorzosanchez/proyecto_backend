@@ -22,7 +22,8 @@ public class CreateProveedorHandler : IRequestHandler<CreateProveedor, IdVO>
             telefono: request.Telefono,
             correo: request.Correo,
             direccion: request.Direccion,
-            isActive: request.IsActive
+            isActive: request.IsActive,
+            userId: request.UserId
         );
 
         await _repository.AddAsync(proveedor, cancellationToken);

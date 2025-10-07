@@ -21,7 +21,8 @@ public class CreateMecanicoHandler : IRequestHandler<CreateMecanico, IdVO>
             nombre: request.Nombre,
             telefono: request.Telefono,
             especialidad: request.Especialidad,
-            isActive: request.IsActive
+            isActive: request.IsActive,
+            userId: request.UserId
         );
 
         await _repository.AddAsync(mecanico, cancellationToken);

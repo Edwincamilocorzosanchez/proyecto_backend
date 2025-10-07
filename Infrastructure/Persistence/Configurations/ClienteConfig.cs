@@ -31,10 +31,14 @@ public class ClienteConfiguration : IEntityTypeConfiguration<Cliente>
             .HasColumnName("is_active")
             .IsRequired();
 
+        // FK explicita por el modelo de usuario
+        builder.Property(a => a.UserId)
+            .HasColumnName("user_id")
+            .IsRequired();
+
         builder.HasOne(c => c.User)
             .WithOne()
             .HasForeignKey<Cliente>(c => c.Id)
-            .HasConstraintName("fk_cliente_user")
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

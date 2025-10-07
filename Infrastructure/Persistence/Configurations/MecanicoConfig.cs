@@ -14,12 +14,8 @@ public class MecanicoConfig : IEntityTypeConfiguration<Mecanico>
         builder.HasKey(m => m.Id);
 
         builder.Property(m => m.Id)
-            .HasConversion(
-                id => id.Value,
-                value => new IdVO(value)
-            )
-            .HasColumnName("id")
-            .ValueGeneratedOnAdd();
+            .HasConversion(v => v.Value, v => new IdVO(v))
+            .HasColumnName("id");
 
         builder.Property(m => m.Nombre)
             .HasConversion(
@@ -46,6 +42,11 @@ public class MecanicoConfig : IEntityTypeConfiguration<Mecanico>
         builder.Property(m => m.IsActive)
             .HasConversion(e => e.Value, value => new EstadoVO(value))
             .HasColumnName("is_active")
+            .IsRequired();
+
+        // FK explicita por el modelo de usuario
+        builder.Property(a => a.UserId)
+            .HasColumnName("user_id")
             .IsRequired();
 
         builder.HasOne(m => m.User)

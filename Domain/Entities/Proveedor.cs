@@ -13,13 +13,15 @@ public class Proveedor : BaseEntity
     public EstadoVO IsActive { get; set; } = null!;
 
     // relaciones
+    // Clave foránea real (int)
+    public int UserId { get; set; }
     public UserMember User { get; set; } = null!;
     // relacion uno a muchos
     public ICollection<Repuesto> Repuestos { get; set; } = new List<Repuesto>();    
 
     // constructores
     public Proveedor() { }
-    public Proveedor(IdVO id, NombreVO nombre, TelefonoVO? telefono, CorreoVO? correo, DireccionVO? direccion, EstadoVO isActive)
+    public Proveedor(IdVO id, NombreVO nombre, TelefonoVO? telefono, CorreoVO? correo, DireccionVO? direccion, EstadoVO isActive, int userId)
     {
         Id = id;
         Nombre = nombre;
@@ -27,5 +29,6 @@ public class Proveedor : BaseEntity
         Correo = correo;
         Direccion = direccion;
         IsActive = isActive;
+        UserId = userId;
     }
 }

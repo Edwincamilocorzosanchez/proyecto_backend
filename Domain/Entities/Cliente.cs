@@ -10,6 +10,8 @@ public class Cliente : BaseEntity
     public DireccionVO Direccion { get; set; } = null!;
     public EstadoVO IsActive { get; set; } = null!;
 
+    // Clave foránea real (int)
+    public int UserId { get; set; }
     // Relación 1:1 con usuario
     public UserMember User { get; set; } = null!;
     // relacion uno a muchos
@@ -17,11 +19,12 @@ public class Cliente : BaseEntity
 
     // constructores
     public Cliente() { }
-    public Cliente(IdVO id, TelefonoVO telefono, DireccionVO direccion, EstadoVO isActive)
+    public Cliente(IdVO id, TelefonoVO telefono, DireccionVO direccion, EstadoVO isActive, int userId)
     {
         Id = id;
         Telefono = telefono;
         Direccion = direccion;
         IsActive = isActive;
+        UserId = userId;
     }
 }

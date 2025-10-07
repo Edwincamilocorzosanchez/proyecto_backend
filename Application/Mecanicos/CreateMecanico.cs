@@ -7,5 +7,6 @@ public sealed record CreateMecanico(
     NombreVO Nombre,
     TelefonoVO? Telefono,
     EspecialidadVO? Especialidad,
-    EstadoVO IsActive
+    EstadoVO IsActive,
+    int UserId
 ) : IRequest<IdVO>;

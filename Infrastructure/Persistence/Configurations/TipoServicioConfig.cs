@@ -32,6 +32,6 @@ public class TipoServicioConfig : IEntityTypeConfiguration<TipoServicio>
             .HasConversion(p => p.Value, value => new DineroVO(value))
             .HasColumnName("precio_base")
             .HasColumnType("decimal(10,2)")
-            .HasDefaultValue(0.00m);
+            .IsRequired();
     }
 }

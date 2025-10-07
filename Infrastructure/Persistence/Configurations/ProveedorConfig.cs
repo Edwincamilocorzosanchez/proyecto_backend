@@ -43,10 +43,10 @@ public class ProveedorConfig : IEntityTypeConfiguration<Proveedor>
             .HasColumnName("direccion")
             .HasMaxLength(255);
 
-        builder.Property(p => p.IsActive)
+        builder.Property(m => m.IsActive)
             .HasConversion(e => e.Value, value => new EstadoVO(value))
             .HasColumnName("is_active")
-            .HasDefaultValue(true);
+            .IsRequired();
 
         builder.HasOne(p => p.User)
             .WithOne()

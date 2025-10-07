@@ -15,6 +15,4 @@ public record IdVO : IEquatable<IdVO>
     public static IdVO CreateNew() => new(-1);
 
     public override string ToString() => Value.ToString();
-
-    public override int GetHashCode() => Value.GetHashCode();
 }

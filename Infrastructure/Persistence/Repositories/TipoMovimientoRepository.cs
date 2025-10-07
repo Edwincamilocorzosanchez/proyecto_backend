@@ -1,52 +1,60 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Application.Abstractions;
 using Domain.Entities;
+using Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace Infrastructure.Persistence.Repositories
+namespace Infrastructure.Persistence.Repositories;
+
+public class TipoMovimientoRepository : ITipoMovimientoRepository
 {
-    public class TipoMovimientoRepository : ITipoMovimientoRepository
+    private readonly AppDbContext _context;
+
+    public TipoMovimientoRepository(AppDbContext context)
     {
-        private readonly AppDbContext _context;
+        _context = context;
+    }
 
-        public TipoMovimientoRepository(AppDbContext context)
-        {
-            _context = context;
-        }
+    public async Task<int> AddAsync(TipoMovimiento tipo, CancellationToken ct = default)
+    {
+        await _context.TiposMovimiento.AddAsync(tipo, ct);
+        await _context.SaveChangesAsync(ct);
+        return tipo.Id.Value.GetHashCode();
+    }
 
-        public async Task<IEnumerable<TipoMovimiento>> GetAllAsync()
-        {
-            return await _context.TiposMovimiento.ToListAsync();
-        }
+    public async Task<bool> UpdateAsync(TipoMovimiento tipo, CancellationToken ct = default)
+    {
+        _context.TiposMovimiento.Update(tipo);
+        var updated = await _context.SaveChangesAsync(ct);
+        return updated > 0;
+    }
 
-        public async Task<TipoMovimiento?> GetByIdAsync(Guid id)
-        {
-            return await _context.TiposMovimiento.FirstOrDefaultAsync(t => t.Id.Value == id);
-        }
+    public async Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default)
+    {
+        var tipo = await _context.TiposMovimiento.FirstOrDefaultAsync(t => t.Id.Value == id.Value, ct);
+        if (tipo == null) return false;
 
-        public async Task AddAsync(TipoMovimiento entity)
-        {
-            await _context.TiposMovimiento.AddAsync(entity);
-            await _context.SaveChangesAsync();
-        }
+        _context.TiposMovimiento.Remove(tipo);
+        var deleted = await _context.SaveChangesAsync(ct);
+        return deleted > 0;
+    }
 
-        public async Task UpdateAsync(TipoMovimiento entity)
-        {
-            _context.TiposMovimiento.Update(entity);
-            await _context.SaveChangesAsync();
-        }
+    public async Task<TipoMovimiento?> GetByIdAsync(IdVO id, CancellationToken ct = default)
+    {
+        return await _context.TiposMovimiento
+            .FirstOrDefaultAsync(t => t.Id.Value == id.Value, ct);
+    }
 
-        public async Task DeleteAsync(Guid id)
-        {
-            var entity = await _context.TiposMovimiento.FirstOrDefaultAsync(t => t.Id.Value == id);
-            if (entity != null)
-            {
-                _context.TiposMovimiento.Remove(entity);
-                await _context.SaveChangesAsync();
-            }
-        }
+    public async Task<TipoMovimiento?> GetByNombreAsync(NombreVO nombre, CancellationToken ct = default)
+    {
+        return await _context.TiposMovimiento
+            .FirstOrDefaultAsync(t => t.Nombre == nombre, ct);
+    }
+
+    public async Task<IReadOnlyList<TipoMovimiento>> GetAllAsync(CancellationToken ct = default)
+    {
+        return await _context.TiposMovimiento.ToListAsync(ct);
     }
 }

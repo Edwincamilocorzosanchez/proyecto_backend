@@ -22,7 +22,8 @@ namespace Application.Administradores
                 telefono: request.Telefono,
                 nivelAcceso: request.NivelAcceso,
                 areaResponsabilidad: request.AreaResponsabilidad,
-                isActive: request.IsActive
+                isActive: request.IsActive,
+                userId: request.UserId
             );
 
             await _repository.AddAsync(administrador, cancellationToken);

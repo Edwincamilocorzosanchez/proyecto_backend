@@ -2,10 +2,6 @@ using Application.Abstractions;
 using Domain.Entities;
 using Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Persistence.Repositories
 {

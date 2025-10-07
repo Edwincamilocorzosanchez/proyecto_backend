@@ -8,6 +8,7 @@ public sealed record CreateAdministrador(
     TelefonoVO Telefono,
     NivelAccesoVO NivelAcceso,
     DescripcionVO AreaResponsabilidad,
-    EstadoVO IsActive
+    EstadoVO IsActive,
+    int UserId
 ) : IRequest<IdVO>;
 

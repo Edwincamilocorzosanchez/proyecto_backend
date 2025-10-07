@@ -44,6 +44,14 @@ public class MecanicoConfig : IEntityTypeConfiguration<Mecanico>
             .HasColumnName("is_active")
             .IsRequired();
 
+        builder.Property(m => m.CreatedAt)
+            .HasColumnName("created_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+        builder.Property(m => m.UpdatedAt)
+            .HasColumnName("updated_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
         // FK explicita por el modelo de usuario
         builder.Property(a => a.UserId)
             .HasColumnName("user_id")
@@ -51,15 +59,7 @@ public class MecanicoConfig : IEntityTypeConfiguration<Mecanico>
 
         builder.HasOne(m => m.User)
             .WithOne()
-            .HasForeignKey<Mecanico>(m => m.Id)
+            .HasForeignKey<Mecanico>(m => m.UserId)
             .OnDelete(DeleteBehavior.Cascade);
-
-        builder.Property(m => m.CreatedAt)
-            .HasColumnName("created_at")
-            .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-        builder.Property(m => m.UpdatedAt)
-            .HasColumnName("updated_at")
-            .HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
     }
 }

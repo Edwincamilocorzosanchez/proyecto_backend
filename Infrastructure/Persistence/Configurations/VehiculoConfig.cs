@@ -50,6 +50,15 @@ public class VehiculoConfig : IEntityTypeConfiguration<Vehiculo>
             .HasColumnName("kilometraje")
             .IsRequired();
 
+        // agregar las columnas del base entity
+        builder.Property(v => v.CreatedAt)
+            .HasColumnName("created_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+        builder.Property(v => v.UpdatedAt)
+            .HasColumnName("updated_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
         builder.HasOne(v => v.Cliente)
             .WithMany(c => c.Vehiculos)
             .HasForeignKey(v => v.ClienteId)

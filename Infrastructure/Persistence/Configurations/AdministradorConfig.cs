@@ -39,6 +39,14 @@ public class AdministradorConfig : IEntityTypeConfiguration<Administrador>
             .HasConversion(v => v.Value, v => new EstadoVO(v))
             .HasColumnName("is_active")
             .IsRequired();
+        
+        builder.Property(m => m.CreatedAt)
+            .HasColumnName("created_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+        builder.Property(m => m.UpdatedAt)
+            .HasColumnName("updated_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         // FK explicita por el modelo de usuario
         builder.Property(a => a.UserId)

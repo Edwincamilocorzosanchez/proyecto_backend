@@ -30,6 +30,14 @@ public class ClienteConfiguration : IEntityTypeConfiguration<Cliente>
             .HasConversion(v => v.Value, v => new EstadoVO(v))
             .HasColumnName("is_active")
             .IsRequired();
+        
+        builder.Property(m => m.CreatedAt)
+            .HasColumnName("created_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+        builder.Property(m => m.UpdatedAt)
+            .HasColumnName("updated_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         // FK explicita por el modelo de usuario
         builder.Property(a => a.UserId)
@@ -38,7 +46,7 @@ public class ClienteConfiguration : IEntityTypeConfiguration<Cliente>
 
         builder.HasOne(c => c.User)
             .WithOne()
-            .HasForeignKey<Cliente>(c => c.Id)
+            .HasForeignKey<Cliente>(c => c.UserId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

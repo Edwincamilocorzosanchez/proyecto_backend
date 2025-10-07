@@ -37,8 +37,17 @@ public class FacturaConfiguration : IEntityTypeConfiguration<Factura>
 
         builder.Property(f => f.FechaGeneracion)
             .HasConversion(fv => fv.Value, value => new FechaHistoricaVO(value))
-            .HasColumnType("datetime")
+            .HasColumnType("timestamp")
             .IsRequired();
+
+                // agregar las columnas del base entity
+        builder.Property(v => v.CreatedAt)
+            .HasColumnName("created_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+        builder.Property(v => v.UpdatedAt)
+            .HasColumnName("updated_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         // Relaciones
         builder.HasOne(f => f.OrdenServicio)

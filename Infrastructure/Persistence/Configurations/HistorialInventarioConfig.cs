@@ -2,6 +2,7 @@ using Domain.Entities;
 using Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Infrastructure.Persistence.Configurations;
 
@@ -21,7 +22,10 @@ public class HistorialInventarioConfig: IEntityTypeConfiguration<HistorialInvent
             .IsRequired();
 
         builder.Property(h => h.AdminId)
-            .HasConversion(id => id != null ? id.Value : 0, value => value != 0 ? new IdVO(value) : null);
+            .HasConversion(new ValueConverter<IdVO?, Guid?>(
+                id => id != null ? id.Value : (Guid?)null,
+                value => value.HasValue ? new IdVO(value.Value) : null
+            ));
 
         builder.Property(h => h.TipoMovimientoId)
             .HasConversion(id => id.Value, value => new IdVO(value))

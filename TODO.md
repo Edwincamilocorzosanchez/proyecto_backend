@@ -202,4 +202,3 @@ ReportesController
 
 
 # Preguntas
-- Saber si la ruta de las configuracione de autenticación es Configurations/ o Configurations/Auth

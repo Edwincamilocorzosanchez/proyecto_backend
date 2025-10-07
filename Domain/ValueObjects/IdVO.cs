@@ -1,6 +1,6 @@
 namespace Domain.ValueObjects;
 
-public record IdVO
+public record IdVO : IEquatable<IdVO>
 {
     public int Value { get; }
 
@@ -11,12 +11,10 @@ public record IdVO
         Value = value;
     }
 
+    // Método para crear un ID temporal antes de guardar
+    public static IdVO CreateNew() => new(-1);
+
     public override string ToString() => Value.ToString();
 
-    // esto es un metodo estático para crear un Id temporal (solo si se necesita en memoria antes de guardar)
-    public static IdVO CreateNew()
-    {
-        // Por simplicidad, se genera un Id negativo temporal que luego será reemplazado por la BD
-        return new IdVO(-1);
-    }
+    public override int GetHashCode() => Value.GetHashCode();
 }

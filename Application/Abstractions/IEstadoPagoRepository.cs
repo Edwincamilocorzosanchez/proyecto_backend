@@ -13,4 +13,3 @@ public interface IEstadoPagoRepository
     Task<bool> UpdateAsync(EstadoPago estado, CancellationToken ct = default);
     Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default);
 }
-

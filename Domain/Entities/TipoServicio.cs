@@ -13,7 +13,7 @@ public class TipoServicio
 
     // constructores
     public TipoServicio() { }
-    public TipoServicio(IdVO id, NombreVO nombre, DescripcionVO? descripcion, DineroVO precioBase)
+    public TipoServicio(IdVO id, NombreVO nombre, DescripcionVO descripcion, DineroVO precioBase)
     {
         Id = id;
         Nombre = nombre;

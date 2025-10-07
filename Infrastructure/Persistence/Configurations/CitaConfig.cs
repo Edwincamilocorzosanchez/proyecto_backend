@@ -45,6 +45,14 @@ public class CitaConfig : IEntityTypeConfiguration<Cita>
             .HasColumnName("estado_id")
             .IsRequired();
 
+        builder.Property(m => m.CreatedAt)
+            .HasColumnName("created_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+        builder.Property(m => m.UpdatedAt)
+            .HasColumnName("updated_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
         builder.HasOne(c => c.Cliente)
             .WithMany()
             .HasForeignKey(c => c.ClienteId)

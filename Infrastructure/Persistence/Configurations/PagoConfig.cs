@@ -42,6 +42,14 @@ public class PagoConfig : IEntityTypeConfiguration<Pago>
             .HasConversion(f => f.Value, value => new FechaHistoricaVO(value))
             .HasColumnName("fecha_pago")
             .IsRequired();
+        
+        builder.Property(m => m.CreatedAt)
+            .HasColumnName("created_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+        builder.Property(m => m.UpdatedAt)
+            .HasColumnName("updated_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         builder.HasOne(p => p.Factura)
             .WithMany(f => f.Pagos)

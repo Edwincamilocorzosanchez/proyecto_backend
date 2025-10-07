@@ -1,21 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 using Domain.Entities;
+using Domain.ValueObjects;
 
-namespace Application.Abstractions
+namespace Application.Abstractions;
+
+public interface ITipoMovimientoRepository
 {
-    public interface ITipoMovimientoRepository : IGenericRepository<TipoMovimiento>
-    {
-        Task<IEnumerable<TipoMovimiento>> GetAllAsync();
-        Task<TipoMovimiento?> GetByIdAsync(Guid id);
-        Task AddAsync(TipoMovimiento entity);
-        Task UpdateAsync(TipoMovimiento entity);
-        Task DeleteAsync(Guid id);
-    }
+    Task<TipoMovimiento?> GetByIdAsync(IdVO id, CancellationToken ct = default);
+    Task<TipoMovimiento?> GetByNombreAsync(NombreVO nombre, CancellationToken ct = default);
+    Task<IReadOnlyList<TipoMovimiento>> GetAllAsync(CancellationToken ct = default);
 
-    public interface IGenericRepository<T>
-    {
-    }
+    Task<int> AddAsync(TipoMovimiento tipo, CancellationToken ct = default);
+    Task<bool> UpdateAsync(TipoMovimiento tipo, CancellationToken ct = default);
+    Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default);
 }

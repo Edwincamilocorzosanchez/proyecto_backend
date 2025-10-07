@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Application.Abstractions;
 using Domain.Entities;
+using Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories
@@ -11,43 +8,50 @@ namespace Infrastructure.Persistence.Repositories
     public class EstadoPagoRepository : IEstadoPagoRepository
     {
         private readonly AppDbContext _context;
-    
-        public EstadoPagoRepository(AppDbContext context)
+
+        public EstadoPagoRepository(AppDbContext context) =>_context = context;
+
+        public async Task<int> AddAsync(EstadoPago estado, CancellationToken ct = default)
         {
-            _context = context;
+            await _context.EstadosPago.AddAsync(estado, ct);
+            await _context.SaveChangesAsync(ct);
+            return estado.Id.Value; // devuelve el ID generado por la BD
         }
-    
-        public async Task AddAsync(EstadoPago estadoPago)
+
+        public async Task<bool> UpdateAsync(EstadoPago estado, CancellationToken ct = default)
         {
-            await _context.EstadosPago.AddAsync(estadoPago);
-            await _context.SaveChangesAsync();
+            _context.EstadosPago.Update(estado);
+            var updated = await _context.SaveChangesAsync(ct);
+            return updated > 0;
         }
-    
-        public async Task<IEnumerable<EstadoPago>> GetAllAsync()
+
+        public async Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default)
         {
-            return await _context.EstadosPago.ToListAsync();
+            var entity = await _context.EstadosPago
+                .FirstOrDefaultAsync(e => e.Id.Value == id.Value, ct);
+
+            if (entity == null) return false;
+
+            _context.EstadosPago.Remove(entity);
+            var deleted = await _context.SaveChangesAsync(ct);
+            return deleted > 0;
         }
-    
-        public async Task<EstadoPago?> GetByIdAsync(Guid id)
+
+        public async Task<EstadoPago?> GetByIdAsync(IdVO id, CancellationToken ct = default)
         {
             return await _context.EstadosPago
-                .FirstOrDefaultAsync(e => e.Id.Value == id);
+                .FirstOrDefaultAsync(e => e.Id.Value == id.Value, ct);
         }
-    
-        public async Task UpdateAsync(EstadoPago estadoPago)
+
+        public async Task<EstadoPago?> GetByNombreAsync(NombreVO nombre, CancellationToken ct = default)
         {
-            _context.EstadosPago.Update(estadoPago);
-            await _context.SaveChangesAsync();
+            return await _context.EstadosPago
+                .FirstOrDefaultAsync(e => e.Nombre.Value == nombre.Value, ct);
         }
-    
-        public async Task DeleteAsync(Guid id)
+
+        public async Task<IReadOnlyList<EstadoPago>> GetAllAsync(CancellationToken ct = default)
         {
-            var entity = await GetByIdAsync(id);
-            if (entity != null)
-            {
-                _context.EstadosPago.Remove(entity);
-                await _context.SaveChangesAsync();
-            }
+            return await _context.EstadosPago.ToListAsync(ct);
         }
     }
 }

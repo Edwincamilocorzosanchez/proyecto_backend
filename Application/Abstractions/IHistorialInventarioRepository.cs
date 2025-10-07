@@ -1,17 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Domain.Entities;
+using Domain.ValueObjects;
 
-namespace Application.Abstractions
+namespace Application.Abstractions;
+
+public interface IHistorialInventarioRepository
 {
-    public interface IHistorialInventarioRepository
-    {
-        Task<IEnumerable<HistorialInventario>> GetAllAsync();
-        Task<HistorialInventario?> GetByIdAsync(Guid id);
-        Task AddAsync(HistorialInventario historial);
-        Task UpdateAsync(HistorialInventario historial);
-        Task DeleteAsync(Guid id);
-    }
+    Task<HistorialInventario?> GetByIdAsync(IdVO id, CancellationToken ct = default);
+    Task<IReadOnlyList<HistorialInventario>> GetByRepuestoIdAsync(IdVO repuestoId, CancellationToken ct = default);
+    Task<IReadOnlyList<HistorialInventario>> GetByAdminIdAsync(IdVO adminId, CancellationToken ct = default);
+    Task<IReadOnlyList<HistorialInventario>> GetAllAsync(CancellationToken ct = default);
+
+    Task<int> AddAsync(HistorialInventario historial, CancellationToken ct = default);
+    Task<bool> UpdateAsync(HistorialInventario historial, CancellationToken ct = default);
+    Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default);
 }

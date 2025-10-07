@@ -1,17 +1,17 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Domain.Entities;
+using Domain.ValueObjects;
 
-namespace Application.Abstractions
+namespace Application.Abstractions;
+
+public interface IAdministradorRepository
 {
-    public interface IAdministradorRepository
-    {
-        Task AddAsync(Administrador administrador);
-        Task<IEnumerable<Administrador>> GetAllAsync();
-        Task<Administrador?> GetByIdAsync(Guid id);
-        Task UpdateAsync(Administrador administrador);
-        Task DeleteAsync(Guid id);
-    }
+    // metodos de lectura
+    Task<Administrador?> GetByIdAsync(IdVO id, CancellationToken ct = default);
+    Task<IReadOnlyList<Administrador>> GetAllAsync(CancellationToken ct = default);
+    Task<IReadOnlyList<Administrador>> GetByNivelAccesoAsync(NivelAccesoVO nivel, CancellationToken ct = default);
+
+    // metodos de insercion, actualizacion y eliminacion
+    Task<int> AddAsync(Administrador admin, CancellationToken ct = default);
+    Task<bool> UpdateAsync(Administrador admin, CancellationToken ct = default);
+    Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default);
 }

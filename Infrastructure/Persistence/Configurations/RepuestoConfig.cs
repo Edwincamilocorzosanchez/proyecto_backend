@@ -45,6 +45,15 @@ public class RepuestoConfiguration : IEntityTypeConfiguration<Repuesto>
         builder.Property(r => r.ProveedorId)
             .HasConversion(id => id != null ? id.Value : default, value => new IdVO(value))
             .HasColumnName("proveedor_id");
+        
+        // agregar las columnas del base entity
+        builder.Property(v => v.CreatedAt)
+            .HasColumnName("created_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+        builder.Property(v => v.UpdatedAt)
+            .HasColumnName("updated_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         builder.HasOne(r => r.Proveedor)
             .WithMany(p => p.Repuestos)

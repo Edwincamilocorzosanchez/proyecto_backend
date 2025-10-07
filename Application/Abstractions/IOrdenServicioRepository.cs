@@ -1,17 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Domain.Entities;
+using Domain.ValueObjects;
 
-namespace Application.Abstractions
+namespace Application.Abstractions;
+
+public interface IOrdenServicioRepository
 {
-    public interface IOrdenServicioRepository
-    {
-        Task AddAsync(OrdenServicio orden);
-        Task<IEnumerable<OrdenServicio>> GetAllAsync();
-        Task<OrdenServicio?> GetByIdAsync(Guid id);
-        Task UpdateAsync(OrdenServicio orden);
-        Task DeleteAsync(Guid id);
-    }
+    Task<OrdenServicio?> GetByIdAsync(IdVO id, CancellationToken ct = default);
+    Task<IReadOnlyList<OrdenServicio>> GetByVehiculoIdAsync(IdVO vehiculoId, CancellationToken ct = default);
+    Task<IReadOnlyList<OrdenServicio>> GetByMecanicoIdAsync(IdVO mecanicoId, CancellationToken ct = default);
+    Task<IReadOnlyList<OrdenServicio>> GetAllAsync(CancellationToken ct = default);
+
+    Task<int> AddAsync(OrdenServicio orden, CancellationToken ct = default);
+    Task<bool> UpdateAsync(OrdenServicio orden, CancellationToken ct = default);
+    Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default);
 }

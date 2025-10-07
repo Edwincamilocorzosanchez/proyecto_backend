@@ -45,12 +45,24 @@ public class ProveedorConfig : IEntityTypeConfiguration<Proveedor>
 
         builder.Property(p => p.IsActive)
             .HasConversion(e => e.Value, value => new EstadoVO(value))
-            .HasColumnName("is_active")
-            .HasDefaultValue(true);
+            .HasColumnName("is_active");
+
+        builder.Property(m => m.CreatedAt)
+            .HasColumnName("created_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+        builder.Property(m => m.UpdatedAt)
+            .HasColumnName("updated_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+        // FK explicita por el modelo de usuario
+        builder.Property(a => a.UserId)
+            .HasColumnName("user_id")
+            .IsRequired();
 
         builder.HasOne(p => p.User)
             .WithOne()
-            .HasForeignKey<Proveedor>(p => p.Id)
+            .HasForeignKey<Proveedor>(p => p.UserId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

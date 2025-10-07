@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Application.Abstractions;
 using Domain.Entities;
+using Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories
@@ -12,48 +9,59 @@ namespace Infrastructure.Persistence.Repositories
     {
         private readonly AppDbContext _context;
 
-        public RepuestoRepository(AppDbContext context)
+        public RepuestoRepository(AppDbContext context) =>_context = context;
+
+        public async Task<int> AddAsync(Repuesto repuesto, CancellationToken ct = default)
         {
-            _context = context;
+            await _context.Repuestos.AddAsync(repuesto, ct);
+            await _context.SaveChangesAsync(ct);
+            return repuesto.Id.Value; // devuelve el ID generado por la base de datos
         }
 
-
-        public async Task UpdateAsync(Repuesto repuesto)
+        public async Task<bool> UpdateAsync(Repuesto repuesto, CancellationToken ct = default)
         {
             _context.Repuestos.Update(repuesto);
-            await _context.SaveChangesAsync();
+            var updated = await _context.SaveChangesAsync(ct);
+            return updated > 0;
         }
 
-        public async Task<IEnumerable<Repuesto>> GetAllAsync()
+        public async Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default)
+        {
+            var repuesto = await _context.Repuestos.FirstOrDefaultAsync(r => r.Id.Value == id.Value, ct);
+            if (repuesto == null) return false;
+
+            _context.Repuestos.Remove(repuesto);
+            var deleted = await _context.SaveChangesAsync(ct);
+            return deleted > 0;
+        }
+
+        public async Task<Repuesto?> GetByIdAsync(IdVO id, CancellationToken ct = default)
         {
             return await _context.Repuestos
                 .Include(r => r.Proveedor)
-                .ToListAsync();
+                .FirstOrDefaultAsync(r => r.Id.Value == id.Value, ct);
         }
 
-        public async Task<Repuesto?> GetByIdAsync(Guid id)
+        public async Task<Repuesto?> GetByCodigoAsync(CodigoRepuestoVO codigo, CancellationToken ct = default)
         {
             return await _context.Repuestos
                 .Include(r => r.Proveedor)
-                .FirstOrDefaultAsync(r => r.Id.Value == id);
+                .FirstOrDefaultAsync(r => r.Codigo.Value == codigo.Value, ct);
         }
 
-        public async Task AddAsync(Repuesto repuesto)
+        public async Task<IReadOnlyList<Repuesto>> GetAllAsync(CancellationToken ct = default)
         {
-            await _context.Repuestos.AddAsync(repuesto);
-            await _context.SaveChangesAsync();
+            return await _context.Repuestos
+                .Include(r => r.Proveedor)
+                .ToListAsync(ct);
         }
 
-        public async Task DeleteAsync(Guid id)
+        public async Task<IReadOnlyList<Repuesto>> GetByProveedorIdAsync(IdVO proveedorId, CancellationToken ct = default)
         {
-            var repuesto = await _context.Repuestos.FirstOrDefaultAsync(r => r.Id.Value == id);
-            if (repuesto != null)
-            {
-                _context.Repuestos.Remove(repuesto);
-                await _context.SaveChangesAsync();
-            }
+            return await _context.Repuestos
+                .Include(r => r.Proveedor)
+                .Where(r => r.ProveedorId != null && r.ProveedorId.Value == proveedorId.Value)
+                .ToListAsync(ct);
         }
-
-
     }
 }

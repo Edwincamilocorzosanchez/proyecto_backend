@@ -12,8 +12,10 @@ public class AdministradorConfig : IEntityTypeConfiguration<Administrador>
         builder.ToTable("administradores");
 
         builder.HasKey(a => a.Id);
+
         builder.Property(a => a.Id)
-            .HasConversion(v => v.Value, v => new IdVO(v));
+            .HasConversion(v => v.Value, v => new IdVO(v))
+            .HasColumnName("id");
 
         builder.Property(a => a.Nombre)
             .HasConversion(v => v.Value, v => new NombreVO(v))
@@ -37,11 +39,23 @@ public class AdministradorConfig : IEntityTypeConfiguration<Administrador>
             .HasConversion(v => v.Value, v => new EstadoVO(v))
             .HasColumnName("is_active")
             .IsRequired();
+        
+        builder.Property(m => m.CreatedAt)
+            .HasColumnName("created_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+        builder.Property(m => m.UpdatedAt)
+            .HasColumnName("updated_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+        // FK explicita por el modelo de usuario
+        builder.Property(a => a.UserId)
+            .HasColumnName("user_id")
+            .IsRequired();
 
         builder.HasOne(a => a.User)
             .WithOne()
-            .HasForeignKey<Administrador>(a => a.Id)
-            .HasConstraintName("fk_admin_user")
+            .HasForeignKey<Administrador>(a => a.UserId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

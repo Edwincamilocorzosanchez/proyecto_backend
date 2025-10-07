@@ -2,20 +2,17 @@ namespace Domain.ValueObjects;
 
 public record IdVO : IEquatable<IdVO>
 {
-        public Guid Value { get; }
+    public int Value { get; }
 
-        public IdVO(Guid value)
-        {
-            if (value == Guid.Empty)
-                throw new ArgumentException("El ID no puede ser vacío.", nameof(value));
+    public IdVO(int value)
+    {
+        if (value <= 0)
+            throw new ArgumentException("El ID debe ser mayor que cero.");
+        Value = value;
+    }
 
-            Value = value;
-        }
+    // Método para crear un ID temporal antes de guardar
+    public static IdVO CreateNew() => new(-1);
 
-        public static IdVO NewId() => new(Guid.NewGuid());
-
-
-        public override int GetHashCode() => Value.GetHashCode();
-
-        public override string ToString() => Value.ToString();
+    public override string ToString() => Value.ToString();
 }

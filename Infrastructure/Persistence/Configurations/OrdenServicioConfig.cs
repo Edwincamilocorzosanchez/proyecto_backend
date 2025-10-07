@@ -42,6 +42,14 @@ public class OrdenServicioConfig: IEntityTypeConfiguration<OrdenServicio>
             .HasColumnType("timestamp")
             .IsRequired();
 
+        builder.Property(m => m.CreatedAt)
+            .HasColumnName("created_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+        builder.Property(m => m.UpdatedAt)
+            .HasColumnName("updated_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
         // Relaciones
         builder.HasOne(o => o.Vehiculo)
             .WithMany(v => v.OrdenesServicio)

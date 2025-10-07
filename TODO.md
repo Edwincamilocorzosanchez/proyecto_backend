@@ -198,7 +198,7 @@ ReportesController
 
 ### Cosas que quizas se pueden hacer mejor
 - En la base de datos agregar la tabla inventario y anidarla con repuestos, historial_inventario...
+- puedo mejorar los mensajes de los Validatos de la parte de Application
 
 
 # Preguntas
-- Saber si la ruta de las configuracione de autenticación es Configurations/ o Configurations/Auth

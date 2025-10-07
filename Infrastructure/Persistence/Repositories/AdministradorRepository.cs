@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Application.Abstractions;
 using Domain.Entities;
+using Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories
@@ -12,45 +13,54 @@ namespace Infrastructure.Persistence.Repositories
     {
         private readonly AppDbContext _context;
 
-        public AdministradorRepository(AppDbContext context)
+        public AdministradorRepository(AppDbContext context) => _context = context;
+
+        public async Task<int> AddAsync(Administrador admin, CancellationToken ct = default)
         {
-            _context = context;
+            await _context.Administradores.AddAsync(admin, ct);
+            await _context.SaveChangesAsync(ct);
+            return admin.Id.Value; // devuelve el ID generado por la BD
         }
 
-        public async Task AddAsync(Administrador administrador)
+        public async Task<bool> UpdateAsync(Administrador admin, CancellationToken ct = default)
         {
-            await _context.Administradores.AddAsync(administrador);
-            await _context.SaveChangesAsync();
+            _context.Administradores.Update(admin);
+            var updated = await _context.SaveChangesAsync(ct);
+            return updated > 0;
         }
 
-        public async Task<IEnumerable<Administrador>> GetAllAsync()
+        public async Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default)
+        {
+            var admin = await _context.Administradores
+                .FirstOrDefaultAsync(a => a.Id.Value == id.Value, ct);
+
+            if (admin == null) return false;
+
+            _context.Administradores.Remove(admin);
+            var deleted = await _context.SaveChangesAsync(ct);
+            return deleted > 0;
+        }
+
+        public async Task<Administrador?> GetByIdAsync(IdVO id, CancellationToken ct = default)
         {
             return await _context.Administradores
                 .Include(a => a.User)
-                .ToListAsync();
+                .FirstOrDefaultAsync(a => a.Id.Value == id.Value, ct);
         }
 
-        public async Task<Administrador?> GetByIdAsync(Guid id)
+        public async Task<IReadOnlyList<Administrador>> GetAllAsync(CancellationToken ct = default)
         {
             return await _context.Administradores
                 .Include(a => a.User)
-                .FirstOrDefaultAsync(a => a.Id.Value == id);
+                .ToListAsync(ct);
         }
 
-        public async Task UpdateAsync(Administrador administrador)
+        public async Task<IReadOnlyList<Administrador>> GetByNivelAccesoAsync(NivelAccesoVO nivel, CancellationToken ct = default)
         {
-            _context.Administradores.Update(administrador);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task DeleteAsync(Guid id)
-        {
-            var admin = await GetByIdAsync(id);
-            if (admin != null)
-            {
-                _context.Administradores.Remove(admin);
-                await _context.SaveChangesAsync();
-            }
+            return await _context.Administradores
+                .Include(a => a.User)
+                .Where(a => a.NivelAcceso.Value == nivel.Value)
+                .ToListAsync(ct);
         }
     }
 }

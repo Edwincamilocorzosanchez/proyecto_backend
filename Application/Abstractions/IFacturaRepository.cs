@@ -1,17 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Domain.Entities;
+using Domain.ValueObjects;
 
-namespace Application.Abstractions
+namespace Application.Abstractions;
+
+public interface IFacturaRepository
 {
-    public interface IFacturaRepository
-    {
-        Task<IEnumerable<Factura>> GetAllAsync();
-        Task<Factura?> GetByIdAsync(Guid id);
-        Task AddAsync(Factura factura);
-        Task UpdateAsync(Factura factura);
-        Task DeleteAsync(Guid id);
-    }
+    Task<Factura?> GetByIdAsync(IdVO id, CancellationToken ct = default);
+    Task<IReadOnlyList<Factura>> GetByOrdenServicioIdAsync(IdVO ordenServicioId, CancellationToken ct = default);
+    Task<IReadOnlyList<Factura>> GetAllAsync(CancellationToken ct = default);
+
+    Task<int> AddAsync(Factura factura, CancellationToken ct = default);
+    Task<bool> UpdateAsync(Factura factura, CancellationToken ct = default);
+    Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default);
 }

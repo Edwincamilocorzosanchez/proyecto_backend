@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Infrastructure.Persistence.Configurations;
 
-public class HistorialInventarioConfig: IEntityTypeConfiguration<HistorialInventario>
+public class HistorialInventarioConfig : IEntityTypeConfiguration<HistorialInventario>
 {
     public void Configure(EntityTypeBuilder<HistorialInventario> builder)
     {
@@ -22,10 +22,10 @@ public class HistorialInventarioConfig: IEntityTypeConfiguration<HistorialInvent
             .IsRequired();
 
         builder.Property(h => h.AdminId)
-            .HasConversion(new ValueConverter<IdVO?, Guid?>(
-                id => id != null ? id.Value : (Guid?)null,
+            .HasConversion(
+                id => id != null ? id.Value : (int?)null,
                 value => value.HasValue ? new IdVO(value.Value) : null
-            ));
+            );
 
         builder.Property(h => h.TipoMovimientoId)
             .HasConversion(id => id.Value, value => new IdVO(value))
@@ -41,10 +41,12 @@ public class HistorialInventarioConfig: IEntityTypeConfiguration<HistorialInvent
             .IsRequired();
 
         builder.Property(h => h.Observaciones)
-            .HasConversion(o => o != null ? o.Value : null, value => value != null ? new DescripcionVO(value) : null)
+            .HasConversion(
+                o => o != null ? o.Value : null,
+                value => value != null ? new DescripcionVO(value) : null
+            )
             .HasMaxLength(255);
 
-        // Relaciones
         builder.HasOne(h => h.Repuesto)
             .WithMany(r => r.Historiales)
             .HasForeignKey(h => h.RepuestoId)
@@ -57,6 +59,7 @@ public class HistorialInventarioConfig: IEntityTypeConfiguration<HistorialInvent
 
         builder.HasOne(h => h.TipoMovimiento)
             .WithMany()
-            .HasForeignKey(h => h.TipoMovimientoId);
+            .HasForeignKey(h => h.TipoMovimientoId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

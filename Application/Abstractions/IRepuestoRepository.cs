@@ -1,17 +1,17 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Domain.Entities;
 
-namespace Application.Abstractions
+using Domain.Entities;
+using Domain.ValueObjects;
+
+namespace Application.Abstractions;
+
+public interface IRepuestoRepository
 {
-    public interface IRepuestoRepository
-    {
-        Task<IEnumerable<Repuesto>> GetAllAsync();
-        Task<Repuesto?> GetByIdAsync(Guid id);
-        Task AddAsync(Repuesto repuesto);
-        Task UpdateAsync(Repuesto repuesto);
-        Task DeleteAsync(Guid id);
-    }
+    Task<Repuesto?> GetByIdAsync(IdVO id, CancellationToken ct = default);
+    Task<Repuesto?> GetByCodigoAsync(CodigoRepuestoVO codigo, CancellationToken ct = default);
+    Task<IReadOnlyList<Repuesto>> GetAllAsync(CancellationToken ct = default);
+    Task<IReadOnlyList<Repuesto>> GetByProveedorIdAsync(IdVO proveedorId, CancellationToken ct = default);
+
+    Task<int> AddAsync(Repuesto repuesto, CancellationToken ct = default);
+    Task<bool> UpdateAsync(Repuesto repuesto, CancellationToken ct = default);
+    Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default);
 }

@@ -1,17 +1,17 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Domain.Entities;
+using Domain.ValueObjects;
 
-namespace Application.Abstractions
+namespace Application.Abstractions;
+
+public interface IPagoRepository
 {
-    public interface IPagoRepository
-    {
-        Task<IEnumerable<Pago>> GetAllAsync();
-        Task<Pago?> GetByIdAsync(Guid id);
-        Task AddAsync(Pago pago);
-        Task UpdateAsync(Pago pago);
-        Task DeleteAsync(Guid id);
-    }
+    Task<Pago?> GetByIdAsync(IdVO id, CancellationToken ct = default);
+    Task<IReadOnlyList<Pago>> GetByFacturaIdAsync(IdVO facturaId, CancellationToken ct = default);
+    Task<IReadOnlyList<Pago>> GetByMetodoPagoIdAsync(IdVO metodoPagoId, CancellationToken ct = default);
+    Task<IReadOnlyList<Pago>> GetByEstadoPagoIdAsync(IdVO estadoPagoId, CancellationToken ct = default);
+    Task<IReadOnlyList<Pago>> GetAllAsync(CancellationToken ct = default);
+
+    Task<int> AddAsync(Pago pago, CancellationToken ct = default);
+    Task<bool> UpdateAsync(Pago pago, CancellationToken ct = default);
+    Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default);
 }

@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization.Metadata;
 using Domain.Entities.Auth;
 using Domain.ValueObjects;
 
@@ -12,11 +13,13 @@ public class Administrador : BaseEntity
     public DescripcionVO AreaResponsabilidad { get; set; } = null!;
     public EstadoVO IsActive { get; set; } = null!;
 
-    // relaciones
+    // Clave foránea real (int)
+    public int UserId { get; set; }
+    // Relación con el usuario del sistema (autenticación)
     public UserMember User { get; set; } = null!;
     // constructores 
     public Administrador() { }
-    public Administrador(IdVO id, NombreVO nombre, TelefonoVO telefono, NivelAccesoVO nivelAcceso, DescripcionVO areaResponsabilidad, EstadoVO isActive)
+    public Administrador(IdVO id, NombreVO nombre, TelefonoVO telefono, NivelAccesoVO nivelAcceso, DescripcionVO areaResponsabilidad, EstadoVO isActive, int userId)
     {
         Id = id;
         Nombre = nombre;
@@ -24,5 +27,6 @@ public class Administrador : BaseEntity
         NivelAcceso = nivelAcceso;
         AreaResponsabilidad = areaResponsabilidad;
         IsActive = isActive;
+        UserId = userId;
     }
 }

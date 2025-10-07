@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Application;
+using Application.Abstractions;
 using Domain.Entities;
+using Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories
@@ -17,36 +14,48 @@ namespace Infrastructure.Persistence.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<MetodoPago>> GetAllAsync()
+        public async Task<int> AddAsync(MetodoPago metodo, CancellationToken ct = default)
         {
-            return await _context.MetodosPago.ToListAsync();
+            await _context.MetodosPago.AddAsync(metodo, ct);
+            await _context.SaveChangesAsync(ct);
+            return metodo.Id.Value;
         }
 
-        public async Task<MetodoPago?> GetByIdAsync(Guid id)
-        {
-            return await _context.MetodosPago.FirstOrDefaultAsync(m => m.Id.Value == id);
-        }
-
-        public async Task AddAsync(MetodoPago metodo)
-        {
-            await _context.MetodosPago.AddAsync(metodo);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task UpdateAsync(MetodoPago metodo)
+        public async Task<bool> UpdateAsync(MetodoPago metodo, CancellationToken ct = default)
         {
             _context.MetodosPago.Update(metodo);
-            await _context.SaveChangesAsync();
+            var updated = await _context.SaveChangesAsync(ct);
+            return updated > 0;
         }
 
-        public async Task DeleteAsync(Guid id)
+        public async Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default)
         {
-            var entity = await _context.MetodosPago.FirstOrDefaultAsync(m => m.Id.Value == id);
-            if (entity != null)
-            {
-                _context.MetodosPago.Remove(entity);
-                await _context.SaveChangesAsync();
-            }
+            var metodo = await _context.MetodosPago
+                .FirstOrDefaultAsync(m => m.Id.Value == id.Value, ct);
+
+            if (metodo == null) return false;
+
+            _context.MetodosPago.Remove(metodo);
+            var deleted = await _context.SaveChangesAsync(ct);
+            return deleted > 0;
+        }
+
+        public async Task<MetodoPago?> GetByIdAsync(IdVO id, CancellationToken ct = default)
+        {
+            return await _context.MetodosPago
+                .FirstOrDefaultAsync(m => m.Id.Value == id.Value, ct);
+        }
+
+        public async Task<MetodoPago?> GetByNombreAsync(NombreVO nombre, CancellationToken ct = default)
+        {
+            return await _context.MetodosPago
+                .FirstOrDefaultAsync(m => m.Nombre == nombre, ct);
+        }
+
+        public async Task<IReadOnlyList<MetodoPago>> GetAllAsync(CancellationToken ct = default)
+        {
+            return await _context.MetodosPago
+                .ToListAsync(ct);
         }
     }
 }

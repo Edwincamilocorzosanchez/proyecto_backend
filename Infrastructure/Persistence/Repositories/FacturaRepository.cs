@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Application.Abstractions;
 using Domain.Entities;
+using Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories
@@ -17,42 +14,57 @@ namespace Infrastructure.Persistence.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<Factura>> GetAllAsync()
+        public async Task<int> AddAsync(Factura factura, CancellationToken ct = default)
         {
-            return await _context.Facturas
-                .Include(f => f.Pagos)
-                .Include(f => f.OrdenServicio)
-                .ToListAsync();
+            await _context.Facturas.AddAsync(factura, ct);
+            await _context.SaveChangesAsync(ct);
+            return factura.Id.Value; // devuelve el ID generado por la BD
         }
 
-        public async Task<Factura?> GetByIdAsync(Guid id)
-        {
-            return await _context.Facturas
-                .Include(f => f.Pagos)
-                .Include(f => f.OrdenServicio)
-                .FirstOrDefaultAsync(f => f.Id.Value == id);
-        }
-
-        public async Task AddAsync(Factura factura)
-        {
-            await _context.Facturas.AddAsync(factura);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task UpdateAsync(Factura factura)
+        public async Task<bool> UpdateAsync(Factura factura, CancellationToken ct = default)
         {
             _context.Facturas.Update(factura);
-            await _context.SaveChangesAsync();
+            var updated = await _context.SaveChangesAsync(ct);
+            return updated > 0;
         }
 
-        public async Task DeleteAsync(Guid id)
+        public async Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default)
         {
-            var factura = await GetByIdAsync(id);
-            if (factura != null)
-            {
-                _context.Facturas.Remove(factura);
-                await _context.SaveChangesAsync();
-            }
+            var factura = await _context.Facturas
+                .Include(f => f.Pagos)
+                .Include(f => f.OrdenServicio)
+                .FirstOrDefaultAsync(f => f.Id.Value == id.Value, ct);
+
+            if (factura == null) return false;
+
+            _context.Facturas.Remove(factura);
+            var deleted = await _context.SaveChangesAsync(ct);
+            return deleted > 0;
+        }
+
+        public async Task<Factura?> GetByIdAsync(IdVO id, CancellationToken ct = default)
+        {
+            return await _context.Facturas
+                .Include(f => f.Pagos)
+                .Include(f => f.OrdenServicio)
+                .FirstOrDefaultAsync(f => f.Id.Value == id.Value, ct);
+        }
+
+        public async Task<IReadOnlyList<Factura>> GetAllAsync(CancellationToken ct = default)
+        {
+            return await _context.Facturas
+                .Include(f => f.Pagos)
+                .Include(f => f.OrdenServicio)
+                .ToListAsync(ct);
+        }
+
+        public async Task<IReadOnlyList<Factura>> GetByOrdenServicioIdAsync(IdVO ordenServicioId, CancellationToken ct = default)
+        {
+            return await _context.Facturas
+                .Include(f => f.Pagos)
+                .Include(f => f.OrdenServicio)
+                .Where(f => f.OrdenServicioId.Value == ordenServicioId.Value)
+                .ToListAsync(ct);
         }
     }
 }

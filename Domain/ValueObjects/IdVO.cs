@@ -12,4 +12,11 @@ public record IdVO
     }
 
     public override string ToString() => Value.ToString();
+
+    // esto es un metodo estático para crear un Id temporal (solo si se necesita en memoria antes de guardar)
+    public static IdVO CreateNew()
+    {
+        // Por simplicidad, se genera un Id negativo temporal que luego será reemplazado por la BD
+        return new IdVO(-1);
+    }
 }

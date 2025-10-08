@@ -22,7 +22,7 @@ namespace Infrastructure.Persistence.Repositories
         {
             await _context.Pagos.AddAsync(pago, ct);
             await _context.SaveChangesAsync(ct);
-            return pago.Id.Value.GetHashCode(); // o devuelve el hash de Guid, según tu lógica de IdVO
+            return pago.Id.Value.GetHashCode(); // aqui devuelve el id del pago
         }
 
         public async Task<bool> UpdateAsync(Pago pago, CancellationToken ct = default)

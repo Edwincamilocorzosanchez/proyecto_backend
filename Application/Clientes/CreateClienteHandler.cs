@@ -19,6 +19,8 @@ public class CreateClienteHandler : IRequestHandler<CreateCliente, IdVO>
     {
         var cliente = new Cliente(
             id: IdVO.CreateNew(),
+            nombre: request.Nombre,
+            correo: request.Correo,
             telefono: request.Telefono,
             direccion: request.Direccion,
             isActive: request.IsActive,

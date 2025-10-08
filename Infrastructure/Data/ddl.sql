@@ -79,6 +79,8 @@ CREATE TABLE clientes (
     id INT PRIMARY KEY,
     telefono VARCHAR(20),
     direccion VARCHAR(255),
+    nombre VARCHAR(100) NOT NULL,
+    correo VARCHAR(255) NOT NULL,
     -- si es false no puede hacer login
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -91,7 +93,7 @@ CREATE TABLE proveedores (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(100) NOT NULL,
     telefono VARCHAR(20),
-    correo VARCHAR(100),
+    correo VARCHAR(255),
     direccion VARCHAR(255),
     -- si es false no puede hacer login
     is_active BOOLEAN NOT NULL DEFAULT TRUE,

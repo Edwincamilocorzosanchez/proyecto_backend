@@ -2,9 +2,9 @@ namespace Domain.ValueObjects;
 
 public record AnioVehiculoVO
 {
-    public short Value { get; }
+    public int Value { get; }
 
-    public AnioVehiculoVO(short value)
+    public AnioVehiculoVO(int value)
     {
         int currentYear = DateTime.UtcNow.Year + 1;
         if (value < 1950 || value > currentYear)

@@ -21,7 +21,9 @@ public record CorreoVO
         // Si no cumple el formato, lanza excepción.
         if (!System.Text.RegularExpressions.Regex.IsMatch(value, emailPattern))
             throw new ArgumentException("El formato del correo electrónico es inválido.");
-
+        // si el corres es demasiadlo largo, lanza excepción.
+        if (value.Length > 254)
+            throw new ArgumentException("El correo electrónico no puede exceder los 254 caracteres.");
         // Normaliza el valor: elimina espacios y convierte a minúsculas.
         Value = value.Trim().ToLowerInvariant();
     }

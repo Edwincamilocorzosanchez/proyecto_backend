@@ -1,6 +1,6 @@
 namespace Api.DTOs.Administradores;
 
-public sealed record AdministradorResponseDto(
+public sealed record AdministradorDto(
     int Id,
     string Nombre,
     string Telefono,

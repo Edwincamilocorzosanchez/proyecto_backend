@@ -1,12 +1,12 @@
 namespace Api.DTOs.Repuestos;
 
 public record RepuestoDetailDto(
-    Guid Id,
+    int Id,
     string Codigo,
     string Descripcion,
     int CantidadStock,
     decimal PrecioUnitario,
-    Guid? ProveedorId,
+    int? ProveedorId,
     string? ProveedorNombre,
     IEnumerable<string>? Historiales,
     IEnumerable<string>? DetallesOrden

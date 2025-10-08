@@ -6,6 +6,8 @@ namespace Domain.Entities;
 public class Cliente : BaseEntity
 {
     public IdVO Id { get; set; } = null!;
+    public NombreVO Nombre { get; set; } = null!;
+    public CorreoVO Correo { get; set; } = null!;
     public TelefonoVO Telefono { get; set; } = null!;
     public DireccionVO Direccion { get; set; } = null!;
     public EstadoVO IsActive { get; set; } = null!;
@@ -19,9 +21,11 @@ public class Cliente : BaseEntity
 
     // constructores
     public Cliente() { }
-    public Cliente(IdVO id, TelefonoVO telefono, DireccionVO direccion, EstadoVO isActive, int userId)
+    public Cliente(IdVO id, NombreVO nombre, CorreoVO correo, TelefonoVO telefono, DireccionVO direccion, EstadoVO isActive, int userId)
     {
         Id = id;
+        Nombre = nombre;
+        Correo = correo;
         Telefono = telefono;
         Direccion = direccion;
         IsActive = isActive;

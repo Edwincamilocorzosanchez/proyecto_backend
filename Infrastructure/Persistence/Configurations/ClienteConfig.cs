@@ -16,6 +16,18 @@ public class ClienteConfiguration : IEntityTypeConfiguration<Cliente>
             .HasConversion(v => v.Value, v => new IdVO(v))
             .HasColumnName("id");
 
+        builder.Property(c => c.Nombre)
+            .HasConversion(v => v.Value, v => new NombreVO(v))
+            .HasColumnName("nombre")
+            .HasMaxLength(100)
+            .IsRequired();
+
+        builder.Property(c => c.Correo)
+            .HasConversion(v => v.Value, v => new CorreoVO(v))
+            .HasColumnName("correo")
+            .HasMaxLength(255)
+            .IsRequired();
+        
         builder.Property(c => c.Telefono)
             .HasConversion(v => v.Value, v => new TelefonoVO(v))
             .HasColumnName("telefono")

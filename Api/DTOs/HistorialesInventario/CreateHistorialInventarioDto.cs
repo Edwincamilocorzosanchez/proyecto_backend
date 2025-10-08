@@ -1,4 +1,4 @@
-namespace Api.DTOs.HistorialInventario;
+namespace Api.DTOs.HistorialesInventario;
 
 public record CreateHistorialInventarioDto(
     int RepuestoId,

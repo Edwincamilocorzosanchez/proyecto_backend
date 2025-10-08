@@ -5,8 +5,8 @@ namespace Api.DTOs.Vehiculos;
 // GET /api/vehiculos/vin/{vin}
 // GET /api/vehiculos/cliente/{clienteId}
 public sealed record VehiculoDto(
-    Guid Id, 
-    Guid ClienteId, 
+    int Id, 
+    int ClienteId, 
     string Marca, 
     string Modelo,  
     int Anio, 

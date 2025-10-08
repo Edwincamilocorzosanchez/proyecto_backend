@@ -5,5 +5,5 @@ public record CreateRepuestoDto(
     string Descripcion,
     int CantidadStock,
     decimal PrecioUnitario,
-    Guid? ProveedorId
+    int? ProveedorId
 );

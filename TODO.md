@@ -199,6 +199,8 @@ ReportesController
 ### Cosas que quizas se pueden hacer mejor
 - En la base de datos agregar la tabla inventario y anidarla con repuestos, historial_inventario...
 - puedo mejorar los mensajes de los Validatos de la parte de Application
-
+- Agregarles las columnas Nombres a todas las personas que se relacionen con UserMember
+- agregar la columnas que me faltan de los DTOs que tienen entidades foraneas y que pueden tener consultas grandes
+- En UserMember hay UserName y en las otras entidades hay Nombre, correo y telefono. ¿Por qué no se usa el mismo? Tengo que corregirlo en todos los DTOs, entidades, Profiles, Services, Controller y configuraciones de EF
 
 # Preguntas

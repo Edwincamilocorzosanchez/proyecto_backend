@@ -7,10 +7,7 @@ public class UpdateClienteHandler : IRequestHandler<UpdateCliente, bool>
 {
     private readonly IClienteRepository _repository;
 
-    public UpdateClienteHandler(IClienteRepository repository)
-    {
-        _repository = repository;
-    }
+    public UpdateClienteHandler(IClienteRepository repository) =>_repository = repository;
 
     public async Task<bool> Handle(UpdateCliente request, CancellationToken cancellationToken)
     {
@@ -18,6 +15,8 @@ public class UpdateClienteHandler : IRequestHandler<UpdateCliente, bool>
         if (cliente is null)
             return false;
 
+        cliente.Nombre = request.Nombre;
+        cliente.Correo = request.Correo;
         cliente.Telefono = request.Telefono;
         cliente.Direccion = request.Direccion;
         cliente.IsActive = request.IsActive;

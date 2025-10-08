@@ -7,25 +7,41 @@ namespace Api.Services.Implementations;
 
 public class DetalleOrdenService : IDetalleOrdenService
 {
-    private readonly IDetalleOrdenRepository _repository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public DetalleOrdenService(IDetalleOrdenRepository repository)
+    public DetalleOrdenService(IUnitOfWork unitOfWork)
     {
-        _repository = repository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<DetalleOrden?> GetByIdAsync(IdVO ordenServicioId, IdVO repuestoId, CancellationToken ct = default)
-        => await _repository.GetByIdsAsync(ordenServicioId, repuestoId, ct);
+        => await _unitOfWork.DetalleOrden.GetByIdsAsync(ordenServicioId, repuestoId, ct);
 
     public async Task<IReadOnlyList<DetalleOrden>> GetByOrdenIdAsync(IdVO ordenServicioId, CancellationToken ct = default)
-        => await _repository.GetByOrdenServicioIdAsync(ordenServicioId, ct);
+        => await _unitOfWork.DetalleOrden.GetByOrdenServicioIdAsync(ordenServicioId, ct);
 
     public async Task<int> AddAsync(DetalleOrden detalle, CancellationToken ct = default)
-        => await _repository.AddAsync(detalle, ct);
+    {
+        var result = await _unitOfWork.DetalleOrden.AddAsync(detalle, ct);
+        await _unitOfWork.SaveChanges(ct);
+        return result;
+    }
 
     public async Task<bool> UpdateAsync(DetalleOrden detalle, CancellationToken ct = default)
-        => await _repository.UpdateAsync(detalle, ct);
+    {
+        var updated = await _unitOfWork.DetalleOrden.UpdateAsync(detalle, ct);
+        if (updated)
+            await _unitOfWork.SaveChanges(ct);
+
+        return updated;
+    }
 
     public async Task<bool> DeleteAsync(IdVO ordenServicioId, IdVO repuestoId, CancellationToken ct = default)
-        => await _repository.DeleteAsync(ordenServicioId, repuestoId, ct);
+    {
+        var deleted = await _unitOfWork.DetalleOrden.DeleteAsync(ordenServicioId, repuestoId, ct);
+        if (deleted)
+            await _unitOfWork.SaveChanges(ct);
+
+        return deleted;
+    }
 }

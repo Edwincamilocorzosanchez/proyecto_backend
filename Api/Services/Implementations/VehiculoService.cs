@@ -7,56 +7,65 @@ namespace Api.Services.Implementations;
 
 public class VehiculoService : IVehiculoService
 {
-    private readonly IVehiculoRepository _repository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public VehiculoService(IVehiculoRepository repository)
+    public VehiculoService(IUnitOfWork unitOfWork)
     {
-        _repository = repository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Vehiculo?> GetByIdAsync(IdVO id, CancellationToken ct = default)
-        => await _repository.GetByIdAsync(id, ct);
+        => await _unitOfWork.Vehiculos.GetByIdAsync(id, ct);
 
     public async Task<IReadOnlyList<Vehiculo>> GetAllAsync(CancellationToken ct = default)
-        => await _repository.GetAllAsync(ct);
+        => await _unitOfWork.Vehiculos.GetAllAsync(ct);
 
     public async Task<IReadOnlyList<Vehiculo>> GetByClienteIdAsync(IdVO clienteId, CancellationToken ct = default)
-        => await _repository.GetByClienteIdAsync(clienteId, ct);
+        => await _unitOfWork.Vehiculos.GetByClienteIdAsync(clienteId, ct);
 
     public async Task<int> AddAsync(Vehiculo vehiculo, CancellationToken ct = default)
     {
-        // Validar que el VIN no exista
-        if (await _repository.ExistsByVinAsync(vehiculo.Vin, ct))
+        // Validar VIN único
+        if (await _unitOfWork.Vehiculos.ExistsByVinAsync(vehiculo.Vin, ct))
             throw new Exception($"Ya existe un vehículo con VIN '{vehiculo.Vin.Value}'");
 
-        return await _repository.AddAsync(vehiculo, ct);
+        var result = await _unitOfWork.Vehiculos.AddAsync(vehiculo, ct);
+        await _unitOfWork.SaveChanges(ct);
+
+        return result;
     }
 
     public async Task<bool> UpdateAsync(Vehiculo vehiculo, CancellationToken ct = default)
     {
-        var existing = await _repository.GetByIdAsync(vehiculo.Id, ct);
+        var existing = await _unitOfWork.Vehiculos.GetByIdAsync(vehiculo.Id, ct);
         if (existing == null)
             return false;
 
-        // Validar VIN único
+        // Validar VIN único si se modificó
         if (existing.Vin.Value != vehiculo.Vin.Value &&
-            await _repository.ExistsByVinAsync(vehiculo.Vin, ct))
+            await _unitOfWork.Vehiculos.ExistsByVinAsync(vehiculo.Vin, ct))
         {
             throw new Exception($"Ya existe un vehículo con VIN '{vehiculo.Vin.Value}'");
         }
 
-        return await _repository.UpdateAsync(vehiculo, ct);
+        var result = await _unitOfWork.Vehiculos.UpdateAsync(vehiculo, ct);
+        await _unitOfWork.SaveChanges(ct);
+
+        return result;
     }
 
     public async Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default)
     {
-        var existing = await _repository.GetByIdAsync(id, ct);
+        var existing = await _unitOfWork.Vehiculos.GetByIdAsync(id, ct);
         if (existing == null)
             return false;
 
-        return await _repository.DeleteAsync(id, ct);
+        var result = await _unitOfWork.Vehiculos.DeleteAsync(id, ct);
+        await _unitOfWork.SaveChanges(ct);
+
+        return result;
     }
 
     public async Task<bool> ExistsByVinAsync(VinVO vin, CancellationToken ct = default)
-        => await _repository.ExistsByVinAsync(vin, ct);
+        => await _unitOfWork.Vehiculos.ExistsByVinAsync(vin, ct);
 }

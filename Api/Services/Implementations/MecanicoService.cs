@@ -7,58 +7,68 @@ namespace Api.Services.Implementations;
 
 public class MecanicoService : IMecanicoService
 {
-    private readonly IMecanicoRepository _repository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public MecanicoService(IMecanicoRepository repository)
+    public MecanicoService(IUnitOfWork unitOfWork)
     {
-        _repository = repository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Mecanico?> GetByIdAsync(IdVO id, CancellationToken ct = default)
-        => await _repository.GetByIdAsync(id, ct);
+        => await _unitOfWork.Mecanicos.GetByIdAsync(id, ct);
 
     public async Task<IReadOnlyList<Mecanico>> GetAllAsync(CancellationToken ct = default)
-        => await _repository.GetAllAsync(ct);
+        => await _unitOfWork.Mecanicos.GetAllAsync(ct);
 
     public async Task<IReadOnlyList<Mecanico>> GetActiveAsync(CancellationToken ct = default)
     {
-        var all = await _repository.GetAllAsync(ct);
+        var all = await _unitOfWork.Mecanicos.GetAllAsync(ct);
         return all.Where(m => m.IsActive.Value).ToList();
     }
 
     public async Task<int> AddAsync(Mecanico mecanico, CancellationToken ct = default)
     {
-        if (await _repository.ExistsByNombreAsync(mecanico.Nombre, ct))
+        // Validación de negocio: nombre único
+        if (await _unitOfWork.Mecanicos.ExistsByNombreAsync(mecanico.Nombre, ct))
             throw new Exception($"Ya existe un mecánico con el nombre '{mecanico.Nombre.Value}'");
 
-        return await _repository.AddAsync(mecanico, ct);
+        var id = await _unitOfWork.Mecanicos.AddAsync(mecanico, ct);
+        await _unitOfWork.SaveChanges(ct);
+
+        return id;
     }
 
     public async Task<bool> UpdateAsync(Mecanico mecanico, CancellationToken ct = default)
     {
-        var existing = await _repository.GetByIdAsync(mecanico.Id, ct);
+        var existing = await _unitOfWork.Mecanicos.GetByIdAsync(mecanico.Id, ct);
         if (existing == null)
             return false;
 
-        // Aquí podrías agregar validaciones adicionales, por ejemplo no duplicar nombres
-        if (existing.Nombre.Value != mecanico.Nombre.Value && 
-            await _repository.ExistsByNombreAsync(mecanico.Nombre, ct))
+        // Validar nombre único si cambió
+        if (existing.Nombre.Value != mecanico.Nombre.Value &&
+            await _unitOfWork.Mecanicos.ExistsByNombreAsync(mecanico.Nombre, ct))
         {
             throw new Exception($"Ya existe un mecánico con el nombre '{mecanico.Nombre.Value}'");
         }
 
-        return await _repository.UpdateAsync(mecanico, ct);
+        var updated = await _unitOfWork.Mecanicos.UpdateAsync(mecanico, ct);
+        await _unitOfWork.SaveChanges(ct);
+
+        return updated;
     }
 
     public async Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default)
     {
-        var existing = await _repository.GetByIdAsync(id, ct);
+        var existing = await _unitOfWork.Mecanicos.GetByIdAsync(id, ct);
         if (existing == null)
             return false;
 
-        return await _repository.DeleteAsync(id, ct);
+        var deleted = await _unitOfWork.Mecanicos.DeleteAsync(id, ct);
+        await _unitOfWork.SaveChanges(ct);
+
+        return deleted;
     }
 
     public async Task<bool> ExistsByNombreAsync(NombreVO nombre, CancellationToken ct = default)
-        => await _repository.ExistsByNombreAsync(nombre, ct);
+        => await _unitOfWork.Mecanicos.ExistsByNombreAsync(nombre, ct);
 }

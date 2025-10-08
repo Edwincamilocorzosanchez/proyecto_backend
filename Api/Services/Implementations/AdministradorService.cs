@@ -7,58 +7,70 @@ namespace Api.Services.Implementations;
 
 public class AdministradorService : IAdministradorService
 {
-    private readonly IAdministradorRepository _repository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public AdministradorService(IAdministradorRepository repository)
+    public AdministradorService(IUnitOfWork unitOfWork)
     {
-        _repository = repository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Administrador?> GetByIdAsync(IdVO id, CancellationToken ct = default)
-        => await _repository.GetByIdAsync(id, ct);
+        => await _unitOfWork.Admins.GetByIdAsync(id, ct);
 
     public async Task<IReadOnlyList<Administrador>> GetAllAsync(CancellationToken ct = default)
-        => await _repository.GetAllAsync(ct);
+        => await _unitOfWork.Admins.GetAllAsync(ct);
 
     public async Task<IReadOnlyList<Administrador>> GetActiveAsync(CancellationToken ct = default)
     {
-        var all = await _repository.GetAllAsync(ct);
+        var all = await _unitOfWork.Admins.GetAllAsync(ct);
         return all.Where(a => a.IsActive.Value).ToList();
     }
 
     public async Task<int> AddAsync(Administrador administrador, CancellationToken ct = default)
     {
-        if (await _repository.ExistsByNombreAsync(administrador.Nombre, ct))
+        if (await _unitOfWork.Admins.ExistsByNombreAsync(administrador.Nombre, ct))
             throw new Exception($"Ya existe un administrador con el nombre '{administrador.Nombre.Value}'");
 
-        return await _repository.AddAsync(administrador, ct);
+        var result = await _unitOfWork.Admins.AddAsync(administrador, ct);
+        await _unitOfWork.SaveChanges(ct); //guardar los cambios
+
+        return result;
     }
 
     public async Task<bool> UpdateAsync(Administrador administrador, CancellationToken ct = default)
     {
-        var existing = await _repository.GetByIdAsync(administrador.Id, ct);
+        var existing = await _unitOfWork.Admins.GetByIdAsync(administrador.Id, ct);
         if (existing == null)
             return false;
 
-        // Validar que no duplique nombres
+        // Validar duplicados
         if (existing.Nombre.Value != administrador.Nombre.Value &&
-            await _repository.ExistsByNombreAsync(administrador.Nombre, ct))
+            await _unitOfWork.Admins.ExistsByNombreAsync(administrador.Nombre, ct))
         {
             throw new Exception($"Ya existe un administrador con el nombre '{administrador.Nombre.Value}'");
         }
 
-        return await _repository.UpdateAsync(administrador, ct);
+        var updated = await _unitOfWork.Admins.UpdateAsync(administrador, ct);
+        if (updated)
+        // guardar los cambios en cada metodo
+            await _unitOfWork.SaveChanges(ct);
+
+        return updated;
     }
 
     public async Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default)
     {
-        var existing = await _repository.GetByIdAsync(id, ct);
+        var existing = await _unitOfWork.Admins.GetByIdAsync(id, ct);
         if (existing == null)
             return false;
 
-        return await _repository.DeleteAsync(id, ct);
+        var deleted = await _unitOfWork.Admins.DeleteAsync(id, ct);
+        if (deleted)
+            await _unitOfWork.SaveChanges(ct);
+
+        return deleted;
     }
 
     public async Task<bool> ExistsByNombreAsync(NombreVO nombre, CancellationToken ct = default)
-        => await _repository.ExistsByNombreAsync(nombre, ct);
+        => await _unitOfWork.Admins.ExistsByNombreAsync(nombre, ct);
 }

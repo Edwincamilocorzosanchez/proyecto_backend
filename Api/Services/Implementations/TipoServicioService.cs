@@ -7,46 +7,55 @@ namespace Api.Services.Implementations;
 
 public class TipoServicioService : ITipoServicioService
 {
-    private readonly ITipoServicioRepository _repository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public TipoServicioService(ITipoServicioRepository repository)
+    public TipoServicioService(IUnitOfWork unitOfWork)
     {
-        _repository = repository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<TipoServicio?> GetByIdAsync(IdVO id, CancellationToken ct = default)
-        => await _repository.GetByIdAsync(id, ct);
+        => await _unitOfWork.TipoServicio.GetByIdAsync(id, ct);
 
     public async Task<IReadOnlyList<TipoServicio>> GetAllAsync(CancellationToken ct = default)
-        => await _repository.GetAllAsync(ct);
+        => await _unitOfWork.TipoServicio.GetAllAsync(ct);
 
     public async Task<int> AddAsync(TipoServicio tipoServicio, CancellationToken ct = default)
     {
-        // Validación: el precio base no puede ser negativo
+        // Validación de negocio
         if (tipoServicio.PrecioBase.Value < 0)
             throw new Exception("El precio base no puede ser negativo.");
 
-        return await _repository.AddAsync(tipoServicio, ct);
+        var id = await _unitOfWork.TipoServicio.AddAsync(tipoServicio, ct);
+        await _unitOfWork.SaveChanges(ct);
+
+        return id;
     }
 
     public async Task<bool> UpdateAsync(TipoServicio tipoServicio, CancellationToken ct = default)
     {
-        var existing = await _repository.GetByIdAsync(tipoServicio.Id, ct);
+        var existing = await _unitOfWork.TipoServicio.GetByIdAsync(tipoServicio.Id, ct);
         if (existing == null)
             return false;
 
         if (tipoServicio.PrecioBase.Value < 0)
             throw new Exception("El precio base no puede ser negativo.");
 
-        return await _repository.UpdateAsync(tipoServicio, ct);
+        var updated = await _unitOfWork.TipoServicio.UpdateAsync(tipoServicio, ct);
+        await _unitOfWork.SaveChanges(ct);
+
+        return updated;
     }
 
     public async Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default)
     {
-        var existing = await _repository.GetByIdAsync(id, ct);
+        var existing = await _unitOfWork.TipoServicio.GetByIdAsync(id, ct);
         if (existing == null)
             return false;
 
-        return await _repository.DeleteAsync(id, ct);
+        var deleted = await _unitOfWork.TipoServicio.DeleteAsync(id, ct);
+        await _unitOfWork.SaveChanges(ct);
+
+        return deleted;
     }
 }

@@ -7,28 +7,26 @@ namespace Api.Services.Implementations;
 
 public class PagoService : IPagoService
 {
-    private readonly IPagoRepository _repository;
-    private readonly IFacturaRepository _facturaRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public PagoService(IPagoRepository repository, IFacturaRepository facturaRepository)
+    public PagoService(IUnitOfWork unitOfWork)
     {
-        _repository = repository;
-        _facturaRepository = facturaRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Pago?> GetByIdAsync(IdVO id, CancellationToken ct = default)
-        => await _repository.GetByIdAsync(id, ct);
+        => await _unitOfWork.Pagos.GetByIdAsync(id, ct);
 
     public async Task<IReadOnlyList<Pago>> GetAllAsync(CancellationToken ct = default)
-        => await _repository.GetAllAsync(ct);
+        => await _unitOfWork.Pagos.GetAllAsync(ct);
 
     public async Task<int> AddAsync(Pago pago, CancellationToken ct = default)
     {
-        // alidaciones
+        // Validaciones
         if (pago.Monto.Value <= 0)
             throw new ArgumentException("El monto del pago debe ser mayor a cero.");
 
-        var factura = await _facturaRepository.GetByIdAsync(pago.FacturaId, ct);
+        var factura = await _unitOfWork.Facturas.GetByIdAsync(pago.FacturaId, ct);
         if (factura == null)
             throw new InvalidOperationException("No se puede registrar el pago porque la factura no existe.");
 
@@ -39,7 +37,10 @@ public class PagoService : IPagoService
         if (pago.FechaPago == null)
             pago.FechaPago = new FechaHistoricaVO(DateTime.UtcNow);
 
-        return await _repository.AddAsync(pago, ct);
+        var result = await _unitOfWork.Pagos.AddAsync(pago, ct);
+        await _unitOfWork.SaveChanges(ct);
+
+        return result;
     }
 
     public async Task<bool> UpdateAsync(Pago pago, CancellationToken ct = default)
@@ -47,32 +48,40 @@ public class PagoService : IPagoService
         if (pago.Monto.Value <= 0)
             throw new ArgumentException("El monto del pago debe ser mayor a cero.");
 
-        var factura = await _facturaRepository.GetByIdAsync(pago.FacturaId, ct);
+        var factura = await _unitOfWork.Facturas.GetByIdAsync(pago.FacturaId, ct);
         if (factura == null)
             throw new InvalidOperationException("La factura asociada no existe.");
 
-        var totalPagadoSinEste = await GetTotalPagadoPorFacturaAsync(pago.FacturaId, ct) - pago.Monto.Value;
+        var pagos = await _unitOfWork.Pagos.GetByFacturaIdAsync(pago.FacturaId, ct);
+        var totalPagadoSinEste = pagos.Where(p => p.Id.Value != pago.Id.Value).Sum(p => p.Monto.Value);
+
         if (totalPagadoSinEste + pago.Monto.Value > factura.Total.Value)
             throw new InvalidOperationException("El pago actualizado excede el total pendiente de la factura.");
 
-        return await _repository.UpdateAsync(pago, ct);
+        var result = await _unitOfWork.Pagos.UpdateAsync(pago, ct);
+        await _unitOfWork.SaveChanges(ct);
+
+        return result;
     }
 
     public async Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default)
     {
-        var pago = await _repository.GetByIdAsync(id, ct);
+        var pago = await _unitOfWork.Pagos.GetByIdAsync(id, ct);
         if (pago == null)
             throw new InvalidOperationException("No se puede eliminar un pago que no existe.");
 
-        return await _repository.DeleteAsync(id, ct);
+        var result = await _unitOfWork.Pagos.DeleteAsync(id, ct);
+        await _unitOfWork.SaveChanges(ct);
+
+        return result;
     }
 
     public async Task<decimal> GetTotalPagadoPorFacturaAsync(IdVO facturaId, CancellationToken ct = default)
     {
-        var pagos = await _repository.GetByFacturaIdAsync(facturaId, ct);
+        var pagos = await _unitOfWork.Pagos.GetByFacturaIdAsync(facturaId, ct);
         return pagos.Sum(p => p.Monto.Value);
     }
 
     public async Task<IReadOnlyList<Pago>> GetByFacturaIdAsync(IdVO facturaId, CancellationToken ct = default)
-        => await _repository.GetByFacturaIdAsync(facturaId, ct);
+        => await _unitOfWork.Pagos.GetByFacturaIdAsync(facturaId, ct);
 }

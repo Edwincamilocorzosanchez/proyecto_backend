@@ -4,30 +4,29 @@ using Application.Abstractions;
 using AutoMapper;
 using Domain.Entities;
 using Domain.ValueObjects;
-using Microsoft.EntityFrameworkCore;
 
 namespace Api.Services.Implementations;
 
 public class ClienteService : IClienteService
 {
-    private readonly IClienteRepository _clienteRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public ClienteService(IClienteRepository clienteRepository, IMapper mapper)
+    public ClienteService(IUnitOfWork unitOfWork, IMapper mapper)
     {
-        _clienteRepository = clienteRepository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
     public async Task<IEnumerable<ClienteDto>> GetAllAsync()
     {
-        var clientes = await _clienteRepository.GetAllAsync();
+        var clientes = await _unitOfWork.Clientes.GetAllAsync();
         return _mapper.Map<IEnumerable<ClienteDto>>(clientes);
     }
 
     public async Task<ClienteDto> GetByIdAsync(int id)
     {
-        var cliente = await _clienteRepository.GetByIdAsync(new IdVO(id));
+        var cliente = await _unitOfWork.Clientes.GetByIdAsync(new IdVO(id));
         if (cliente == null)
             throw new KeyNotFoundException("Cliente no encontrado");
 
@@ -36,15 +35,14 @@ public class ClienteService : IClienteService
 
     public async Task<ClienteDto> CreateAsync(CreateClienteDto dto)
     {
-        // Aquí puedes poner validaciones de negocio:
-        // Ej: correo único
-        var exists = await _clienteRepository.ExistsByEmailAsync(new CorreoVO(dto.Correo));
+        // Validación: correo único
+        var exists = await _unitOfWork.Clientes.ExistsByEmailAsync(new CorreoVO(dto.Correo));
         if (exists)
             throw new InvalidOperationException("Ya existe un cliente con este correo");
 
         var cliente = new Cliente
         {
-            Id = new IdVO(0), // se asigna automáticamente en la DB
+            Id = new IdVO(0),
             Nombre = new NombreVO(dto.Nombre),
             Correo = new CorreoVO(dto.Correo),
             Telefono = new TelefonoVO(dto.Telefono),
@@ -53,36 +51,40 @@ public class ClienteService : IClienteService
             UserId = dto.UserId
         };
 
-        await _clienteRepository.AddAsync(cliente);
+        await _unitOfWork.Clientes.AddAsync(cliente);
+        await _unitOfWork.SaveChanges(); // guardar los cambios
 
         return _mapper.Map<ClienteDto>(cliente);
     }
 
     public async Task<ClienteDto> UpdateAsync(int id, UpdateClienteDto dto)
     {
-        var cliente = await _clienteRepository.GetByIdAsync(new IdVO(id));
+        var cliente = await _unitOfWork.Clientes.GetByIdAsync(new IdVO(id));
         if (cliente == null)
             throw new KeyNotFoundException("Cliente no encontrado");
 
-        // Aplicar cambios
+        // Actualizar propiedades
         cliente.Nombre = new NombreVO(dto.Nombre);
         cliente.Correo = new CorreoVO(dto.Correo);
         cliente.Telefono = new TelefonoVO(dto.Telefono);
         cliente.Direccion = new DireccionVO(dto.Direccion);
         cliente.IsActive = new EstadoVO(dto.IsActive);
 
-        await _clienteRepository.UpdateAsync(cliente);
+        await _unitOfWork.Clientes.UpdateAsync(cliente);
+        await _unitOfWork.SaveChanges(); // 👈 importante
 
         return _mapper.Map<ClienteDto>(cliente);
     }
 
     public async Task<bool> DeleteAsync(int id)
     {
-        var cliente = await _clienteRepository.GetByIdAsync(new IdVO(id));
+        var cliente = await _unitOfWork.Clientes.GetByIdAsync(new IdVO(id));
         if (cliente == null)
             return false;
 
-        await _clienteRepository.DeleteAsync(cliente.Id);
+        await _unitOfWork.Clientes.DeleteAsync(cliente.Id);
+        await _unitOfWork.SaveChanges(); // 👈 importante
+
         return true;
     }
 }

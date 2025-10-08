@@ -1,9 +1,7 @@
-using System;
+
 using FluentValidation;
 using MediatR;
 using Application.Abstractions;
-using Infrastructure.Persistence.Repositories;
-using Api.Mappings;
 using Infrastructure.UnitOfWork;
 using System.Threading.RateLimiting;
 using Api.Helpers;
@@ -14,7 +12,6 @@ using Microsoft.AspNetCore.Mvc;
 using Api.Helpers.Errors;
 using Microsoft.AspNetCore.Identity;
 using Domain.Entities.Auth;
-using Api.Services;
 using Api.Services.Implementations;
 using Api.Services.Interfaces;
 namespace Api.Extensions;

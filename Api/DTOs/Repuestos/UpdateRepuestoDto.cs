@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+namespace Api.DTOs.Repuestos;
 
-namespace Api.DTOs
-{
-    public class UpdateRepuestoDto : CreateRepuestoDto
-    {
-        public Guid Id { get; set; }
-    }
-}
+public record UpdateRepuestoDto(
+    string Codigo,
+    string Descripcion,
+    int CantidadStock,
+    decimal PrecioUnitario,
+    Guid? ProveedorId
+);

@@ -1,18 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+namespace Api.DTOs.HistorialesInventario;
 
-namespace Api.DTOs
-{
-    public class HistorialInventarioDto
-    {
-        public Guid Id { get; set; }
-        public Guid RepuestoId { get; set; }
-        public Guid? AdminId { get; set; }
-        public Guid TipoMovimientoId { get; set; }
-        public int Cantidad { get; set; }
-        public DateTime FechaMovimiento { get; set; }
-        public string? Observaciones { get; set; }
-    }
-}
+public record HistorialInventarioDto(        
+    int Id,
+    int RepuestoId,
+    int? AdminId,
+    int TipoMovimientoId,
+    int Cantidad,
+    DateTime FechaMovimiento,
+    string? Observaciones
+);

@@ -1,12 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+namespace Api.DTOs.HistorialInventario;
 
-namespace Api.DTOs
-{
-    public class UpdateHistorialInventarioDto : CreateHistorialInventarioDto
-    {
-         public Guid Id { get; set; }
-    }
-}
+public record UpdateHistorialInventarioDto(
+    int Cantidad,
+    DateTime FechaMovimiento,
+    string? Observaciones
+);

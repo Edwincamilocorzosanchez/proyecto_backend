@@ -28,13 +28,21 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "CleanShop API v1");
+        // esto hace que swagger se ejecute en la raiz
+        c.RoutePrefix = string.Empty; 
+    });
 }
 
 app.UseCors("CorsPolicy");
 
 app.UseHttpsRedirection();
+// app.UseRateLimiter();
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 app.Run();

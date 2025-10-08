@@ -1,58 +1,55 @@
-// using System;
-// using System.Collections.Generic;
-// using System.Linq;
-// using System.Threading.Tasks;
-// using Api.DTOs;
-// using Application.Services;
-// using Microsoft.AspNetCore.Mvc;
+using Api.DTOs.Pagos;
+using Api.Services.Implementations;
+using Application.Pagos;
+using Domain.ValueObjects;
+using Microsoft.AspNetCore.Mvc;
 
 
-// namespace Api.Controllers
-// {
-//      [ApiController]
-//     [Route("api/[controller]")]
-//     public class PagoController : ControllerBase
-//     {
-//         private readonly PagoService _service;
+namespace Api.Controllers
+ {
+      [ApiController]
+     [Route("api/[controller]")]
+     public class PagoController : ControllerBase
+     {
+         private readonly PagoService _service;
 
-//         public PagoController(PagoService service)
-//         {
-//             _service = service;
-//         }
+         public PagoController(PagoService service)
+         {
+             _service = service;
+         }
 
-//         [HttpGet]
-//         public async Task<IActionResult> GetAll()
-//         {
-//             var result = await _service.GetAllAsync();
-//             return Ok(result);
-//         }
+         [HttpGet]
+         public async Task<IActionResult> GetAll()
+         {
+             var result = await _service.GetAllAsync();
+             return Ok(result);
+         }
 
-//         [HttpGet("{id}")]
-//         public async Task<IActionResult> GetById(Guid id)
-//         {
-//             var result = await _service.GetByIdAsync(id);
-//             return result is null ? NotFound() : Ok(result);
-//         }
+         [HttpGet("{id}")]
+         public async Task<IActionResult> GetById(int id)
+         {
+             var result = await _service.GetByIdAsync(new IdVO(id));
+             return result is null ? NotFound() : Ok(result);
+         }
+         [HttpPost]
+         public async Task<IActionResult> Create([FromBody] CreatePagoDto dto)
+         {
+             await _service.AddAsync(dto);
+             return Ok("Pago registrado exitosamente.");
+         }
 
-//         [HttpPost]
-//         public async Task<IActionResult> Create([FromBody] PagoRequestDto dto)
-//         {
-//             await _service.AddAsync(dto);
-//             return Ok("Pago registrado exitosamente.");
-//         }
+         [HttpPut("{id}")]
+         public async Task<IActionResult> Update(Guid id, [FromBody] UpdatePagoDto dto)
+         {
+             await _service.UpdateAsync(id, dto);
+             return Ok("Pago actualizado correctamente.");
+         }
 
-//         [HttpPut("{id}")]
-//         public async Task<IActionResult> Update(Guid id, [FromBody] PagoRequestDto dto)
-//         {
-//             await _service.UpdateAsync(id, dto);
-//             return Ok("Pago actualizado correctamente.");
-//         }
-
-//         [HttpDelete("{id}")]
-//         public async Task<IActionResult> Delete(Guid id)
-//         {
-//             await _service.DeleteAsync(id);
-//             return Ok("Pago eliminado.");
-//         }
-//     }
-// }
+         [HttpDelete("{id}")]
+         public async Task<IActionResult> Delete(int id)
+         {
+             await _service.DeleteAsync(new IdVO(id));
+             return Ok("Pago eliminado.");
+         }
+     }
+ }

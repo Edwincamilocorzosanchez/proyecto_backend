@@ -7,6 +7,6 @@ namespace Api.DTOs
 {
     public class UpdateRepuestoDto : CreateRepuestoDto
     {
-         public Guid Id { get; set; }
+        public Guid Id { get; set; }
     }
 }

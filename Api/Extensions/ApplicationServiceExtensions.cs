@@ -19,45 +19,67 @@ using Api.Services.Implementations;
 using Api.Services.Interfaces;
 namespace Api.Extensions;
 
+// este archivo define ciertos metodos de extensión para la aplicación, como CORS, JWT, servicios de aplicacion, RateLimiter, errores de validación, etc...
 public static class ApplicationServiceExtensions
 {
-
+    // este es el metodo de CORS que se usa en la aplicación
     public static void ConfigureCors(this IServiceCollection services) =>
 
         services.AddCors(options =>
         {
+            // estos son los dominios permitidos para la aplicación
             HashSet<String> allowed = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             {
                 "https://app.ejemplo.com",
                 "https://admin.ejemplo.com"
             };
+            // este es el comportamiento de CORS
             options.AddPolicy("CorsPolicy", builder =>
                 builder.AllowAnyOrigin()   //WithOrigins("https://dominio.com")
                 .AllowAnyMethod()          //WithMethods("GET","POST")
                 .AllowAnyHeader());        //WithHeaders("accept","content-type")
 
+            // este es el comportamiento de CORS para URLs específicas
             options.AddPolicy("CorsPolicyUrl", builder =>
                 builder.WithOrigins("https://localhost:4200", "https://localhost:5500")   //WithOrigins("https://dominio.com")
                 .AllowAnyMethod()          //WithMethods("GET","POST")
                 .AllowAnyHeader());
-
+            // otro comportamiento de CORS
             options.AddPolicy("Dinamica", builder =>
                 builder.SetIsOriginAllowed(origin => allowed.Contains(origin))   //WithOrigins("https://dominio.com")
                 .WithMethods("GET", "POST")
                 .WithHeaders("Content-Type", "Authorization"));        //WithHeaders("accept","content-type")
         });
+    // este método registra los servicios de la aplicación
     public static void AddApplicationServices(this IServiceCollection services)
     {
+        // estp registrar el hasher de contraseñas
         services.AddScoped<IPasswordHasher<UserMember>, PasswordHasher<UserMember>>();
+        // registrar servicios 
+        services.AddScoped<IAdministradorService, AdministradorService>();
+        services.AddScoped<ICitaService, CitaService>();
+        services.AddScoped<IClienteService, ClienteService>();
+        services.AddScoped<IDetalleOrdenService, DetalleOrdenService>();
+        services.AddScoped<IFacturaService, FacturaService>();
+        services.AddScoped<IHistorialInventarioService, HistorialInventarioService>();
+        services.AddScoped<IMecanicoService, MecanicoService>();
+        services.AddScoped<IOrdenServicioService, OrdenServicioService>();
+        services.AddScoped<IPagoService, PagoService>();
+        services.AddScoped<IProveedorService, ProveedorService>();
+        services.AddScoped<IRepuestoService, RepuestoService>();
+        services.AddScoped<ITipoServicioService, TipoServicioService>();
+        services.AddScoped<IVehiculoService, VehiculoService>();
+        // este es el servicio de autenticación
         services.AddScoped<IUserService, UserService>();
-        
+
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
         services.AddValidatorsFromAssembly(typeof(Program).Assembly);
         services.AddAutoMapper(typeof(Program).Assembly);
-        // esto aparentemente es para agregar directamente todos lso mapeos
+        // esto aparentemente es para agregar directamente todos los mapeos
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
     }
+    // este es el meetodo para agregar el RateLimiter 
     public static IServiceCollection AddCustomRateLimiter(this IServiceCollection services)
     {
         services.AddRateLimiter(options =>
@@ -118,6 +140,7 @@ public static class ApplicationServiceExtensions
 
         return services;
     }
+    // este es el metodo para agregar el JWT
     public static void AddJwt(this IServiceCollection services, IConfiguration configuration)
     {
         //Configuration from AppSettings
@@ -170,6 +193,7 @@ public static class ApplicationServiceExtensions
                         c.Type == "Subscription" && c.Value == "Premium")));
         });
     }
+    // este metodos sirve para agregar los errores de validacion
     public static void AddValidationErrors(this IServiceCollection services)
     {
         services.Configure<ApiBehaviorOptions>(options =>

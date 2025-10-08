@@ -203,5 +203,9 @@ ReportesController
 - agregar la columnas que me faltan de los DTOs que tienen entidades foraneas y que pueden tener consultas grandes
 - En UserMember hay UserName y en las otras entidades hay Nombre, correo y telefono. ¿Por qué no se usa el mismo? Tengo que corregirlo en todos los DTOs, entidades, Profiles, Services, Controller y configuraciones de EF
 - Si el UserMember tiene un id Guid entonces todos los demas entidades que heredan el ID principal de UserMember deben ser Guid tambien. :(
+- tengo que revisar si debo de crear un Service por cada entidad o si puedo dejar los servicios de las entidades que he colocado 
+
+- En cada controlador se debe de colocar el CORS y el RateLimiter que va a aplicar
 
 # Preguntas
+- que debo de hacer para que el DBSeaderFuncione 

@@ -28,9 +28,8 @@ var app = builder.Build();
 // {
 //     app.MapOpenApi();
 // }
+
 // esto es para poder usar swagger
-
-
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -41,10 +40,10 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-// aqui se usa la ultima a menos que se espeficique que politica se va a usar en cada endpoint
-// app.UseCors("CorsPolicy");
-// app.UseCors("CorsPolicyUrl");
-// app.UseCors("Dinamica");
+// aqui se usa la ultima a menos que se espeficique que politica se va a usar en cada endpoint, pero se va a usar la ultima por defecto
+app.UseCors("CorsPolicy");
+app.UseCors("CorsPolicyUrl");
+app.UseCors("Dinamica");
 
 app.UseHttpsRedirection();
 // app.UseRateLimiter();

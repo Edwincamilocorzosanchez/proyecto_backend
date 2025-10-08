@@ -39,5 +39,16 @@ public sealed class MecanicoProfile : Profile
                 if (src.Especialidad != null) dest.Especialidad = new EspecialidadVO(src.Especialidad);
                 if (src.IsActive != null) dest.IsActive = new EstadoVO(src.IsActive);
             });
+        
+        // Entidad -> Detail DTO
+        CreateMap<Mecanico, MecanicoDetailDto>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.Value))
+            .ForMember(dest => dest.Nombre, opt => opt.MapFrom(src => src.Nombre.Value))
+            .ForMember(dest => dest.Telefono, opt => opt.MapFrom(src => src.Telefono != null ? src.Telefono.Value : null))
+            .ForMember(dest => dest.Especialidad, opt => opt.MapFrom(src => src.Especialidad != null ? src.Especialidad.Value : null))
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive.Value))
+            .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
+            // Mapeo de colecciones relacionadas usando los DTOs de cada entidad
+            .ForMember(dest => dest.OrdenesServicio, opt => opt.MapFrom(src => src.OrdenesServicio));
     }
 }

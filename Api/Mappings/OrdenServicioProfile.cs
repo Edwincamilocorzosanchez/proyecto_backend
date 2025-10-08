@@ -34,6 +34,7 @@ public sealed class OrdenServicioProfile : Profile
             .ForMember(dest => dest.Mecanico, opt => opt.MapFrom(src => src.Mecanico))
             .ForMember(dest => dest.TipoServicio, opt => opt.MapFrom(src => src.TipoServicio))
             .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => src.Estado))
+            // Mapeo de colecciones relacionadas usando los DTOs de cada entidad
             .ForMember(dest => dest.Detalles, opt => opt.MapFrom(src => src.Detalles))
             .ForMember(dest => dest.Facturas, opt => opt.MapFrom(src => src.Facturas));
 

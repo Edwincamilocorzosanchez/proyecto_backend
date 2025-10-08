@@ -34,5 +34,14 @@ public sealed class TipoServicioProfile : Profile
                 dest.Descripcion = new DescripcionVO(src.Descripcion);
                 dest.PrecioBase = new DineroVO(src.PrecioBase);
             });
+
+        // Entidad => Detail DTO
+        CreateMap<TipoServicio, TipoServicioDetailDto>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.Value))
+            .ForMember(dest => dest.Nombre, opt => opt.MapFrom(src => src.Nombre.Value))
+            .ForMember(dest => dest.Descripcion, opt => opt.MapFrom(src => src.Descripcion.Value))
+            .ForMember(dest => dest.PrecioBase, opt => opt.MapFrom(src => src.PrecioBase.Value))
+            // Mapeo de colecciones relacionadas usando los DTOs de cada entidad
+            .ForMember(dest => dest.OrdenesServicio, opt => opt.MapFrom(src => src.OrdenesServicio));
     }
 }

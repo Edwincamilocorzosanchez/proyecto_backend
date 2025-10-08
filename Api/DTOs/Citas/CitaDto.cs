@@ -1,6 +1,6 @@
 namespace Api.DTOs.Citas;
 
-public sealed record CitaResponseDto(
+public sealed record CitaDto(
     int Id,
     int ClienteId,
     string ClienteNombre,

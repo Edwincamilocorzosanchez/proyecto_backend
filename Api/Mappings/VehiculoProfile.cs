@@ -45,5 +45,20 @@ public sealed class VehiculoProfile : Profile
                 dest.Kilometraje = new KilometrajeVO(src.Kilometraje);
             })
             .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+        
+        // Entidad -> Detail DTO
+        CreateMap<Vehiculo, VehiculoDetailDto>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.Value))
+            .ForMember(dest => dest.ClienteId, opt => opt.MapFrom(src => src.ClienteId.Value))
+            .ForMember(dest => dest.Marca, opt => opt.MapFrom(src => src.Marca.Value))
+            .ForMember(dest => dest.Modelo, opt => opt.MapFrom(src => src.Modelo.Value))
+            .ForMember(dest => dest.Anio, opt => opt.MapFrom(src => src.Anio.Value))
+            .ForMember(dest => dest.Vin, opt => opt.MapFrom(src => src.Vin.Value))
+            .ForMember(dest => dest.Kilometraje, opt => opt.MapFrom(src => src.Kilometraje.Value))
+            .ForMember(dest => dest.ClienteNombre, opt => opt.MapFrom(src => src.Cliente.Nombre.Value))
+            .ForMember(dest => dest.ClienteCorreo, opt => opt.MapFrom(src => src.Cliente.Correo.Value))
+            // Mapeo de colecciones relacionadas usando los DTOs de cada entidad
+            .ForMember(dest => dest.Citas, opt => opt.MapFrom(src => src.Citas))
+            .ForMember(dest => dest.OrdenesServicio, opt => opt.MapFrom(src => src.OrdenesServicio));
     }
 }

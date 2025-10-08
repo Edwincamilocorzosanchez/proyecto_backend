@@ -9,9 +9,7 @@ public sealed class AdministradorProfile : Profile
 {
     public AdministradorProfile()
     {
-        // ==========================================================
-        // ✅ Entidad ->  DTO
-        // ==========================================================
+        // Entidad ->  DTO
         CreateMap<Administrador, AdministradorDto>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.Value))
             .ForMember(dest => dest.Nombre, opt => opt.MapFrom(src => src.Nombre.Value))
@@ -23,9 +21,7 @@ public sealed class AdministradorProfile : Profile
             .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
             .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt));
 
-        // ==========================================================
-        // ✅ Create DTO -> Entidad
-        // ==========================================================
+        // Create DTO -> Entidad
         CreateMap<CreateAdministradorDto, Administrador>()
             .ConstructUsing(src => new Administrador(
                 new IdVO(0), // se genera automáticamente (por EF o dominio)
@@ -37,9 +33,7 @@ public sealed class AdministradorProfile : Profile
                 src.UserId
             ));
 
-        // ==========================================================
-        // ✅ Update DTO -> Entidad (solo para actualizar campos no nulos)
-        // ==========================================================
+        // Update DTO -> Entidad 
         var updateMap = CreateMap<UpdateAdministradorDto, Administrador>();
         updateMap.ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
         updateMap.AfterMap((src, dest) =>

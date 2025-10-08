@@ -10,8 +10,8 @@ public sealed class CitaProfile : Profile
 {
     public CitaProfile()
     {
-        // Entidad -> Response DTO
-        CreateMap<Cita, CitaResponseDto>()
+        // Entidad ->  DTO
+        CreateMap<Cita, CitaDto>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.Value))
             .ForMember(dest => dest.ClienteId, opt => opt.MapFrom(src => src.ClienteId.Value))
             .ForMember(dest => dest.ClienteNombre, opt => opt.MapFrom(src => src.Cliente.Nombre.Value))

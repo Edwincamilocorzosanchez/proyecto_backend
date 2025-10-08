@@ -37,6 +37,20 @@ namespace Infrastructure.Persistence.Repositories
             var deleted = await _context.SaveChangesAsync(ct);
             return deleted > 0;
         }
+        
+        public async Task<bool> ExistsByNombreAsync(NombreVO nombre, CancellationToken ct = default)
+        {
+            return await _context.Proveedores
+                .AnyAsync(p => p.Nombre == nombre, ct);
+        }
+
+        public async Task<IReadOnlyList<Proveedor>> GetActivosAsync(CancellationToken ct = default)
+        {
+            return await _context.Proveedores
+                .Where(p => p.IsActive.Value)
+                .Include(p => p.Repuestos)
+                .ToListAsync(ct);
+        }
 
         public async Task<Proveedor?> GetByIdAsync(IdVO id, CancellationToken ct = default)
         {

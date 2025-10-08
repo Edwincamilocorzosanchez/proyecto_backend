@@ -10,6 +10,8 @@ public interface IAdministradorRepository
     Task<IReadOnlyList<Administrador>> GetAllAsync(CancellationToken ct = default);
     Task<IReadOnlyList<Administrador>> GetByNivelAccesoAsync(NivelAccesoVO nivel, CancellationToken ct = default);
 
+    // devolver false o tru
+    Task<bool> ExistsByNombreAsync(NombreVO nombre, CancellationToken ct = default);
     // metodos de insercion, actualizacion y eliminacion
     Task<int> AddAsync(Administrador admin, CancellationToken ct = default);
     Task<bool> UpdateAsync(Administrador admin, CancellationToken ct = default);

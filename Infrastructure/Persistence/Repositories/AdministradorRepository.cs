@@ -41,6 +41,12 @@ namespace Infrastructure.Persistence.Repositories
             return deleted > 0;
         }
 
+        public async Task<bool> ExistsByNombreAsync(NombreVO nombre, CancellationToken ct = default)
+        {
+            return await _context.Administradores
+                .AnyAsync(a => a.Nombre == nombre, ct);
+        }
+
         public async Task<Administrador?> GetByIdAsync(IdVO id, CancellationToken ct = default)
         {
             return await _context.Administradores

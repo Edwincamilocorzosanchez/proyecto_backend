@@ -13,7 +13,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
 
-namespace Api.Services;
+namespace Api.Services.Users;
 
 public class UserService : IUserService
 {

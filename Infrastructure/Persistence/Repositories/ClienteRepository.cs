@@ -33,6 +33,11 @@ public class ClienteRepository : IClienteRepository
             .FirstOrDefaultAsync(c => c.User.Id == userId.Value, ct);
     }
 
+    public async Task<bool> ExistsByEmailAsync(CorreoVO correo, CancellationToken ct = default)
+    {
+        return await _context.Clientes
+            .AnyAsync(c => c.Correo.Value == correo.Value, ct);
+    }
     public async Task<int> AddAsync(Cliente cliente, CancellationToken ct = default)
     {
         await _context.Clientes.AddAsync(cliente, ct);

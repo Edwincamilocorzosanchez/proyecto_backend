@@ -30,6 +30,11 @@ public class MecanicoRepository: IMecanicoRepository
             .ToListAsync(ct);
     }
 
+    public async Task<bool> ExistsByNombreAsync(NombreVO nombre, CancellationToken ct = default)
+    {
+        return await _context.Mecanicos
+            .AnyAsync(m => m.Nombre.Value == nombre.Value, ct);
+    }
     public async Task<int> AddAsync(Mecanico mecanico, CancellationToken ct = default)
     {
         _context.Mecanicos.Add(mecanico);

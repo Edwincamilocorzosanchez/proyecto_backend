@@ -51,6 +51,12 @@ public class VehiculoRepository: IVehiculoRepository
             .ToListAsync(ct);
     }
 
+    public async Task<bool> ExistsByVinAsync(VinVO vin, CancellationToken ct = default)
+    {
+        return await _context.Vehiculos
+            .AnyAsync(v => v.Vin.Value == vin.Value, ct);
+    }
+
     public async Task<int> AddAsync(Vehiculo vehiculo, CancellationToken ct = default)
     {
         _context.Vehiculos.Add(vehiculo);

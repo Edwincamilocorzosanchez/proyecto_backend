@@ -9,7 +9,9 @@ namespace Infrastructure.UnitOfWork;
 
 public class UnitOfWork : IUnitOfWork
 {
+    // carga de contexto de la base de datos
     private readonly AppDbContext _context;
+    // carga de interfaz de repositorios
     private IAdministradorRepository? _administradorRepository;
     private ICitaRepository? _citaRepository;
     private IClienteRepository? _clienteRepository;

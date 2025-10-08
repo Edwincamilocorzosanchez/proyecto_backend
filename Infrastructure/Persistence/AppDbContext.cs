@@ -4,10 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence;
 
-public class AppDbContext : DbContext
+public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
-
     // Entidades de autenticación
     public DbSet<UserMember> UsersMembers => Set<UserMember>();
     public DbSet<Rol> Roles => Set<Rol>();

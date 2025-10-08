@@ -16,3 +16,4 @@ public record IdVO : IEquatable<IdVO>
 
     public override string ToString() => Value.ToString();
 }
+

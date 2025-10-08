@@ -12,8 +12,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
+using Api.Services.Interfaces;
 
-namespace Api.Services.Users;
+namespace Api.Services.Implementations;
 
 public class UserService : IUserService
 {

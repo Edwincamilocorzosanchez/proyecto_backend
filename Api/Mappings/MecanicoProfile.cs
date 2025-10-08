@@ -37,7 +37,7 @@ public sealed class MecanicoProfile : Profile
                 if (src.Nombre != null) dest.Nombre = new NombreVO(src.Nombre);
                 if (src.Telefono != null) dest.Telefono = new TelefonoVO(src.Telefono);
                 if (src.Especialidad != null) dest.Especialidad = new EspecialidadVO(src.Especialidad);
-                if (src.IsActive != null) dest.IsActive = new EstadoVO(src.IsActive);
+                if (src.IsActive.HasValue) dest.IsActive = new EstadoVO(src.IsActive.Value);
             });
         
         // Entidad -> Detail DTO

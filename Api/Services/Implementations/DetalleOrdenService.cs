@@ -15,10 +15,10 @@ public class DetalleOrdenService : IDetalleOrdenService
     }
 
     public async Task<DetalleOrden?> GetByIdAsync(IdVO ordenServicioId, IdVO repuestoId, CancellationToken ct = default)
-        => await _repository.GetByIdAsync(ordenServicioId, repuestoId, ct);
+        => await _repository.GetByIdsAsync(ordenServicioId, repuestoId, ct);
 
     public async Task<IReadOnlyList<DetalleOrden>> GetByOrdenIdAsync(IdVO ordenServicioId, CancellationToken ct = default)
-        => await _repository.GetByOrdenIdAsync(ordenServicioId, ct);
+        => await _repository.GetByOrdenServicioIdAsync(ordenServicioId, ct);
 
     public async Task<int> AddAsync(DetalleOrden detalle, CancellationToken ct = default)
         => await _repository.AddAsync(detalle, ct);

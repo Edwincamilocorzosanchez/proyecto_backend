@@ -35,6 +35,14 @@ namespace Infrastructure.Persistence.Repositories
             return deleted > 0;
         }
 
+        // true o false, define si existe o no
+        public async Task<bool> ExistsByCodigoAsync(CodigoRepuestoVO codigo, CancellationToken ct = default)
+        {
+            var repuesto = await _context.Repuestos
+                .FirstOrDefaultAsync(r => r.Codigo.Value == codigo.Value, ct);
+            return repuesto != null;
+        }
+
         public async Task<Repuesto?> GetByIdAsync(IdVO id, CancellationToken ct = default)
         {
             return await _context.Repuestos

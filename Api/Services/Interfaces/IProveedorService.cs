@@ -1,7 +1,7 @@
 using Domain.Entities;
 using Domain.ValueObjects;
 
-namespace Application.Abstractions;
+namespace Api.Services.Interfaces;
 
 public interface IProveedorService
 {

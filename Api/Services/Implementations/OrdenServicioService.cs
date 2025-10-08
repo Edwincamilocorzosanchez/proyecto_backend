@@ -51,8 +51,8 @@ public class OrdenServicioService : IOrdenServicioService
     }
 
     public async Task<IReadOnlyList<OrdenServicio>> GetByVehiculoAsync(IdVO vehiculoId, CancellationToken ct = default)
-        => await _repository.GetByVehiculoAsync(vehiculoId, ct);
+        => await _repository.GetByVehiculoIdAsync(vehiculoId, ct);
 
     public async Task<IReadOnlyList<OrdenServicio>> GetByMecanicoAsync(IdVO mecanicoId, CancellationToken ct = default)
-        => await _repository.GetByMecanicoAsync(mecanicoId, ct);
+        => await _repository.GetByMecanicoIdAsync(mecanicoId, ct);
 }

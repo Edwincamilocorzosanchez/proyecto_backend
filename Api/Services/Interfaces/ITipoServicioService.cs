@@ -1,7 +1,7 @@
 using Domain.Entities;
 using Domain.ValueObjects;
 
-namespace Api.Services.TipoServicio;
+namespace Api.Services.Interfaces;
 
 public interface ITipoServicioService
 {

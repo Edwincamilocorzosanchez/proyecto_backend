@@ -28,7 +28,4 @@ public class HistorialInventarioService : IHistorialInventarioService
 
     public async Task<IReadOnlyList<HistorialInventario>> GetByAdminIdAsync(IdVO adminId, CancellationToken ct = default)
         => await _repository.GetByAdminIdAsync(adminId, ct);
-
-    public async Task<IReadOnlyList<HistorialInventario>> GetByTipoMovimientoAsync(IdVO tipoMovimientoId, CancellationToken ct = default)
-        => await _repository.GetByTipoMovimientoAsync(tipoMovimientoId, ct);
 }

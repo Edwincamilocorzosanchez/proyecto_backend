@@ -4,5 +4,5 @@ public record UpdateMecanicoDto(
     string Nombre,
     string? Telefono,
     string? Especialidad,
-    bool IsActive
+    bool? IsActive
 );

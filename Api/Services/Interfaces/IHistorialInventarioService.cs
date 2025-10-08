@@ -13,5 +13,4 @@ public interface IHistorialInventarioService
     // Métodos adicionales de negocio
     Task<IReadOnlyList<HistorialInventario>> GetByRepuestoIdAsync(IdVO repuestoId, CancellationToken ct = default);
     Task<IReadOnlyList<HistorialInventario>> GetByAdminIdAsync(IdVO adminId, CancellationToken ct = default);
-    Task<IReadOnlyList<HistorialInventario>> GetByTipoMovimientoAsync(IdVO tipoMovimientoId, CancellationToken ct = default);
 }

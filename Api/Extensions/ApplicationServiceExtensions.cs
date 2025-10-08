@@ -15,6 +15,8 @@ using Api.Helpers.Errors;
 using Microsoft.AspNetCore.Identity;
 using Domain.Entities.Auth;
 using Api.Services;
+using Api.Services.Implementations;
+using Api.Services.Interfaces;
 namespace Api.Extensions;
 
 public static class ApplicationServiceExtensions

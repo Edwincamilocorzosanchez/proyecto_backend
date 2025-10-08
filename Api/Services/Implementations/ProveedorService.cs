@@ -1,8 +1,9 @@
+using Api.Services.Interfaces;
 using Application.Abstractions;
 using Domain.Entities;
 using Domain.ValueObjects;
 
-namespace Application.Services;
+namespace Api.Services.Implementations;
 
 public class ProveedorService : IProveedorService
 {

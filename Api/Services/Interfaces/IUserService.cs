@@ -1,7 +1,7 @@
 using System;
 using Api.DTOs.Auth;
 
-namespace Api.Services.Users;
+namespace Api.Services.Interfaces;
 
 public interface IUserService
 {

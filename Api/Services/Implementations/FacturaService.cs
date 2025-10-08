@@ -36,7 +36,7 @@ public class FacturaService : IFacturaService
         var factura = await _repository.GetByIdAsync(facturaId, ct);
         if (factura == null) return 0;
 
-        var detalles = await _detalleRepository.GetByOrdenIdAsync(factura.OrdenServicioId, ct);
+        var detalles = await _detalleRepository.GetByOrdenServicioIdAsync(factura.OrdenServicioId, ct);
         decimal totalRepuestos = detalles.Sum(d => d.Costo.Value * d.Cantidad.Value);
 
         return totalRepuestos + factura.ManoObra.Value;

@@ -17,24 +17,34 @@ builder.Services.AddValidationErrors();
 // Configurar DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    string connectionString = builder.Configuration.GetConnectionString("Postgres")!;
+    var isDocker = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
+    string connectionString = builder.Configuration.GetConnectionString(isDocker ? "PostgresDocker" : "PostgresLocal")!;
     options.UseNpgsql(connectionString);
     options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 });
 
 var app = builder.Build();
+Console.WriteLine(builder.Configuration.GetConnectionString("Postgres"));
 
 // Swagger y middlewares
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Proyecto full-stack");
+        // esto hace que swagger se ejecute en la raiz
+        c.RoutePrefix = string.Empty; 
+    });
 }
 
 app.UseCors("CorsPolicy");
 
 app.UseHttpsRedirection();
+// app.UseRateLimiter();
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 app.Run();

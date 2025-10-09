@@ -1,101 +1,110 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Api.DTOs;
 using Api.DTOs.HistorialesInventario;
-using Application.Abstractions;
+using Api.Services.Interfaces;
+using AutoMapper;
 using Domain.Entities;
 using Domain.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Api.Controllers
+namespace Api.Controllers;
+public class HistorialesInventarioController : BaseApiController
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class HistorialInventarioController : ControllerBase
+    private readonly IHistorialInventarioService _historialInventarioService;
+    private readonly IMapper _mapper;
+
+    public HistorialesInventarioController(
+        IHistorialInventarioService historialInventarioService,
+        IMapper mapper)
     {
-        private readonly IHistorialInventarioRepository _repository;
+        _historialInventarioService = historialInventarioService;
+        _mapper = mapper;
+    }
 
-        public HistorialInventarioController(IHistorialInventarioRepository repository)
-        {
-            _repository = repository;
-        }
+    // ✅ GET: api/HistorialesInventario
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<HistorialInventarioDto>>> GetAll(CancellationToken ct)
+    {
+        var historiales = await _historialInventarioService.GetAllAsync(ct);
+        var historialesDto = _mapper.Map<IEnumerable<HistorialInventarioDto>>(historiales);
+        return Ok(historialesDto);
+    }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
-        {
-            var historial = await _repository.GetAllAsync();
-            var result = historial.Select(h => new HistorialInventarioDto
-            (
-                h.Id.Value,
-                h.RepuestoId.Value,
-                h.AdminId?.Value,
-                h.TipoMovimientoId.Value,
-                h.Cantidad.Value,
-                h.FechaMovimiento.Value,
-                h.Observaciones?.Value
-            ));
-            return Ok(result);
-        }
+    // ✅ GET: api/HistorialesInventario/{id}
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<HistorialInventarioDto>> GetById(int id, CancellationToken ct)
+    {
+        var historial = await _historialInventarioService.GetByIdAsync(new IdVO(id), ct);
+        if (historial is null)
+            return NotFound($"No se encontró el historial con ID {id}");
 
-        [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetById(int id)
-        {
-            var historial = await _repository.GetByIdAsync (new IdVO(id));
-            if (historial == null) return NotFound();
+        var dto = _mapper.Map<HistorialInventarioDto>(historial);
+        return Ok(dto);
+    }
 
-            return Ok(new HistorialInventarioDto
-            (
-                historial.Id.Value,
-                historial.RepuestoId.Value,
-                historial.AdminId?.Value,
-                historial.TipoMovimientoId.Value,
-                historial.Cantidad.Value,
-                historial.FechaMovimiento.Value,
-                historial.Observaciones?.Value
-            ));
-        }
+    // ✅ GET: api/HistorialesInventario/repuesto/{repuestoId}
+    [HttpGet("repuesto/{repuestoId:int}")]
+    public async Task<ActionResult<IEnumerable<HistorialInventarioDto>>> GetByRepuestoId(int repuestoId, CancellationToken ct)
+    {
+        var historiales = await _historialInventarioService.GetByRepuestoIdAsync(new IdVO(repuestoId), ct);
+        var dto = _mapper.Map<IEnumerable<HistorialInventarioDto>>(historiales);
+        return Ok(dto);
+    }
 
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateHistorialInventarioDto dto)
-        {
-            var historial = new HistorialInventario
-            {
-                Id = IdVO.CreateNew(),
-                RepuestoId = new IdVO(dto.RepuestoId),
-                AdminId= dto.AdminId.HasValue ? new IdVO(dto.AdminId.Value) : null,
-                TipoMovimientoId = new IdVO(dto.TipoMovimientoId),
-                Cantidad = new CantidadVO(dto.Cantidad),
-                FechaMovimiento = new FechaHistoricaVO(dto.FechaMovimiento),
-                Observaciones= !string.IsNullOrWhiteSpace(dto.Observaciones) ? new DescripcionVO(dto.Observaciones) : null
-            };
+    // ✅ GET: api/HistorialesInventario/admin/{adminId}
+    [HttpGet("admin/{adminId:int}")]
+    public async Task<ActionResult<IEnumerable<HistorialInventarioDto>>> GetByAdminId(int adminId, CancellationToken ct)
+    {
+        var historiales = await _historialInventarioService.GetByAdminIdAsync(new IdVO(adminId), ct);
+        var dto = _mapper.Map<IEnumerable<HistorialInventarioDto>>(historiales);
+        return Ok(dto);
+    }
 
-            await _repository.AddAsync(historial);
-            return CreatedAtAction(nameof(GetById), new { id = historial.Id.Value }, dto);
-        }
-        [HttpPut("{id:guid}")]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateHistorialInventarioDto dto)
-        {
-            var historial = await _repository.GetByIdAsync(new IdVO(id));
-            if (historial == null) return NotFound();
+    // ✅ POST: api/HistorialesInventario
+    [HttpPost]
+    public async Task<ActionResult<int>> Create([FromBody] CreateHistorialInventarioDto dto, CancellationToken ct)
+    {
+        var historial = new HistorialInventario(
+            new IdVO(0),
+            new IdVO(dto.RepuestoId),
+            dto.AdminId.HasValue ? new IdVO(dto.AdminId.Value) : null,
+            new IdVO(dto.TipoMovimientoId),
+            new CantidadVO(dto.Cantidad),
+            new FechaHistoricaVO(dto.FechaMovimiento),
+            string.IsNullOrWhiteSpace(dto.Observaciones) ? null : new DescripcionVO(dto.Observaciones)
+        );
 
-            historial.Cantidad = new CantidadVO(dto.Cantidad);
-            historial.FechaMovimiento = new FechaHistoricaVO(dto.FechaMovimiento);
-            historial.Observaciones = !string.IsNullOrWhiteSpace(dto.Observaciones)
-                ? new DescripcionVO(dto.Observaciones)
-                : null;
+        var newId = await _historialInventarioService.AddAsync(historial, ct);
+        return CreatedAtAction(nameof(GetById), new { id = newId }, newId);
+    }
 
-            await _repository.UpdateAsync(historial);
-            return NoContent();
-        }
+    // ✅ PUT: api/HistorialesInventario/{id}
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult> Update(int id, [FromBody] UpdateHistorialInventarioDto dto, CancellationToken ct)
+    {
+        var historialExistente = await _historialInventarioService.GetByIdAsync(new IdVO(id), ct);
+        if (historialExistente is null)
+            return NotFound($"No se encontró el historial con ID {id}");
 
-        [HttpDelete("{id:guid}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            await _repository.DeleteAsync(new IdVO(id));
-            return NoContent();
-        }
+        historialExistente.Cantidad = new CantidadVO(dto.Cantidad);
+        historialExistente.FechaMovimiento = new FechaHistoricaVO(dto.FechaMovimiento);
+        historialExistente.Observaciones = string.IsNullOrWhiteSpace(dto.Observaciones)
+            ? null
+            : new DescripcionVO(dto.Observaciones);
 
+        var actualizado = await _historialInventarioService.UpdateAsync(historialExistente, ct);
+        if (!actualizado)
+            return BadRequest("No se pudo actualizar el historial de inventario.");
+
+        return NoContent();
+    }
+
+    // ✅ DELETE: api/HistorialesInventario/{id}
+    [HttpDelete("{id:int}")]
+    public async Task<ActionResult> Delete(int id, CancellationToken ct)
+    {
+        var eliminado = await _historialInventarioService.DeleteAsync(new IdVO(id), ct);
+        if (!eliminado)
+            return NotFound($"No se encontró el historial con ID {id}");
+
+        return NoContent();
     }
 }

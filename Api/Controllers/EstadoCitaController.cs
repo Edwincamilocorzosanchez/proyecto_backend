@@ -1,5 +1,5 @@
 using Api.DTOs.EstadosCita;
-using Application.Abstractions;
+using Api.Services.Interfaces;
 using AutoMapper;
 using Domain.Entities;
 using Domain.ValueObjects;
@@ -7,15 +7,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
-// se coloca seales para que no se puedan extender, los controladores de entidades no deben extenderse
 public sealed class EstadoCitaController : BaseApiController
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IEstadoCitaService _estadoCitaService;
     private readonly IMapper _mapper;
 
-    public EstadoCitaController(IUnitOfWork unitOfWork, IMapper mapper)
+    public EstadoCitaController(IEstadoCitaService estadoCitaService, IMapper mapper)
     {
-        _unitOfWork = unitOfWork;
+        _estadoCitaService = estadoCitaService;
         _mapper = mapper;
     }
 
@@ -23,7 +22,7 @@ public sealed class EstadoCitaController : BaseApiController
     [HttpGet]
     public async Task<ActionResult<IEnumerable<EstadoCitaDto>>> GetAllAsync(CancellationToken ct)
     {
-        var estados = await _unitOfWork.EstadoCita.GetAllAsync(ct);
+        var estados = await _estadoCitaService.ObtenerTodosAsync(ct);
         var result = _mapper.Map<IEnumerable<EstadoCitaDto>>(estados);
         return Ok(result);
     }
@@ -32,9 +31,21 @@ public sealed class EstadoCitaController : BaseApiController
     [HttpGet("{id:int}")]
     public async Task<ActionResult<EstadoCitaDto>> GetByIdAsync(int id, CancellationToken ct)
     {
-        var estado = await _unitOfWork.EstadoCita.GetByIdAsync(new IdVO(id), ct);
+        var estado = await _estadoCitaService.ObtenerPorIdAsync(new IdVO(id), ct);
         if (estado is null)
-            return NotFound($"No se encontró el estado con ID {id}.");
+            return NotFound(new { message = $"No se encontró un estado con ID {id}." });
+
+        var result = _mapper.Map<EstadoCitaDto>(estado);
+        return Ok(result);
+    }
+
+    // ✅ GET: api/EstadoCita/nombre/{nombre}
+    [HttpGet("nombre/{nombre}")]
+    public async Task<ActionResult<EstadoCitaDto>> GetByNombreAsync(string nombre, CancellationToken ct)
+    {
+        var estado = await _estadoCitaService.ObtenerPorNombreAsync(new NombreVO(nombre), ct);
+        if (estado is null)
+            return NotFound(new { message = $"No se encontró un estado con el nombre '{nombre}'." });
 
         var result = _mapper.Map<EstadoCitaDto>(estado);
         return Ok(result);
@@ -44,50 +55,55 @@ public sealed class EstadoCitaController : BaseApiController
     [HttpPost]
     public async Task<ActionResult<EstadoCitaDto>> CreateAsync([FromBody] CreateEstadoCitaDto dto, CancellationToken ct)
     {
-        // Validar duplicado
-        var existing = await _unitOfWork.EstadoCita.GetByNombreAsync(new NombreVO(dto.Nombre), ct);
-        if (existing is not null)
-            return Conflict($"Ya existe un estado de orden con el nombre '{dto.Nombre}'.");
+        try
+        {
+            var estado = new EstadoCita(
+                new IdVO(0),
+                new NombreVO(dto.Nombre)
+            );
 
-        var estado = new EstadoCita(
-            new IdVO(0),
-            new NombreVO(dto.Nombre)
-        );
+            await _estadoCitaService.CrearAsync(estado, ct);
 
-        await _unitOfWork.EstadoCita.AddAsync(estado, ct);
-        await _unitOfWork.SaveChanges(ct);
-
-        var result = _mapper.Map<EstadoCitaDto>(estado);
-        return CreatedAtAction(nameof(GetByIdAsync), new { id = estado.Id.Value }, result);
+            var result = _mapper.Map<EstadoCitaDto>(estado);
+            return CreatedAtAction(nameof(GetByIdAsync), new { id = estado.Id.Value }, result);
+        }
+        catch (Exception ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
     }
 
     // ✅ PUT: api/EstadoCita/{id}
     [HttpPut("{id:int}")]
-    public async Task<ActionResult> UpdateAsync(int id, [FromBody] UpdateEstadoCitaDto dto, CancellationToken ct)
+    public async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateEstadoCitaDto dto, CancellationToken ct)
     {
-        var existing = await _unitOfWork.EstadoCita.GetByIdAsync(new IdVO(id), ct);
-        if (existing is null)
-            return NotFound($"No se encontró el estado con ID {id}.");
+        try
+        {
+            var estado = new EstadoCita(
+                new IdVO(id),
+                new NombreVO(dto.Nombre)
+            );
 
-        existing.Nombre = new NombreVO(dto.Nombre);
+            var actualizado = await _estadoCitaService.ActualizarAsync(estado, ct);
+            if (!actualizado)
+                return NotFound(new { message = $"No se pudo actualizar el estado con ID {id}." });
 
-        var updated = await _unitOfWork.EstadoCita.UpdateAsync(existing, ct);
-        if (!updated)
-            return BadRequest("No se pudo actualizar el estado.");
-
-        await _unitOfWork.SaveChanges(ct);
-        return NoContent();
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
     }
 
     // ✅ DELETE: api/EstadoCita/{id}
     [HttpDelete("{id:int}")]
-    public async Task<ActionResult> DeleteAsync(int id, CancellationToken ct)
+    public async Task<IActionResult> DeleteAsync(int id, CancellationToken ct)
     {
-        var deleted = await _unitOfWork.EstadoCita.DeleteAsync(new IdVO(id), ct);
-        if (!deleted)
-            return NotFound($"No se encontró el estado con ID {id}.");
+        var eliminado = await _estadoCitaService.EliminarAsync(new IdVO(id), ct);
+        if (!eliminado)
+            return NotFound(new { message = $"No se encontró el estado con ID {id}." });
 
-        await _unitOfWork.SaveChanges(ct);
         return NoContent();
     }
 }

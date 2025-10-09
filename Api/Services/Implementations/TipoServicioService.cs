@@ -16,7 +16,8 @@ public class TipoServicioService : ITipoServicioService
 
     public async Task<TipoServicio?> GetByIdAsync(IdVO id, CancellationToken ct = default)
         => await _unitOfWork.TipoServicio.GetByIdAsync(id, ct);
-
+    public async Task<TipoServicio?> GetByNombreAsync(NombreVO nombre, CancellationToken ct = default)
+        => await _unitOfWork.TipoServicio.GetByNombreAsync(nombre, ct);
     public async Task<IReadOnlyList<TipoServicio>> GetAllAsync(CancellationToken ct = default)
         => await _unitOfWork.TipoServicio.GetAllAsync(ct);
 

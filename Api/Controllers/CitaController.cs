@@ -1,111 +1,128 @@
-using Api.DTOs.Citas;
-using Application.Abstractions;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using AutoMapper;
+using Api.DTOs.Citas;
+using Api.Services.Interfaces;
 using Domain.Entities;
 using Domain.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
-public class CitaController : BaseApiController
+public class CitasController : BaseApiController
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly ICitaService _service;
     private readonly IMapper _mapper;
 
-    public CitaController(IUnitOfWork unitOfWork, IMapper mapper)
+    public CitasController(ICitaService service, IMapper mapper)
     {
-        _unitOfWork = unitOfWork;
+        _service = service;
         _mapper = mapper;
     }
 
     // ============================================================
-    // GET /api/cita
+    // GET /api/citas
     // ============================================================
     [HttpGet]
     public async Task<ActionResult<IEnumerable<CitaDto>>> GetAll(CancellationToken ct)
     {
-        var citas = await _unitOfWork.Citas.GetAllAsync(ct);
+        var citas = await _service.GetAllAsync(ct);
         var result = _mapper.Map<IEnumerable<CitaDto>>(citas);
         return Ok(result);
     }
 
     // ============================================================
-    // GET /api/cita/{id}
+    // GET /api/citas/{id}
     // ============================================================
     [HttpGet("{id:int}")]
     public async Task<ActionResult<CitaDto>> GetById(int id, CancellationToken ct)
     {
-        var cita = await _unitOfWork.Citas.GetByIdAsync(new IdVO(id), ct);
+        var cita = await _service.GetByIdAsync(new IdVO(id), ct);
         if (cita is null)
-            return NotFound($"No se encontró la cita con ID {id}");
+            return NotFound(new { message = $"No se encontró la cita con ID {id}" });
 
         var dto = _mapper.Map<CitaDto>(cita);
         return Ok(dto);
     }
 
     // ============================================================
-    // GET /api/cita/cliente/{clienteId}
+    // GET /api/citas/cliente/{clienteId}
     // ============================================================
     [HttpGet("cliente/{clienteId:int}")]
     public async Task<ActionResult<IEnumerable<CitaDto>>> GetByCliente(int clienteId, CancellationToken ct)
     {
-        var citas = await _unitOfWork.Citas.GetByClienteIdAsync(new IdVO(clienteId), ct);
+        var citas = await _service.GetByClienteIdAsync(new IdVO(clienteId), ct);
         var result = _mapper.Map<IEnumerable<CitaDto>>(citas);
         return Ok(result);
     }
 
     // ============================================================
-    // GET /api/cita/vehiculo/{vehiculoId}
+    // GET /api/citas/vehiculo/{vehiculoId}
     // ============================================================
     [HttpGet("vehiculo/{vehiculoId:int}")]
     public async Task<ActionResult<IEnumerable<CitaDto>>> GetByVehiculo(int vehiculoId, CancellationToken ct)
     {
-        var citas = await _unitOfWork.Citas.GetByVehiculoIdAsync(new IdVO(vehiculoId), ct);
+        var citas = await _service.GetByVehiculoIdAsync(new IdVO(vehiculoId), ct);
         var result = _mapper.Map<IEnumerable<CitaDto>>(citas);
         return Ok(result);
     }
 
     // ============================================================
-    // POST /api/cita
+    // POST /api/citas
     // ============================================================
     [HttpPost]
     public async Task<ActionResult> Create([FromBody] CreateCitaDto dto, CancellationToken ct)
     {
-        var cita = _mapper.Map<Cita>(dto);
-        await _unitOfWork.Citas.AddAsync(cita, ct);
-        await _unitOfWork.SaveChanges(ct);
+        try
+        {
+            var cita = _mapper.Map<Cita>(dto);
+            var id = await _service.AddAsync(cita, ct);
 
-        return CreatedAtAction(nameof(GetById), new { id = cita.Id.Value }, new { cita.Id.Value });
+            return CreatedAtAction(nameof(GetById), new { id = cita.Id.Value }, _mapper.Map<CitaDto>(cita));
+        }
+        catch (Exception ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
     }
 
     // ============================================================
-    // PUT /api/cita/{id}
+    // PUT /api/citas/{id}
     // ============================================================
     [HttpPut("{id:int}")]
     public async Task<ActionResult> Update(int id, [FromBody] UpdateCitaDto dto, CancellationToken ct)
     {
-        var existing = await _unitOfWork.Citas.GetByIdAsync(new IdVO(id), ct);
+        var existing = await _service.GetByIdAsync(new IdVO(id), ct);
         if (existing is null)
-            return NotFound($"No se encontró la cita con ID {id}");
+            return NotFound(new { message = $"No se encontró la cita con ID {id}" });
 
         _mapper.Map(dto, existing);
-        await _unitOfWork.Citas.UpdateAsync(existing, ct);
-        await _unitOfWork.SaveChanges(ct);
 
-        return NoContent();
+        try
+        {
+            var updated = await _service.UpdateAsync(existing, ct);
+            if (!updated)
+                return StatusCode(500, new { message = "Error actualizando la cita" });
+
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
     }
 
     // ============================================================
-    // DELETE /api/cita/{id}
+    // DELETE /api/citas/{id}
     // ============================================================
     [HttpDelete("{id:int}")]
     public async Task<ActionResult> Delete(int id, CancellationToken ct)
     {
-        var deleted = await _unitOfWork.Citas.DeleteAsync(new IdVO(id), ct);
+        var deleted = await _service.DeleteAsync(new IdVO(id), ct);
         if (!deleted)
-            return NotFound($"No se encontró la cita con ID {id}");
+            return NotFound(new { message = $"No se encontró la cita con ID {id}" });
 
-        await _unitOfWork.SaveChanges(ct);
         return NoContent();
     }
 }

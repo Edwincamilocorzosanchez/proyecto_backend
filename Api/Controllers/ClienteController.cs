@@ -1,126 +1,134 @@
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Api.DTOs.Clientes;
-using Application.Abstractions;
+using Api.Services.Interfaces;
 using AutoMapper;
-using Domain.Entities;
-using Domain.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
-public class ClienteController : BaseApiController
+public class ClientesController : BaseApiController
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IClienteService _service;
     private readonly IMapper _mapper;
 
-    public ClienteController(IUnitOfWork unitOfWork, IMapper mapper)
+    public ClientesController(IClienteService service, IMapper mapper)
     {
-        _unitOfWork = unitOfWork;
+        _service = service;
         _mapper = mapper;
     }
 
     // ============================================================
-    // GET /api/cliente
+    // GET /api/clientes
     // ============================================================
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ClienteDto>>> GetAll(CancellationToken ct)
     {
-        var clientes = await _unitOfWork.Clientes.GetAllAsync(ct);
-        var result = _mapper.Map<IEnumerable<ClienteDto>>(clientes);
-        return Ok(result);
+        var clientes = await _service.GetAllAsync();
+        return Ok(clientes);
     }
 
     // ============================================================
-    // GET /api/cliente/{id}
+    // GET /api/clientes/{id}
     // ============================================================
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<ClienteDto>> GetById(int id, CancellationToken ct)
+    public async Task<ActionResult<ClienteDto>> GetById(int id)
     {
-        var cliente = await _unitOfWork.Clientes.GetByIdAsync(new IdVO(id), ct);
-        if (cliente is null)
-            return NotFound($"No se encontró el cliente con ID {id}");
-
-        var dto = _mapper.Map<ClienteDto>(cliente);
-        return Ok(dto);
+        try
+        {
+            var cliente = await _service.GetByIdAsync(id);
+            return Ok(cliente);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
     }
 
     // ============================================================
-    // GET /api/cliente/user/{userId}
+    // GET /api/clientes/user/{userId}
     // ============================================================
     [HttpGet("user/{userId:int}")]
     public async Task<ActionResult<ClienteDto>> GetByUserId(int userId, CancellationToken ct)
     {
-        var cliente = await _unitOfWork.Clientes.GetByUserIdAsync(new IdVO(userId), ct);
-        if (cliente is null)
-            return NotFound($"No se encontró el cliente con UserId {userId}");
+        try
+        {
+            var cliente = await _service.GetByIdAsync(userId, ct);
+            if (cliente == null)
+                return NotFound(new { message = $"No se encontró el cliente con UserId {userId}" });
 
-        var dto = _mapper.Map<ClienteDto>(cliente);
-        return Ok(dto);
+            return Ok(cliente);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = ex.Message });
+        }
     }
 
     // ============================================================
-    // POST /api/cliente
+    // POST /api/clientes
     // ============================================================
     [HttpPost]
-    public async Task<ActionResult> Create([FromBody] CreateClienteDto dto, CancellationToken ct)
+    public async Task<ActionResult> Create([FromBody] CreateClienteDto dto)
     {
-        // Verificar existencia de correo
-        var exists = await _unitOfWork.Clientes.ExistsByEmailAsync(new CorreoVO(dto.Correo), ct);
-        if (exists)
-            return Conflict("Ya existe un cliente registrado con ese correo.");
-
-        var cliente = new Cliente(
-            new IdVO(0),
-            new NombreVO(dto.Nombre),
-            new CorreoVO(dto.Correo),
-            new TelefonoVO(dto.Telefono),
-            new DireccionVO(dto.Direccion),
-            new EstadoVO(dto.IsActive),
-            dto.UserId
-        );
-
-        await _unitOfWork.Clientes.AddAsync(cliente, ct);
-        await _unitOfWork.SaveChanges(ct);
-
-        var createdDto = _mapper.Map<ClienteDto>(cliente);
-        return CreatedAtAction(nameof(GetById), new { id = cliente.Id.Value }, createdDto);
+        try
+        {
+            var created = await _service.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = ex.Message });
+        }
     }
 
     // ============================================================
-    // PUT /api/cliente/{id}
+    // PUT /api/clientes/{id}
     // ============================================================
     [HttpPut("{id:int}")]
-    public async Task<ActionResult> Update(int id, [FromBody] UpdateClienteDto dto, CancellationToken ct)
+    public async Task<ActionResult> Update(int id, [FromBody] UpdateClienteDto dto)
     {
-        var existing = await _unitOfWork.Clientes.GetByIdAsync(new IdVO(id), ct);
-        if (existing is null)
-            return NotFound($"No se encontró el cliente con ID {id}");
-
-        // Actualización de propiedades
-        existing.Nombre = new NombreVO(dto.Nombre);
-        existing.Correo = new CorreoVO(dto.Correo);
-        existing.Telefono = new TelefonoVO(dto.Telefono);
-        existing.Direccion = new DireccionVO(dto.Direccion);
-        existing.IsActive = new EstadoVO(dto.IsActive);
-
-        var updated = await _unitOfWork.Clientes.UpdateAsync(existing, ct);
-        if (!updated)
-            return BadRequest("No se pudo actualizar el cliente.");
-
-        await _unitOfWork.SaveChanges(ct);
-        return NoContent();
+        try
+        {
+            var updated = await _service.UpdateAsync(id, dto);
+            return Ok(updated);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = ex.Message });
+        }
     }
 
     // ============================================================
-    // DELETE /api/cliente/{id}
+    // DELETE /api/clientes/{id}
     // ============================================================
     [HttpDelete("{id:int}")]
-    public async Task<ActionResult> Delete(int id, CancellationToken ct)
+    public async Task<ActionResult> Delete(int id)
     {
-        var deleted = await _unitOfWork.Clientes.DeleteAsync(new IdVO(id), ct);
-        if (!deleted)
-            return NotFound($"No se encontró el cliente con ID {id}");
+        try
+        {
+            var deleted = await _service.DeleteAsync(id);
+            if (!deleted)
+                return NotFound(new { message = $"No se encontró el cliente con ID {id}" });
 
-        await _unitOfWork.SaveChanges(ct);
-        return NoContent();
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = ex.Message });
+        }
     }
 }

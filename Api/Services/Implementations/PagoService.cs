@@ -43,24 +43,6 @@ public class PagoService : IPagoService
 
         return result;
     }
-    public async Task<bool> UpdateAsync(int id, UpdatePagoDto dto, CancellationToken ct = default)
-        {
-            // 1️⃣ Buscar el pago existente
-            var existingPago = await _unitOfWork.Pagos.GetByIdAsync(new IdVO((int)id), ct);
-            if (existingPago == null)
-                throw new KeyNotFoundException("El pago no existe.");
-
-            // 2️⃣ Actualizar los campos con Value Objects
-            existingPago.FacturaId = new IdVO(dto.FacturaId);
-            existingPago.MetodoPagoId = new IdVO(dto.MetodoPagoId);
-            existingPago.EstadoPagoId = new IdVO(dto.EstadoPagoId);
-            existingPago.Monto = new DineroVO(dto.Monto);
-            existingPago.FechaPago = new FechaHistoricaVO(dto.FechaPago);
-
-            // 3️⃣ Reutilizar tu método interno que valida reglas de negocio
-            return await UpdateAsync(existingPago, ct);
-        }
-
     public async Task<bool> UpdateAsync(Pago pago, CancellationToken ct = default)
     {
         if (pago.Monto.Value <= 0)

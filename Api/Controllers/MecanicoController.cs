@@ -1,5 +1,5 @@
 using Api.DTOs.Mecanicos;
-using Application.Abstractions;
+using Api.Services.Interfaces;
 using AutoMapper;
 using Domain.Entities;
 using Domain.ValueObjects;
@@ -7,31 +7,40 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
-public sealed class MecanicoController : BaseApiController
+public sealed class MecanicosController : BaseApiController
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMecanicoService _mecanicoService;
     private readonly IMapper _mapper;
 
-    public MecanicoController(IUnitOfWork unitOfWork, IMapper mapper)
+    public MecanicosController(IMecanicoService mecanicoService, IMapper mapper)
     {
-        _unitOfWork = unitOfWork;
+        _mecanicoService = mecanicoService;
         _mapper = mapper;
     }
 
-    // ✅ GET: api/Mecanico
+    // ✅ GET: api/Mecanicos
     [HttpGet]
     public async Task<ActionResult<IEnumerable<MecanicoDto>>> GetAllAsync(CancellationToken ct)
     {
-        var mecanicos = await _unitOfWork.Mecanicos.GetAllAsync(ct);
+        var mecanicos = await _mecanicoService.GetAllAsync(ct);
         var result = _mapper.Map<IEnumerable<MecanicoDto>>(mecanicos);
         return Ok(result);
     }
 
-    // ✅ GET: api/Mecanico/{id}
+    // ✅ GET: api/Mecanicos/activos
+    [HttpGet("activos")]
+    public async Task<ActionResult<IEnumerable<MecanicoDto>>> GetActiveAsync(CancellationToken ct)
+    {
+        var activos = await _mecanicoService.GetActiveAsync(ct);
+        var result = _mapper.Map<IEnumerable<MecanicoDto>>(activos);
+        return Ok(result);
+    }
+
+    // ✅ GET: api/Mecanicos/{id}
     [HttpGet("{id:int}")]
     public async Task<ActionResult<MecanicoDetailDto>> GetByIdAsync(int id, CancellationToken ct)
     {
-        var mecanico = await _unitOfWork.Mecanicos.GetByIdAsync(new IdVO(id), ct);
+        var mecanico = await _mecanicoService.GetByIdAsync(new IdVO(id), ct);
         if (mecanico is null)
             return NotFound($"No se encontró el mecánico con ID {id}.");
 
@@ -39,35 +48,35 @@ public sealed class MecanicoController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ POST: api/Mecanico
+    // ✅ POST: api/Mecanicos
     [HttpPost]
     public async Task<ActionResult<MecanicoDto>> CreateAsync([FromBody] CreateMecanicoDto dto, CancellationToken ct)
     {
-        var existeNombre = await _unitOfWork.Mecanicos.ExistsByNombreAsync(new NombreVO(dto.Nombre), ct);
+        // Validar nombre duplicado
+        var existeNombre = await _mecanicoService.ExistsByNombreAsync(new NombreVO(dto.Nombre), ct);
         if (existeNombre)
             return Conflict($"Ya existe un mecánico con el nombre '{dto.Nombre}'.");
 
         var mecanico = new Mecanico(
             new IdVO(0),
             new NombreVO(dto.Nombre),
-            string.IsNullOrEmpty(dto.Telefono) ? null : new TelefonoVO(dto.Telefono),
-            string.IsNullOrEmpty(dto.Especialidad) ? null : new EspecialidadVO(dto.Especialidad),
+            string.IsNullOrWhiteSpace(dto.Telefono) ? null : new TelefonoVO(dto.Telefono),
+            string.IsNullOrWhiteSpace(dto.Especialidad) ? null : new EspecialidadVO(dto.Especialidad),
             new EstadoVO(dto.IsActive),
             dto.UserId
         );
 
-        await _unitOfWork.Mecanicos.AddAsync(mecanico, ct);
-        await _unitOfWork.SaveChanges(ct);
-
+        var id = await _mecanicoService.AddAsync(mecanico, ct);
         var result = _mapper.Map<MecanicoDto>(mecanico);
-        return CreatedAtAction(nameof(GetByIdAsync), new { id = mecanico.Id.Value }, result);
+
+        return CreatedAtAction(nameof(GetByIdAsync), new { id }, result);
     }
 
-    // ✅ PUT: api/Mecanico/{id}
+    // ✅ PUT: api/Mecanicos/{id}
     [HttpPut("{id:int}")]
     public async Task<ActionResult> UpdateAsync(int id, [FromBody] UpdateMecanicoDto dto, CancellationToken ct)
     {
-        var existing = await _unitOfWork.Mecanicos.GetByIdAsync(new IdVO(id), ct);
+        var existing = await _mecanicoService.GetByIdAsync(new IdVO(id), ct);
         if (existing is null)
             return NotFound($"No se encontró el mecánico con ID {id}.");
 
@@ -76,23 +85,21 @@ public sealed class MecanicoController : BaseApiController
         existing.Especialidad = dto.Especialidad is null ? null : new EspecialidadVO(dto.Especialidad);
         existing.IsActive = dto.IsActive is null ? existing.IsActive : new EstadoVO(dto.IsActive.Value);
 
-        var updated = await _unitOfWork.Mecanicos.UpdateAsync(existing, ct);
+        var updated = await _mecanicoService.UpdateAsync(existing, ct);
         if (!updated)
             return BadRequest("No se pudo actualizar el mecánico.");
 
-        await _unitOfWork.SaveChanges(ct);
         return NoContent();
     }
 
-    // ✅ DELETE: api/Mecanico/{id}
+    // ✅ DELETE: api/Mecanicos/{id}
     [HttpDelete("{id:int}")]
     public async Task<ActionResult> DeleteAsync(int id, CancellationToken ct)
     {
-        var deleted = await _unitOfWork.Mecanicos.DeleteAsync(new IdVO(id), ct);
+        var deleted = await _mecanicoService.DeleteAsync(new IdVO(id), ct);
         if (!deleted)
             return NotFound($"No se encontró el mecánico con ID {id}.");
 
-        await _unitOfWork.SaveChanges(ct);
         return NoContent();
     }
 }

@@ -1,102 +1,140 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Api.DTOs;
 using Api.DTOs.Repuestos;
-using Application.Abstractions;
+using Api.Services.Interfaces;
+using AutoMapper;
 using Domain.Entities;
 using Domain.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Api.Controllers
+namespace Api.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class RepuestoController : BaseApiController
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class RepuestosController : ControllerBase
-        {
-        private readonly IRepuestoRepository _repository;
+    private readonly IRepuestoService _service;
+    private readonly IMapper _mapper;
 
-        public RepuestosController(IRepuestoRepository repository)
+    public RepuestoController(IRepuestoService service, IMapper mapper)
+    {
+        _service = service;
+        _mapper = mapper;
+    }
+
+    // ✅ GET: api/Repuesto
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<RepuestoDto>>> GetAllAsync(CancellationToken ct)
+    {
+        var repuestos = await _service.GetAllAsync(ct);
+        var result = _mapper.Map<IEnumerable<RepuestoDto>>(repuestos);
+        return Ok(result);
+    }
+
+    // ✅ GET: api/Repuesto/{id}
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<RepuestoDetailDto>> GetByIdAsync(int id, CancellationToken ct)
+    {
+        var repuesto = await _service.GetByIdAsync(new IdVO(id), ct);
+        if (repuesto == null)
+            return NotFound("Repuesto no encontrado.");
+
+        var result = _mapper.Map<RepuestoDetailDto>(repuesto);
+        return Ok(result);
+    }
+
+    // ✅ POST: api/Repuesto
+    [HttpPost]
+    public async Task<ActionResult<RepuestoDto>> CreateAsync([FromBody] CreateRepuestoDto dto, CancellationToken ct)
+    {
+        if (dto == null)
+            return BadRequest("Datos inválidos.");
+
+        var repuesto = new Repuesto
         {
-          _repository = repository;
+            Id = IdVO.CreateNew(),
+            Codigo = new CodigoRepuestoVO(dto.Codigo),
+            Descripcion = new DescripcionVO(dto.Descripcion),
+            CantidadStock = new CantidadVO(dto.CantidadStock),
+            PrecioUnitario = new DineroVO(dto.PrecioUnitario),
+            ProveedorId = dto.ProveedorId.HasValue ? new IdVO(dto.ProveedorId.Value) : null
+        };
+
+        try
+        {
+            await _service.AddAsync(repuesto, ct);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
+        var result = _mapper.Map<RepuestoDto>(repuesto);
+        return CreatedAtAction(nameof(GetByIdAsync), new { id = repuesto.Id.Value }, result);
+    }
+
+    // ✅ PUT: api/Repuesto/{id}
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult> UpdateAsync(int id, [FromBody] UpdateRepuestoDto dto, CancellationToken ct)
+    {
+        if (dto == null)
+            return BadRequest("Datos inválidos.");
+
+        try
         {
-            var repuestos = await _repository.GetAllAsync();
-            var result = repuestos.Select(r => new RepuestoDto(
-                r.Id.Value,
-                r.Codigo.Value,
-                r.Descripcion.Value,
-                r.CantidadStock.Value,
-                r.PrecioUnitario.Value,
-                r.ProveedorId?.Value
-            ));
-        
-            return Ok(result);
-        }
-        
-        
+            var existing = await _service.GetByIdAsync(new IdVO(id), ct);
+            if (existing == null)
+                return NotFound("Repuesto no encontrado.");
 
-        [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetById(int id)
-        {
-            var repuesto = await _repository.GetByIdAsync(new IdVO(id));
-            if (repuesto == null) return NotFound();
-        
-            return Ok(new RepuestoDto(
-                repuesto.Id.Value,
-                repuesto.Codigo.Value,
-                repuesto.Descripcion.Value,
-                repuesto.CantidadStock.Value,
-                repuesto.PrecioUnitario.Value,
-                repuesto.ProveedorId?.Value
-            ));
-        }
-        
+            existing.Codigo = new CodigoRepuestoVO(dto.Codigo);
+            existing.Descripcion = new DescripcionVO(dto.Descripcion);
+            existing.CantidadStock = new CantidadVO(dto.CantidadStock);
+            existing.PrecioUnitario = new DineroVO(dto.PrecioUnitario);
+            existing.ProveedorId = dto.ProveedorId.HasValue ? new IdVO(dto.ProveedorId.Value) : null;
 
+            var updated = await _service.UpdateAsync(existing, ct);
+            if (!updated)
+                return BadRequest("No se pudo actualizar el repuesto.");
 
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateRepuestoDto dto)
-        {
-            var repuesto = new Repuesto
-            {
-                Id = IdVO.CreateNew(), // o simplemente null si EF lo maneja
-                Codigo = new CodigoRepuestoVO(dto.Codigo),
-                Descripcion = new DescripcionVO(dto.Descripcion),
-                CantidadStock = new CantidadVO(dto.CantidadStock),
-                PrecioUnitario = new DineroVO(dto.PrecioUnitario),
-                ProveedorId = dto.ProveedorId.HasValue ? new IdVO(dto.ProveedorId.Value) : null
-            };
-        
-            await _repository.AddAsync(repuesto);
-            return CreatedAtAction(nameof(GetById), new { id = repuesto.Id.Value }, dto);
-        }
-
-
-        [HttpPut("{id:guid}")]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateRepuestoDto dto)
-        {
-            var repuesto = await _repository.GetByIdAsync(new IdVO(id));
-            if (repuesto == null) return NotFound();
-
-            repuesto.Codigo = new CodigoRepuestoVO(dto.Codigo);
-            repuesto.Descripcion = new DescripcionVO(dto.Descripcion);
-            repuesto.CantidadStock = new CantidadVO(dto.CantidadStock);
-            repuesto.PrecioUnitario = new DineroVO(dto.PrecioUnitario);
-            repuesto.ProveedorId = dto.ProveedorId.HasValue ? new IdVO(dto.ProveedorId.Value) : null;
-
-            await _repository.UpdateAsync(repuesto);
             return NoContent();
         }
-
-        [HttpDelete("{id:guid}")]
-        public async Task<IActionResult> Delete(int id)
+        catch (Exception ex)
         {
-            await _repository.DeleteAsync(new IdVO(id));
+            return BadRequest(ex.Message);
+        }
+    }
+
+    // ✅ DELETE: api/Repuesto/{id}
+    [HttpDelete("{id:int}")]
+    public async Task<ActionResult> DeleteAsync(int id, CancellationToken ct)
+    {
+        try
+        {
+            var deleted = await _service.DeleteAsync(new IdVO(id), ct);
+            if (!deleted)
+                return NotFound("Repuesto no encontrado.");
+
             return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    // ✅ PATCH: api/Repuesto/{id}/stock
+    [HttpPatch("{id:int}/stock")]
+    public async Task<ActionResult> UpdateStockAsync(int id, [FromQuery] int cantidad, CancellationToken ct)
+    {
+        try
+        {
+            var result = await _service.UpdateStockAsync(new IdVO(id), cantidad, ct);
+            if (!result)
+                return BadRequest("No se pudo actualizar el stock.");
+
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
         }
     }
 }

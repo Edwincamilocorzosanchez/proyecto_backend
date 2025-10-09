@@ -198,18 +198,29 @@ ReportesController
 
 ### Cosas que quizas se pueden hacer mejor
 - En la base de datos agregar la tabla inventario y anidarla con repuestos, historial_inventario...
+
 - puedo mejorar los mensajes de los Validatos de la parte de Application
-- Agregarles las columnas Nombres a todas las personas que se relacionen con UserMember
+
+- Quitarles las columnas Nombres a todas las personas que se relacionen con UserMember
+
 - agregar la columnas que me faltan de los DTOs que tienen entidades foraneas y que pueden tener consultas grandes
-- En UserMember hay UserName y en las otras entidades hay Nombre, correo y telefono. ¿Por qué no se usa el mismo? Tengo que corregirlo en todos los DTOs, entidades, Profiles, Services, Controller y configuraciones de EF
+
+- En UserMember hay UserName y en las otras entidades hay Nombre, correo y telefono. ¿Por qué no se usa el mismo? Tengo que corregirlo en todos los DTOs, entidades, Profiles, Services, Controller y configuraciones de EF.
+
 - Si el UserMember tiene un id Guid entonces todos los demas entidades que heredan el ID principal de UserMember deben ser Guid tambien. :(
 - tengo que revisar si debo de crear un Service por cada entidad o si puedo dejar los servicios de las entidades que he colocado 
 
 - En cada controlador se debe de colocar el CORS y el RateLimiter que va a aplicar
 
-- como saber si el controlador tiene que utilizar UnitOfWork o services?
+- mirar si la interfaz del servicio debe de tener el CancellationToken, quizas debo de refactorizar todos los servicios porque no implementan todos los metodos de los repositorios
+
+
 
 # Preguntas
+- hacer la refactorizacion de los controladores
+- hacer la refactorizacion de los servicios
+- hacer que los controladores sean todos plurales o singulares
+- hacer los RateLimiter y CORS en el nivel de la Api
 - que debo de hacer para que el DBSeaderFuncione 
 
 
@@ -222,5 +233,4 @@ ReportesController
 
 ## TODO por ahora 
 
-- refactorizar el codigo de los controllers para que usen services
 - hacer lo de los CORS y RateLimiter

@@ -1,94 +1,109 @@
 using Api.DTOs.EstadosPago;
-using Api.Services.Implementations;
-using Application.Abstractions;
+using Api.Services.Interfaces;
+using AutoMapper;
 using Domain.Entities;
 using Domain.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
-namespace Api.Controllers
+
+namespace Api.Controllers;
+
+public sealed class EstadoPagoController : BaseApiController
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class EstadoPagoController : ControllerBase
+    private readonly IEstadoPagoService _estadoPagoService;
+    private readonly IMapper _mapper;
+
+    public EstadoPagoController(IEstadoPagoService estadoPagoService, IMapper mapper)
     {
-        private readonly IEstadoPagoRepository _repository;
+        _estadoPagoService = estadoPagoService;
+        _mapper = mapper;
+    }
 
-        public EstadoPagoController(IEstadoPagoRepository repository)
+    // ✅ GET: api/EstadoPago
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<EstadoPagoDto>>> GetAllAsync(CancellationToken ct)
+    {
+        var estados = await _estadoPagoService.ObtenerTodosAsync(ct);
+        var result = _mapper.Map<IEnumerable<EstadoPagoDto>>(estados);
+        return Ok(result);
+    }
+
+    // ✅ GET: api/EstadoPago/{id}
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<EstadoPagoDto>> GetByIdAsync(int id, CancellationToken ct)
+    {
+        var estado = await _estadoPagoService.ObtenerPorIdAsync(new IdVO(id), ct);
+        if (estado is null)
+            return NotFound(new { message = $"No se encontró un estado con ID {id}." });
+
+        var result = _mapper.Map<EstadoPagoDto>(estado);
+        return Ok(result);
+    }
+
+    // ✅ GET: api/EstadoPago/nombre/{nombre}
+    [HttpGet("nombre/{nombre}")]
+    public async Task<ActionResult<EstadoPagoDto>> GetByNombreAsync(string nombre, CancellationToken ct)
+    {
+        var estado = await _estadoPagoService.ObtenerPorNombreAsync(new NombreVO(nombre), ct);
+        if (estado is null)
+            return NotFound(new { message = $"No se encontró un estado con el nombre '{nombre}'." });
+
+        var result = _mapper.Map<EstadoPagoDto>(estado);
+        return Ok(result);
+    }
+
+    // ✅ POST: api/EstadoPago
+    [HttpPost]
+    public async Task<ActionResult<EstadoPagoDto>> CreateAsync([FromBody] CreateEstadoPagoDto dto, CancellationToken ct)
+    {
+        try
         {
-            _repository = repository;
+            var estado = new EstadoPago(
+                new IdVO(0),
+                new NombreVO(dto.Nombre)
+            );
+
+            await _estadoPagoService.CrearAsync(estado, ct);
+
+            var result = _mapper.Map<EstadoPagoDto>(estado);
+            return CreatedAtAction(nameof(GetByIdAsync), new { id = estado.Id.Value }, result);
         }
-
-        // ✅ GET: api/EstadoPago
-        [HttpGet]
-        public async Task<IActionResult> GetAll(CancellationToken ct)
+        catch (Exception ex)
         {
-            var estados = await _repository.GetAllAsync(ct);
-            return Ok(estados.Select(e => new EstadoPagoDto(
-                e.Id.Value,
-                e.Nombre.Value
-            )));
+            return Conflict(new { message = ex.Message });
         }
+    }
 
-        // ✅ GET: api/EstadoPago/5
-        [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetById(int id, CancellationToken ct)
+    // ✅ PUT: api/EstadoPago/{id}
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateEstadoPagoDto dto, CancellationToken ct)
+    {
+        try
         {
-            var estado = await _repository.GetByIdAsync(new IdVO(id), ct);
-            if (estado == null)
-                return NotFound($"No se encontró el estado con ID {id}.");
+            var estado = new EstadoPago(
+                new IdVO(id),
+                new NombreVO(dto.Nombre)
+            );
 
-            return Ok(new EstadoPagoDto(
-                estado.Id.Value,
-                estado.Nombre.Value
-            ));
-        }
-
-        // ✅ POST: api/EstadoPago
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateEstadoPagoDto dto, CancellationToken ct)
-        {
-            if (string.IsNullOrWhiteSpace(dto.Nombre))
-                return BadRequest("El nombre del estado es obligatorio.");
-
-            var existente = await _repository.GetByNombreAsync(new NombreVO(dto.Nombre), ct);
-            if (existente != null)
-                return Conflict("Ya existe un estado con ese nombre.");
-
-            var nuevoEstado = new EstadoPago
-            {
-                Id = IdVO.CreateNew(),
-                Nombre = new NombreVO(dto.Nombre)
-            };
-
-            var idGenerado = await _repository.AddAsync(nuevoEstado, ct);
-            return CreatedAtAction(nameof(GetById), new { id = idGenerado }, dto);
-        }
-
-        // ✅ PUT: api/EstadoPago/5
-        [HttpPut("{id:int}")]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateEstadoPagoDto dto, CancellationToken ct)
-        {
-            var estado = await _repository.GetByIdAsync(new IdVO(id), ct);
-            if (estado == null)
-                return NotFound($"No se encontró el estado con ID {id}.");
-
-            estado.Nombre = new NombreVO(dto.Nombre);
-
-            var actualizado = await _repository.UpdateAsync(estado, ct);
+            var actualizado = await _estadoPagoService.ActualizarAsync(estado, ct);
             if (!actualizado)
-                return StatusCode(500, "Error al actualizar el estado de pago.");
+                return NotFound(new { message = $"No se pudo actualizar el estado con ID {id}." });
 
-            return Ok("Estado de pago actualizado correctamente.");
+            return NoContent();
         }
-
-        // ✅ DELETE: api/EstadoPago/5
-        [HttpDelete("{id:int}")]
-        public async Task<IActionResult> Delete(int id, CancellationToken ct)
+        catch (Exception ex)
         {
-            var eliminado = await _repository.DeleteAsync(new IdVO(id), ct);
-            if (!eliminado)
-                return NotFound($"No se encontró el estado con ID {id}.");
-
-            return Ok("Estado de pago eliminado correctamente.");
+            return Conflict(new { message = ex.Message });
         }
+    }
+
+    // ✅ DELETE: api/EstadoPago/{id}
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> DeleteAsync(int id, CancellationToken ct)
+    {
+        var eliminado = await _estadoPagoService.EliminarAsync(new IdVO(id), ct);
+        if (!eliminado)
+            return NotFound(new { message = $"No se encontró el estado con ID {id}." });
+
+        return NoContent();
     }
 }

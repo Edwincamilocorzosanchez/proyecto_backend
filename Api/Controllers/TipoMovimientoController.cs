@@ -1,5 +1,5 @@
 using Api.DTOs.TiposMovimiento;
-using Application.Abstractions;
+using Api.Services.Interfaces;
 using AutoMapper;
 using Domain.Entities;
 using Domain.ValueObjects;
@@ -7,14 +7,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
-public sealed class TipoMovimientoController : BaseApiController
+public class TipoMovimientoController : BaseApiController
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly ITipoMovimientoService _service;
     private readonly IMapper _mapper;
 
-    public TipoMovimientoController(IUnitOfWork unitOfWork, IMapper mapper)
+    public TipoMovimientoController(ITipoMovimientoService service, IMapper mapper)
     {
-        _unitOfWork = unitOfWork;
+        _service = service;
         _mapper = mapper;
     }
 
@@ -22,7 +22,7 @@ public sealed class TipoMovimientoController : BaseApiController
     [HttpGet]
     public async Task<ActionResult<IEnumerable<TipoMovimientoResponseDto>>> GetAllAsync(CancellationToken ct)
     {
-        var tipos = await _unitOfWork.TipoMovimiento.GetAllAsync(ct);
+        var tipos = await _service.ObtenerTodosAsync(ct);
         var result = _mapper.Map<IEnumerable<TipoMovimientoResponseDto>>(tipos);
         return Ok(result);
     }
@@ -31,8 +31,8 @@ public sealed class TipoMovimientoController : BaseApiController
     [HttpGet("{id:int}")]
     public async Task<ActionResult<TipoMovimientoResponseDto>> GetByIdAsync(int id, CancellationToken ct)
     {
-        var tipo = await _unitOfWork.TipoMovimiento.GetByIdAsync(new IdVO(id), ct);
-        if (tipo is null)
+        var tipo = await _service.ObtenerPorIdAsync(new IdVO(id), ct);
+        if (tipo == null)
             return NotFound($"No se encontró el tipo de movimiento con ID {id}.");
 
         var result = _mapper.Map<TipoMovimientoResponseDto>(tipo);
@@ -43,18 +43,19 @@ public sealed class TipoMovimientoController : BaseApiController
     [HttpPost]
     public async Task<ActionResult<TipoMovimientoResponseDto>> CreateAsync([FromBody] CreateTipoMovimientoDto dto, CancellationToken ct)
     {
-        // Validar duplicado
-        var existing = await _unitOfWork.TipoMovimiento.GetByNombreAsync(new NombreVO(dto.Nombre), ct);
-        if (existing is not null)
-            return Conflict($"Ya existe un tipo de movimiento con el nombre '{dto.Nombre}'.");
+        if (dto == null)
+            return BadRequest("Datos inválidos.");
 
-        var tipo = new TipoMovimiento(
-            new IdVO(0),
-            new NombreVO(dto.Nombre)
-        );
+        var tipo = new TipoMovimiento(IdVO.CreateNew(), new NombreVO(dto.Nombre));
 
-        await _unitOfWork.TipoMovimiento.AddAsync(tipo, ct);
-        await _unitOfWork.SaveChanges(ct);
+        try
+        {
+            await _service.CrearAsync(tipo, ct);
+        }
+        catch (Exception ex)
+        {
+            return Conflict(ex.Message);
+        }
 
         var result = _mapper.Map<TipoMovimientoResponseDto>(tipo);
         return CreatedAtAction(nameof(GetByIdAsync), new { id = tipo.Id.Value }, result);
@@ -64,17 +65,19 @@ public sealed class TipoMovimientoController : BaseApiController
     [HttpPut("{id:int}")]
     public async Task<ActionResult> UpdateAsync(int id, [FromBody] UpdateTipoMovimientoDto dto, CancellationToken ct)
     {
-        var existing = await _unitOfWork.TipoMovimiento.GetByIdAsync(new IdVO(id), ct);
-        if (existing is null)
+        if (dto == null)
+            return BadRequest("Datos inválidos.");
+
+        var existing = await _service.ObtenerPorIdAsync(new IdVO(id), ct);
+        if (existing == null)
             return NotFound($"No se encontró el tipo de movimiento con ID {id}.");
 
         existing.Nombre = new NombreVO(dto.Nombre);
 
-        var updated = await _unitOfWork.TipoMovimiento.UpdateAsync(existing, ct);
+        var updated = await _service.ActualizarAsync(existing, ct);
         if (!updated)
             return BadRequest("No se pudo actualizar el tipo de movimiento.");
 
-        await _unitOfWork.SaveChanges(ct);
         return NoContent();
     }
 
@@ -82,11 +85,10 @@ public sealed class TipoMovimientoController : BaseApiController
     [HttpDelete("{id:int}")]
     public async Task<ActionResult> DeleteAsync(int id, CancellationToken ct)
     {
-        var deleted = await _unitOfWork.TipoMovimiento.DeleteAsync(new IdVO(id), ct);
+        var deleted = await _service.EliminarAsync(new IdVO(id), ct);
         if (!deleted)
             return NotFound($"No se encontró el tipo de movimiento con ID {id}.");
 
-        await _unitOfWork.SaveChanges(ct);
         return NoContent();
     }
 }

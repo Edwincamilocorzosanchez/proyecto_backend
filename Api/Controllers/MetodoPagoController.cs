@@ -1,76 +1,90 @@
 using Api.DTOs.MetodosPago;
-using Application.Abstractions;
+using Api.Services.Interfaces;
+using AutoMapper;
 using Domain.Entities;
 using Domain.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
 
+namespace Api.Controllers;
 
-namespace Api.Controllers
+public class MetodoPagoController : BaseApiController
 {
-     [ApiController]
-    [Route("api/[controller]")]
-    public class MetodoPagoController : ControllerBase
+    private readonly IMetodoPagoService _service;
+    private readonly IMapper _mapper;
+
+    public MetodoPagoController(IMetodoPagoService service, IMapper mapper)
     {
-        private readonly IMetodoPagoRepository _service;
+        _service = service;
+        _mapper = mapper;
+    }
 
-        public MetodoPagoController(IMetodoPagoRepository service)
-        {
-            _service = service;
-        }
+    // ✅ GET: api/MetodoPago
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<MetodoPagoDto>>> GetAllAsync(CancellationToken ct)
+    {
+        var metodos = await _service.ObtenerTodosAsync(ct);
+        var result = _mapper.Map<IEnumerable<MetodoPagoDto>>(metodos);
+        return Ok(result);
+    }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
-        {
-            var result = await _service.GetAllAsync();
-            return Ok(result);
-        }
+    // ✅ GET: api/MetodoPago/{id}
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<MetodoPagoDto>> GetByIdAsync(int id, CancellationToken ct)
+    {
+        var metodo = await _service.ObtenerPorIdAsync(new IdVO(id), ct);
+        if (metodo is null)
+            return NotFound("Método de pago no encontrado.");
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
-        {
-            var result = await _service.GetByIdAsync(new IdVO(id));
-            return result is null ? NotFound("Método de pago no encontrado.") : Ok(result);
-        }
+        var result = _mapper.Map<MetodoPagoDto>(metodo);
+        return Ok(result);
+    }
 
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateMetodoPagoDto dto)
-        {
-            if (dto == null)
-                return BadRequest("Datos inválidos.");
+    // ✅ POST: api/MetodoPago
+    [HttpPost]
+    public async Task<ActionResult<MetodoPagoDto>> CreateAsync([FromBody] CreateMetodoPagoDto dto, CancellationToken ct)
+    {
+        if (dto is null)
+            return BadRequest("Datos inválidos.");
 
-            var metodoPago = new MetodoPago(
-                id: IdVO.CreateNew(),
-                nombre: new NombreVO(dto.Nombre)
-            );
+        var metodo = new MetodoPago(
+            IdVO.CreateNew(),
+            new NombreVO(dto.Nombre)
+        );
 
-            await _service.AddAsync(metodoPago);
-            return Ok("Método de pago registrado exitosamente.");
-        }
+        var id = await _service.CrearAsync(metodo, ct);
+        var result = _mapper.Map<MetodoPagoDto>(metodo);
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateMetodoPagoDto dto)
-        {
-            if (dto == null)
-                return BadRequest("Datos inválidos.");
+        return CreatedAtAction(nameof(GetByIdAsync), new { id = metodo.Id.Value }, result);
+    }
 
-            var existing = await _service.GetByIdAsync(new IdVO(id));
-            if (existing is null)
-                return NotFound("Método de pago no encontrado.");
+    // ✅ PUT: api/MetodoPago/{id}
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult> UpdateAsync(int id, [FromBody] UpdateMetodoPagoDto dto, CancellationToken ct)
+    {
+        if (dto is null)
+            return BadRequest("Datos inválidos.");
 
-            existing.Nombre = new NombreVO(dto.Nombre);
+        var existing = await _service.ObtenerPorIdAsync(new IdVO(id), ct);
+        if (existing is null)
+            return NotFound("Método de pago no encontrado.");
 
-            await _service.UpdateAsync(existing);
-            return Ok("Método de pago actualizado correctamente.");
-        }
+        existing.Nombre = new NombreVO(dto.Nombre);
+        var updated = await _service.ActualizarAsync(existing, ct);
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var deleted = await _service.DeleteAsync(new IdVO(id));
-            if (!deleted)
-                return NotFound("Método de pago no encontrado.");
+        if (!updated)
+            return BadRequest("No se pudo actualizar el método de pago.");
 
-            return Ok("Método de pago eliminado correctamente.");
-        }
+        return NoContent();
+    }
+
+    // ✅ DELETE: api/MetodoPago/{id}
+    [HttpDelete("{id:int}")]
+    public async Task<ActionResult> DeleteAsync(int id, CancellationToken ct)
+    {
+        var deleted = await _service.EliminarAsync(new IdVO(id), ct);
+        if (!deleted)
+            return NotFound("Método de pago no encontrado.");
+
+        return NoContent();
     }
 }

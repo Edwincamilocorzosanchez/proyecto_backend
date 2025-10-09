@@ -1,218 +1,131 @@
- //using System;
- //using System.Collections.Generic;
- //using System.Linq;
- //using System.Threading.Tasks;
- //using Api.DTOs;
- //using Application.Abstractions;
- //using Domain.Entities;
- //using Domain.ValueObjects;
- //using Microsoft.AspNetCore.Mvc;
-//
- //namespace Api.Controllers
- //{
- //    public class ProveedoresController : ControllerBase
- //    {
- //        private readonly IProveedorRepository _proveedorRepository;
-//
- //        public ProveedoresController(IProveedorRepository proveedorRepository)
- //        {
- //            _proveedorRepository = proveedorRepository;
- //        }
-//
- //        [HttpGet]
- //        public async Task<ActionResult<IEnumerable<ProveedorResponseDto>>> GetAll()
- //        {
- //            var proveedores = await _proveedorRepository.GetAllAsync();
-//
- //            var result = proveedores.Select(p => new ProveedorResponseDto
- //            {
- //                Id = p.Id.Value,
- //                Nombre = p.Nombre.Value,
- //                Telefono = p.Telefono?.Value,
- //                Correo = p.Correo?.Value,
- //                Direccion = p.Direccion?.Value,
- //                IsActive = p.IsActive.Value
- //            });
-//
- //            return Ok(result);
- //        }
-//
- //           [HttpGet("{id}")]
- //           public async Task<ActionResult<ProveedorResponseDto>> GetById(int id)
- //           {
- //               var proveedor = await _proveedorRepository.GetByIdAsync(new IdVO(id));
- //               if (proveedor == null) return NotFound();
-//
- //               return Ok(new ProveedorResponseDto
- //               {
- //                   Id = proveedor.Id.Value,
- //                   Nombre = proveedor.Nombre.Value,
- //                   Telefono = proveedor.Telefono?.Value,
- //                   Correo = proveedor.Correo?.Value,
- //                   Direccion = proveedor.Direccion?.Value,
- //                   IsActive = proveedor.IsActive.Value
- //               });
- //           }
-//
-//
- //        //[HttpPost]
- //        //public async Task<IActionResult> Create([FromBody] ProveedorRequestDto dto)
- //        //{
- //        //    var proveedor = new Proveedor(
- //        //        new IdVO(Guid.NewGuid()),
- //        //        new NombreVO(dto.Nombre),
- //        //        dto.Telefono != null ? new TelefonoVO(dto.Telefono) : null,
- //        //        dto.Correo != null ? new CorreoVO(dto.Correo) : null,
- //        //        dto.Direccion != null ? new DireccionVO(dto.Direccion) : null,
- //        //        new EstadoVO(dto.IsActive),
- //        //        userId
- //        //    );
-////
- //        //    await _proveedorRepository.AddAsync(proveedor);
- //        //    return CreatedAtAction(nameof(GetById), new { id = proveedor.Id.Value }, dto);
- //        //}
- //        [HttpPost]
- //        public async Task<IActionResult> Create([FromBody] ProveedorRequestDto dto)
- //        {
- //              int userId = 1; // 🔧 por ahora un valor fijo (luego lo se puede llamar del JWT o contexto)
- //          
- //              var proveedor = new Proveedor(
- //                  IdVO.CreateNew(),
- //                  new NombreVO(dto.Nombre),
- //                  dto.Telefono != null ? new TelefonoVO(dto.Telefono) : null,
- //                  dto.Correo != null ? new CorreoVO(dto.Correo) : null,
- //                  dto.Direccion != null ? new DireccionVO(dto.Direccion) : null,
- //                  new EstadoVO(dto.IsActive),
- //                  userId // ✅ nuevo argumento agregado
- //              );
-//
- //               await _proveedorRepository.AddAsync(proveedor);
- //               return CreatedAtAction(nameof(GetById), new { id = proveedor.Id.Value }, dto);
- //           }
-//
-//
- //        [HttpPut("{id}")]
- //        public async Task<IActionResult> Update(Guid id, [FromBody] ProveedorRequestDto dto)
- //        {
- //            var proveedor = await _proveedorRepository.GetByIdAsync(id);
- //            if (proveedor == null) return NotFound();
-//
- //            proveedor.Nombre = new NombreVO(dto.Nombre);
- //            proveedor.Telefono = dto.Telefono != null ? new TelefonoVO(dto.Telefono) : null;
- //            proveedor.Correo = dto.Correo != null ? new CorreoVO(dto.Correo) : null;
- //            proveedor.Direccion = dto.Direccion != null ? new DireccionVO(dto.Direccion) : null;
- //            proveedor.IsActive = new EstadoVO(dto.IsActive);
-//
- //            await _proveedorRepository.UpdateAsync(proveedor);
- //            return NoContent();
- //        }
-//
- //        [HttpDelete("{id}")]
- //        public async Task<IActionResult> Delete(Guid id)
- //        {
- //            await _proveedorRepository.DeleteAsync(id);
- //            return NoContent();
- //        }
- //    }
- //}
- using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Api.DTOs;
-using Application.Abstractions;
+using Api.DTOs.Proveedores;
+using Api.Services.Interfaces;
+using AutoMapper;
 using Domain.Entities;
 using Domain.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Api.Controllers
+namespace Api.Controllers;
+
+public class ProveedorController : BaseApiController
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ProveedoresController : ControllerBase
+    private readonly IProveedorService _service;
+    private readonly IMapper _mapper;
+
+    public ProveedorController(IProveedorService service, IMapper mapper)
     {
-        private readonly IProveedorRepository _proveedorRepository;
+        _service = service;
+        _mapper = mapper;
+    }
 
-        public ProveedoresController(IProveedorRepository proveedorRepository)
+    // ✅ GET: api/Proveedor
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<ProveedorDto>>> GetAllAsync(CancellationToken ct)
+    {
+        var proveedores = await _service.GetAllAsync(ct);
+        var result = _mapper.Map<IEnumerable<ProveedorDto>>(proveedores);
+        return Ok(result);
+    }
+
+    // ✅ GET: api/Proveedor/activos
+    [HttpGet("activos")]
+    public async Task<ActionResult<IEnumerable<ProveedorDto>>> GetActivosAsync(CancellationToken ct)
+    {
+        var proveedores = await _service.GetActivosAsync(ct);
+        var result = _mapper.Map<IEnumerable<ProveedorDto>>(proveedores);
+        return Ok(result);
+    }
+
+    // ✅ GET: api/Proveedor/{id}
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<ProveedorDetailDto>> GetByIdAsync(int id, CancellationToken ct)
+    {
+        var proveedor = await _service.GetByIdAsync(new IdVO(id), ct);
+        if (proveedor == null)
+            return NotFound("Proveedor no encontrado.");
+
+        var result = _mapper.Map<ProveedorDetailDto>(proveedor);
+        return Ok(result);
+    }
+
+    // ✅ POST: api/Proveedor
+    [HttpPost]
+    public async Task<ActionResult<ProveedorDto>> CreateAsync([FromBody] CreateProveedorDto dto, CancellationToken ct)
+    {
+        if (dto == null)
+            return BadRequest("Datos inválidos.");
+
+        var proveedor = new Proveedor
         {
-            _proveedorRepository = proveedorRepository;
+            Id = IdVO.CreateNew(),
+            Nombre = new NombreVO(dto.Nombre),
+            Telefono = string.IsNullOrEmpty(dto.Telefono) ? null : new TelefonoVO(dto.Telefono),
+            Correo = string.IsNullOrEmpty(dto.Correo) ? null : new CorreoVO(dto.Correo),
+            Direccion = string.IsNullOrEmpty(dto.Direccion) ? null : new DireccionVO(dto.Direccion),
+            IsActive = new EstadoVO(dto.IsActive),
+            UserId = dto.UserId
+        };
+
+        try
+        {
+            await _service.AddAsync(proveedor, ct);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProveedorResponseDto>>> GetAll()
+        var result = _mapper.Map<ProveedorDto>(proveedor);
+        return CreatedAtAction(nameof(GetByIdAsync), new { id = proveedor.Id.Value }, result);
+    }
+
+    // ✅ PUT: api/Proveedor/{id}
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult> UpdateAsync(int id, [FromBody] UpdateProveedorDto dto, CancellationToken ct)
+    {
+        if (dto == null)
+            return BadRequest("Datos inválidos.");
+
+        try
         {
-            var proveedores = await _proveedorRepository.GetAllAsync();
+            var existing = await _service.GetByIdAsync(new IdVO(id), ct);
+            if (existing == null)
+                return NotFound("Proveedor no encontrado.");
 
-            var result = proveedores.Select(p => new ProveedorResponseDto
-            {
-                Id = p.Id.Value,
-                Nombre = p.Nombre.Value,
-                Telefono = p.Telefono?.Value,
-                Correo = p.Correo?.Value,
-                Direccion = p.Direccion?.Value,
-                IsActive = p.IsActive.Value
-            });
+            existing.Nombre = new NombreVO(dto.Nombre);
+            existing.Telefono = string.IsNullOrEmpty(dto.Telefono) ? null : new TelefonoVO(dto.Telefono);
+            existing.Correo = string.IsNullOrEmpty(dto.Correo) ? null : new CorreoVO(dto.Correo);
+            existing.Direccion = string.IsNullOrEmpty(dto.Direccion) ? null : new DireccionVO(dto.Direccion);
+            existing.IsActive = new EstadoVO(dto.IsActive);
+            existing.UserId = dto.UserId;
 
-            return Ok(result);
-        }
+            var updated = await _service.UpdateAsync(existing, ct);
+            if (!updated)
+                return BadRequest("No se pudo actualizar el proveedor.");
 
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<ProveedorResponseDto>> GetById(int id)
-        {
-            var proveedor = await _proveedorRepository.GetByIdAsync(new IdVO(id));
-            if (proveedor == null) return NotFound();
-
-            return Ok(new ProveedorResponseDto
-            {
-                Id = proveedor.Id.Value,
-                Nombre = proveedor.Nombre.Value,
-                Telefono = proveedor.Telefono?.Value,
-                Correo = proveedor.Correo?.Value,
-                Direccion = proveedor.Direccion?.Value,
-                IsActive = proveedor.IsActive.Value
-            });
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] ProveedorRequestDto dto)
-        {
-            var proveedor = new Proveedor(
-                IdVO.CreateNew(), // usa tu método estático para ID temporal
-                new NombreVO(dto.Nombre),
-                dto.Telefono != null ? new TelefonoVO(dto.Telefono) : null,
-                dto.Correo != null ? new CorreoVO(dto.Correo) : null,
-                dto.Direccion != null ? new DireccionVO(dto.Direccion) : null,
-                new EstadoVO(dto.IsActive),
-                0 // si tu constructor requiere userId, pásalo aquí; si no, remuévelo del constructor
-            );
-
-            await _proveedorRepository.AddAsync(proveedor);
-            return CreatedAtAction(nameof(GetById), new { id = proveedor.Id.Value }, dto);
-        }
-
-        [HttpPut("{id:int}")]
-        public async Task<IActionResult> Update(int id, [FromBody] ProveedorRequestDto dto)
-        {
-            var proveedor = await _proveedorRepository.GetByIdAsync(new IdVO(id));
-            if (proveedor == null) return NotFound();
-
-            proveedor.Nombre = new NombreVO(dto.Nombre);
-            proveedor.Telefono = dto.Telefono != null ? new TelefonoVO(dto.Telefono) : null;
-            proveedor.Correo = dto.Correo != null ? new CorreoVO(dto.Correo) : null;
-            proveedor.Direccion = dto.Direccion != null ? new DireccionVO(dto.Direccion) : null;
-            proveedor.IsActive = new EstadoVO(dto.IsActive);
-
-            var updated = await _proveedorRepository.UpdateAsync(proveedor);
-            if (!updated) return StatusCode(500, "No se pudo actualizar el proveedor.");
             return NoContent();
         }
-
-        [HttpDelete("{id:int}")]
-        public async Task<IActionResult> Delete(int id)
+        catch (Exception ex)
         {
-            var deleted = await _proveedorRepository.DeleteAsync(new IdVO(id));
-            if (!deleted) return NotFound();
+            return BadRequest(ex.Message);
+        }
+    }
+
+    // ✅ DELETE: api/Proveedor/{id}
+    [HttpDelete("{id:int}")]
+    public async Task<ActionResult> DeleteAsync(int id, CancellationToken ct)
+    {
+        try
+        {
+            var deleted = await _service.DeleteAsync(new IdVO(id), ct);
+            if (!deleted)
+                return NotFound("Proveedor no encontrado.");
+
             return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
         }
     }
 }
-// deje las 2 versiones pq siento que puede cambiar en cualquier momento de guid a int (por si acaso)

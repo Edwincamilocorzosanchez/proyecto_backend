@@ -1,72 +1,102 @@
-// using System;
-// using System.Collections.Generic;
-// using System.Linq;
-// using System.Threading.Tasks;
-// using Api.DTOs;
-// using Application.Abstractions;
-// using AutoMapper;
-// using Domain.Entities;
-// using Domain.ValueObjects;
-// using Microsoft.AspNetCore.Mvc;
+using Api.DTOs.Facturas;
+using Api.Services.Interfaces;
+using AutoMapper;
+using Domain.Entities;
+using Domain.ValueObjects;
+using Microsoft.AspNetCore.Mvc;
 
-// namespace Api.Controllers
-// {
-//     [ApiController]
-//     [Route("api/[controller]")]
-//     public class FacturaController : ControllerBase
-//     {
-//         private readonly IFacturaRepository _facturaRepository;
-//         private readonly IMapper _mapper;
+namespace Api.Controllers;
 
-//         public FacturaController(IFacturaRepository facturaRepository, IMapper mapper)
-//         {
-//             _facturaRepository = facturaRepository;
-//             _mapper = mapper;
-//         }
+[Route("api/[controller]")]
+[ApiController]
+public sealed class FacturasController : BaseApiController
+{
+    private readonly IFacturaService _facturaService;
+    private readonly IMapper _mapper;
 
-//         [HttpGet]
-//         public async Task<ActionResult<IEnumerable<FacturaResponseDto>>> GetAll()
-//         {
-//             var facturas = await _facturaRepository.GetAllAsync();
-//             return Ok(_mapper.Map<IEnumerable<FacturaResponseDto>>(facturas));
-//         }
+    public FacturasController(IFacturaService facturaService, IMapper mapper)
+    {
+        _facturaService = facturaService;
+        _mapper = mapper;
+    }
 
-//         [HttpGet("{id:guid}")]
-//         public async Task<ActionResult<FacturaResponseDto>> GetById(Guid id)
-//         {
-//             var factura = await _facturaRepository.GetByIdAsync(id);
-//             if (factura == null) return NotFound();
-//             return Ok(_mapper.Map<FacturaResponseDto>(factura));
-//         }
+    // ✅ GET: api/facturas
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<FacturaDto>>> GetAllAsync(CancellationToken ct)
+    {
+        var facturas = await _facturaService.GetAllAsync(ct);
+        var result = _mapper.Map<IEnumerable<FacturaDto>>(facturas);
+        return Ok(result);
+    }
 
-//         [HttpPost]
-//         public async Task<ActionResult> Create([FromBody] FacturaRequestDto dto)
-//         {
-//             var factura = _mapper.Map<Factura>(dto);
-//             await _facturaRepository.AddAsync(factura);
-//             return CreatedAtAction(nameof(GetById), new { id = factura.Id.Value }, _mapper.Map<FacturaResponseDto>(factura));
-//         }
+    // ✅ GET: api/facturas/{id}
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<FacturaDto>> GetByIdAsync(int id, CancellationToken ct)
+    {
+        var factura = await _facturaService.GetByIdAsync(new IdVO(id), ct);
+        if (factura is null)
+            return NotFound($"No se encontró la factura con ID {id}");
 
-//         [HttpPut("{id:guid}")]
-//         public async Task<ActionResult> Update(Guid id, [FromBody] FacturaRequestDto dto)
-//         {
-//             var factura = await _facturaRepository.GetByIdAsync(id);
-//             if (factura == null) return NotFound();
+        var result = _mapper.Map<FacturaDto>(factura);
+        return Ok(result);
+    }
 
-//             factura.MontoRepuestos = new DineroVO(dto.MontoRepuestos);
-//             factura.ManoObra = new DineroVO(dto.ManoObra);
-//             factura.Total = new DineroVO(dto.Total);
-//             factura.FechaGeneracion = new FechaHistoricaVO(dto.FechaGeneracion);
+    // ✅ GET: api/facturas/orden/{ordenServicioId}
+    [HttpGet("orden/{ordenServicioId:int}")]
+    public async Task<ActionResult<IEnumerable<FacturaDto>>> GetByOrdenServicioIdAsync(int ordenServicioId, CancellationToken ct)
+    {
+        var facturas = await _facturaService.GetByOrdenServicioIdAsync(new IdVO(ordenServicioId), ct);
+        var result = _mapper.Map<IEnumerable<FacturaDto>>(facturas);
+        return Ok(result);
+    }
 
-//             await _facturaRepository.UpdateAsync(factura);
-//             return NoContent();
-//         }
+    // ✅ POST: api/facturas
+    [HttpPost]
+    public async Task<ActionResult> CreateAsync([FromBody] CreateFacturaDto dto, CancellationToken ct)
+    {
+        var factura = _mapper.Map<Factura>(dto);
 
-//         [HttpDelete("{id:guid}")]
-//         public async Task<ActionResult> Delete(Guid id)
-//         {
-//             await _facturaRepository.DeleteAsync(id);
-//             return NoContent();
-//         }
-//     }
-// }
+        var result = await _facturaService.AddAsync(factura, ct);
+        if (result <= 0)
+            return BadRequest("No se pudo crear la factura");
+
+        var createdDto = _mapper.Map<FacturaDto>(factura);
+        return CreatedAtAction(nameof(GetByIdAsync), new { id = factura.Id.Value }, createdDto);
+    }
+
+    // ✅ PUT: api/facturas/{id}
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult> UpdateAsync(int id, UpdateFacturaDto dto, CancellationToken ct)
+    {
+        var existing = await _facturaService.GetByIdAsync(new IdVO(id), ct);
+        if (existing is null)
+            return NotFound($"No se encontró la factura con ID {id}");
+
+        _mapper.Map(dto, existing); // aplica los cambios del DTO sobre la entidad
+
+        var updated = await _facturaService.UpdateAsync(existing, ct);
+        if (!updated)
+            return BadRequest("No se pudo actualizar la factura");
+
+        return NoContent();
+    }
+
+    // ✅ DELETE: api/facturas/{id}
+    [HttpDelete("{id:int}")]
+    public async Task<ActionResult> DeleteAsync(int id, CancellationToken ct)
+    {
+        var deleted = await _facturaService.DeleteAsync(new IdVO(id), ct);
+        if (!deleted)
+            return NotFound($"No se encontró la factura con ID {id}");
+
+        return NoContent();
+    }
+
+    // ✅ GET: api/facturas/{id}/calcular-total
+    [HttpGet("{id:int}/calcular-total")]
+    public async Task<ActionResult<decimal>> CalcularTotalAsync(int id, CancellationToken ct)
+    {
+        var total = await _facturaService.CalcularTotalAsync(new IdVO(id), ct);
+        return Ok(total);
+    }
+}

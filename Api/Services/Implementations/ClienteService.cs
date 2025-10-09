@@ -24,7 +24,7 @@ public class ClienteService : IClienteService
         return _mapper.Map<IEnumerable<ClienteDto>>(clientes);
     }
 
-    public async Task<ClienteDto> GetByIdAsync(int id)
+    public async Task<ClienteDto> GetByIdAsync(int id, CancellationToken ct = default)
     {
         var cliente = await _unitOfWork.Clientes.GetByIdAsync(new IdVO(id));
         if (cliente == null)

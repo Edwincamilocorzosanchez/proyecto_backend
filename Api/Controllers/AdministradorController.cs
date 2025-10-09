@@ -1,7 +1,9 @@
-using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using AutoMapper;
 using Api.DTOs.Administradores;
-using Application.Abstractions;
+using Api.Services.Interfaces;
 using Domain.Entities;
 using Domain.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
@@ -10,19 +12,19 @@ namespace Api.Controllers;
 
 public class AdministradoresController : BaseApiController
 {
+    private readonly IAdministradorService _service;
     private readonly IMapper _mapper;
-    private readonly IUnitOfWork _unitOfWork;
 
-    public AdministradoresController(IMapper mapper, IUnitOfWork unitOfWork)
+    public AdministradoresController(IAdministradorService service, IMapper mapper)
     {
+        _service = service;
         _mapper = mapper;
-        _unitOfWork = unitOfWork;
     }
 
     [HttpGet("all")]
     public async Task<ActionResult<IEnumerable<AdministradorDto>>> GetAll(CancellationToken ct)
     {
-        var admins = await _unitOfWork.Admins.GetAllAsync(ct);
+        var admins = await _service.GetAllAsync(ct);
         var dto = _mapper.Map<IEnumerable<AdministradorDto>>(admins);
         return Ok(dto);
     }
@@ -30,7 +32,7 @@ public class AdministradoresController : BaseApiController
     [HttpGet("{id:int}")]
     public async Task<ActionResult<AdministradorDto>> GetById(int id, CancellationToken ct)
     {
-        var admin = await _unitOfWork.Admins.GetByIdAsync(new IdVO(id), ct);
+        var admin = await _service.GetByIdAsync(new IdVO(id), ct);
         if (admin is null) return NotFound();
 
         return Ok(_mapper.Map<AdministradorDto>(admin));
@@ -39,41 +41,50 @@ public class AdministradoresController : BaseApiController
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateAdministradorDto body, CancellationToken ct)
     {
-        // Validación de unicidad por nombre
-        var nombreVo = new NombreVO(body.Nombre);
-        if (await _unitOfWork.Admins.ExistsByNombreAsync(nombreVo, ct))
-            return Conflict(new { message = "Administrador con este nombre ya existe" });
+        try
+        {
+            var admin = _mapper.Map<Administrador>(body);
+            var id = await _service.AddAsync(admin, ct);
 
-        var admin = _mapper.Map<Administrador>(body);
-        await _unitOfWork.Admins.AddAsync(admin, ct);
-
-        var dto = _mapper.Map<AdministradorDto>(admin);
-        return CreatedAtAction(nameof(GetById), new { id = dto.Id }, dto);
+            var dto = _mapper.Map<AdministradorDto>(admin);
+            return CreatedAtAction(nameof(GetById), new { id = dto.Id }, dto);
+        }
+        catch (Exception ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
     }
 
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateAdministradorDto body, CancellationToken ct)
     {
-        var admin = await _unitOfWork.Admins.GetByIdAsync(new IdVO(id), ct);
-        if (admin is null) return NotFound();
+        var existing = await _service.GetByIdAsync(new IdVO(id), ct);
+        if (existing is null) return NotFound();
 
-        // Map parcial
-        if (body.Nombre != null) admin.Nombre = new NombreVO(body.Nombre);
-        if (body.Telefono != null) admin.Telefono = new TelefonoVO(body.Telefono);
-        if (body.NivelAcceso != null) admin.NivelAcceso = new NivelAccesoVO(body.NivelAcceso);
-        if (body.AreaResponsabilidad != null) admin.AreaResponsabilidad = new DescripcionVO(body.AreaResponsabilidad);
-        if (body.IsActive.HasValue) admin.IsActive = new EstadoVO(body.IsActive.Value);
+        // Map parcial con value objects
+        if (body.Nombre != null) existing.Nombre = new NombreVO(body.Nombre);
+        if (body.Telefono != null) existing.Telefono = new TelefonoVO(body.Telefono);
+        if (body.NivelAcceso != null) existing.NivelAcceso = new NivelAccesoVO(body.NivelAcceso);
+        if (body.AreaResponsabilidad != null) existing.AreaResponsabilidad = new DescripcionVO(body.AreaResponsabilidad);
+        if (body.IsActive.HasValue) existing.IsActive = new EstadoVO(body.IsActive.Value);
 
-        var updated = await _unitOfWork.Admins.UpdateAsync(admin, ct);
-        if (!updated) return StatusCode(500, new { message = "Error actualizando administrador" });
+        try
+        {
+            var updated = await _service.UpdateAsync(existing, ct);
+            if (!updated) return StatusCode(500, new { message = "Error actualizando administrador" });
 
-        return NoContent();
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
     }
 
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id, CancellationToken ct)
     {
-        var deleted = await _unitOfWork.Admins.DeleteAsync(new IdVO(id), ct);
+        var deleted = await _service.DeleteAsync(new IdVO(id), ct);
         if (!deleted) return NotFound();
 
         return NoContent();
@@ -82,10 +93,10 @@ public class AdministradoresController : BaseApiController
     [HttpGet("nivel/{nivel}")]
     public async Task<ActionResult<IEnumerable<AdministradorDto>>> GetByNivelAcceso(string nivel, CancellationToken ct)
     {
-        var nivelVo = new NivelAccesoVO(nivel);
-        var admins = await _unitOfWork.Admins.GetByNivelAccesoAsync(nivelVo, ct);
-        var dto = _mapper.Map<IEnumerable<AdministradorDto>>(admins);
+        var all = await _service.GetAllAsync(ct);
+        var filtered = all.Where(a => a.NivelAcceso.Value.Equals(nivel, StringComparison.OrdinalIgnoreCase));
+
+        var dto = _mapper.Map<IEnumerable<AdministradorDto>>(filtered);
         return Ok(dto);
     }
 }
-

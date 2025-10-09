@@ -1,5 +1,5 @@
 using Api.DTOs.DetallesOrden;
-using Application.Abstractions;
+using Api.Services.Interfaces;
 using AutoMapper;
 using Domain.Entities;
 using Domain.ValueObjects;
@@ -9,12 +9,12 @@ namespace Api.Controllers;
 
 public class DetalleOrdenController : BaseApiController
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IDetalleOrdenService _detalleOrdenService;
     private readonly IMapper _mapper;
 
-    public DetalleOrdenController(IUnitOfWork unitOfWork, IMapper mapper)
+    public DetalleOrdenController(IDetalleOrdenService detalleOrdenService, IMapper mapper)
     {
-        _unitOfWork = unitOfWork;
+        _detalleOrdenService = detalleOrdenService;
         _mapper = mapper;
     }
 
@@ -24,22 +24,7 @@ public class DetalleOrdenController : BaseApiController
     [HttpGet("orden/{ordenServicioId:int}")]
     public async Task<ActionResult<IEnumerable<DetalleOrdenDto>>> GetByOrdenServicio(int ordenServicioId, CancellationToken ct)
     {
-        var detalles = await _unitOfWork.DetalleOrden
-            .GetByOrdenServicioIdAsync(new IdVO(ordenServicioId), ct);
-
-        var result = _mapper.Map<IEnumerable<DetalleOrdenDto>>(detalles);
-        return Ok(result);
-    }
-
-    // ============================================================
-    // GET /api/detalleorden/repuesto/{repuestoId}
-    // ============================================================
-    [HttpGet("repuesto/{repuestoId:int}")]
-    public async Task<ActionResult<IEnumerable<DetalleOrdenDto>>> GetByRepuesto(int repuestoId, CancellationToken ct)
-    {
-        var detalles = await _unitOfWork.DetalleOrden
-            .GetByRepuestoIdAsync(new IdVO(repuestoId), ct);
-
+        var detalles = await _detalleOrdenService.GetByOrdenIdAsync(new IdVO(ordenServicioId), ct);
         var result = _mapper.Map<IEnumerable<DetalleOrdenDto>>(detalles);
         return Ok(result);
     }
@@ -50,8 +35,7 @@ public class DetalleOrdenController : BaseApiController
     [HttpGet("{ordenServicioId:int}/{repuestoId:int}")]
     public async Task<ActionResult<DetalleOrdenDto>> GetByIds(int ordenServicioId, int repuestoId, CancellationToken ct)
     {
-        var detalle = await _unitOfWork.DetalleOrden
-            .GetByIdsAsync(new IdVO(ordenServicioId), new IdVO(repuestoId), ct);
+        var detalle = await _detalleOrdenService.GetByIdAsync(new IdVO(ordenServicioId), new IdVO(repuestoId), ct);
 
         if (detalle is null)
             return NotFound($"No se encontró el detalle con OrdenServicioId={ordenServicioId} y RepuestoId={repuestoId}");
@@ -67,8 +51,7 @@ public class DetalleOrdenController : BaseApiController
     public async Task<ActionResult> Create([FromBody] CreateDetalleOrdenDto dto, CancellationToken ct)
     {
         var detalle = _mapper.Map<DetalleOrden>(dto);
-        await _unitOfWork.DetalleOrden.AddAsync(detalle, ct);
-        await _unitOfWork.SaveChanges(ct);
+        await _detalleOrdenService.AddAsync(detalle, ct);
 
         return CreatedAtAction(nameof(GetByIds),
             new { ordenServicioId = dto.OrdenServicioId, repuestoId = dto.RepuestoId },
@@ -81,15 +64,15 @@ public class DetalleOrdenController : BaseApiController
     [HttpPut("{ordenServicioId:int}/{repuestoId:int}")]
     public async Task<ActionResult> Update(int ordenServicioId, int repuestoId, [FromBody] UpdateDetalleOrdenDto dto, CancellationToken ct)
     {
-        var existing = await _unitOfWork.DetalleOrden
-            .GetByIdsAsync(new IdVO(ordenServicioId), new IdVO(repuestoId), ct);
-
+        var existing = await _detalleOrdenService.GetByIdAsync(new IdVO(ordenServicioId), new IdVO(repuestoId), ct);
         if (existing is null)
             return NotFound($"No se encontró el detalle con OrdenServicioId={ordenServicioId} y RepuestoId={repuestoId}");
 
         _mapper.Map(dto, existing);
-        await _unitOfWork.DetalleOrden.UpdateAsync(existing, ct);
-        await _unitOfWork.SaveChanges(ct);
+        var updated = await _detalleOrdenService.UpdateAsync(existing, ct);
+
+        if (!updated)
+            return BadRequest("No se pudo actualizar el detalle.");
 
         return NoContent();
     }
@@ -100,13 +83,11 @@ public class DetalleOrdenController : BaseApiController
     [HttpDelete("{ordenServicioId:int}/{repuestoId:int}")]
     public async Task<ActionResult> Delete(int ordenServicioId, int repuestoId, CancellationToken ct)
     {
-        var deleted = await _unitOfWork.DetalleOrden
-            .DeleteAsync(new IdVO(ordenServicioId), new IdVO(repuestoId), ct);
+        var deleted = await _detalleOrdenService.DeleteAsync(new IdVO(ordenServicioId), new IdVO(repuestoId), ct);
 
         if (!deleted)
             return NotFound($"No se encontró el detalle con OrdenServicioId={ordenServicioId} y RepuestoId={repuestoId}");
 
-        await _unitOfWork.SaveChanges(ct);
         return NoContent();
     }
 }

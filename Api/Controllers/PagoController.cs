@@ -1,71 +1,134 @@
 using Api.DTOs.Pagos;
-using Api.Services.Implementations;
-using Application.Pagos;
+using Api.Services.Interfaces;
+using AutoMapper;
 using Domain.Entities;
 using Domain.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
 
+namespace Api.Controllers;
 
-namespace Api.Controllers
- {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class PagoController : ControllerBase
+[ApiController]
+[Route("api/[controller]")]
+public class PagoController : BaseApiController
+{
+    private readonly IPagoService _service;
+    private readonly IMapper _mapper;
+
+    public PagoController(IPagoService service, IMapper mapper)
     {
-        private readonly PagoService _service;
-        public PagoController(PagoService service)
-        {
-            _service = service;
-        }
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
-        {
-            var result = await _service.GetAllAsync();
-            return Ok(result);
-        }
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
-        {
-            var result = await _service.GetByIdAsync(new IdVO(id));
-            return result is null ? NotFound() : Ok(result);
-        }
-        
-        [HttpPost]
+        _service = service;
+        _mapper = mapper;
+    }
 
-        public async Task<IActionResult> Create([FromBody] CreatePagoDto dto)
+    // ✅ GET: api/Pago
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<PagoDto>>> GetAllAsync(CancellationToken ct)
+    {
+        var pagos = await _service.GetAllAsync(ct);
+        var result = _mapper.Map<IEnumerable<PagoDto>>(pagos);
+        return Ok(result);
+    }
+
+    // ✅ GET: api/Pago/{id}
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<PagoDetailDto>> GetByIdAsync(int id, CancellationToken ct)
+    {
+        var pago = await _service.GetByIdAsync(new IdVO(id), ct);
+        if (pago == null)
+            return NotFound("Pago no encontrado.");
+
+        var result = _mapper.Map<PagoDetailDto>(pago);
+        return Ok(result);
+    }
+
+    // ✅ GET: api/Pago/factura/{facturaId}
+    [HttpGet("factura/{facturaId:int}")]
+    public async Task<ActionResult<IEnumerable<PagoDto>>> GetByFacturaAsync(int facturaId, CancellationToken ct)
+    {
+        var pagos = await _service.GetByFacturaIdAsync(new IdVO(facturaId), ct);
+        var result = _mapper.Map<IEnumerable<PagoDto>>(pagos);
+        return Ok(result);
+    }
+
+    // ✅ POST: api/Pago
+    [HttpPost]
+    public async Task<ActionResult<PagoDto>> CreateAsync([FromBody] CreatePagoDto dto, CancellationToken ct)
+    {
+        if (dto == null)
+            return BadRequest("Datos inválidos.");
+
+        var pago = new Pago
         {
-            var pago = new Pago
-            {
-                Id = IdVO.CreateNew(),
-                FacturaId = new IdVO(dto.FacturaId),
-                MetodoPagoId = new IdVO(dto.MetodoPagoId),
-                EstadoPagoId = new IdVO(dto.EstadoPagoId),
-                Monto = new DineroVO(dto.Monto),
-                FechaPago = new FechaHistoricaVO(dto.FechaPago)
-            };
-        
-            await _service.AddAsync(pago);
-            return Ok("Pago registrado exitosamente.");
+            Id = IdVO.CreateNew(),
+            FacturaId = new IdVO(dto.FacturaId),
+            MetodoPagoId = new IdVO(dto.MetodoPagoId),
+            EstadoPagoId = new IdVO(dto.EstadoPagoId),
+            Monto = new DineroVO(dto.Monto),
+            FechaPago = new FechaHistoricaVO(dto.FechaPago)
+        };
+
+        try
+        {
+            await _service.AddAsync(pago, ct);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
         }
 
+        var result = _mapper.Map<PagoDto>(pago);
+        return CreatedAtAction(nameof(GetByIdAsync), new { id = pago.Id.Value }, result);
+    }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdatePagoDto dto)
+    // ✅ PUT: api/Pago/{id}
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult> UpdateAsync(int id, [FromBody] UpdatePagoDto dto, CancellationToken ct)
+    {
+        if (dto == null)
+            return BadRequest("Datos inválidos.");
+
+        try
         {
-            var result = await _service.UpdateAsync(id, dto);
+            // Obtener el pago existente
+            var existingPago = await _service.GetByIdAsync(new IdVO(id), ct);
+            if (existingPago == null)
+                return NotFound("Pago no encontrado.");
 
-            if (!result)
+            // Actualizar los valores con Value Objects
+            existingPago.FacturaId = new IdVO(dto.FacturaId);
+            existingPago.MetodoPagoId = new IdVO(dto.MetodoPagoId);
+            existingPago.EstadoPagoId = new IdVO(dto.EstadoPagoId);
+            existingPago.Monto = new DineroVO(dto.Monto);
+            existingPago.FechaPago = new FechaHistoricaVO(dto.FechaPago);
+
+            // Llamar al servicio para actualizar
+            var updated = await _service.UpdateAsync(existingPago, ct);
+            if (!updated)
                 return BadRequest("No se pudo actualizar el pago.");
 
-            return Ok("Pago actualizado correctamente.");
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    // ✅ DELETE: api/Pago/{id}
+    [HttpDelete("{id:int}")]
+    public async Task<ActionResult> DeleteAsync(int id, CancellationToken ct)
+    {
+        try
+        {
+            var deleted = await _service.DeleteAsync(new IdVO(id), ct);
+            if (!deleted)
+                return NotFound("Pago no encontrado.");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
         }
 
-        
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            await _service.DeleteAsync(new IdVO(id));
-            return Ok("Pago eliminado.");
-        }
-     }
- }
+        return NoContent();
+    }
+}

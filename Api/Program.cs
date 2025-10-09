@@ -24,6 +24,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 
 var app = builder.Build();
+// muestra la conexion a la base de datos de Postgres
 Console.WriteLine(builder.Configuration.GetConnectionString("Postgres"));
 
 // Swagger y middlewares
@@ -38,8 +39,11 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseCors("CorsPolicy");
+// esto es para agregar los Seeders de la base de datos
+await app.SeedDatabaseAsync();
 
+// agregar CORS y RateLimiter
+app.UseCors("CorsPolicy");
 app.UseHttpsRedirection();
 // app.UseRateLimiter();
 

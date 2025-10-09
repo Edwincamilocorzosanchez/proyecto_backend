@@ -9,12 +9,12 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class PagoController : BaseApiController
+public class PagosController : BaseApiController
 {
     private readonly IPagoService _service;
     private readonly IMapper _mapper;
 
-    public PagoController(IPagoService service, IMapper mapper)
+    public PagosController(IPagoService service, IMapper mapper)
     {
         _service = service;
         _mapper = mapper;

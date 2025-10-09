@@ -7,14 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
-public class TipoServicioController : BaseApiController
+public class TiposServicioController : BaseApiController
 {
     private readonly ITipoServicioService _service;
     private readonly IMapper _mapper;
 
-    public TipoServicioController(ITipoServicioService service, IMapper mapper)
+    public TiposServicioController(ITipoServicioService service, IMapper mapper)
     {
         _service = service;
         _mapper = mapper;

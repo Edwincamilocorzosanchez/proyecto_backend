@@ -7,12 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
-public sealed class EstadoPagoController : BaseApiController
+public sealed class EstadosPagoController : BaseApiController
 {
     private readonly IEstadoPagoService _estadoPagoService;
     private readonly IMapper _mapper;
 
-    public EstadoPagoController(IEstadoPagoService estadoPagoService, IMapper mapper)
+    public EstadosPagoController(IEstadoPagoService estadoPagoService, IMapper mapper)
     {
         _estadoPagoService = estadoPagoService;
         _mapper = mapper;

@@ -7,12 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
-public class TipoMovimientoController : BaseApiController
+public class TiposMovimientoController : BaseApiController
 {
     private readonly ITipoMovimientoService _service;
     private readonly IMapper _mapper;
 
-    public TipoMovimientoController(ITipoMovimientoService service, IMapper mapper)
+    public TiposMovimientoController(ITipoMovimientoService service, IMapper mapper)
     {
         _service = service;
         _mapper = mapper;

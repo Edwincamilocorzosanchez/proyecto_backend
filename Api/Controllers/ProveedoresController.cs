@@ -7,12 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
-public class ProveedorController : BaseApiController
+public class ProveedoresController : BaseApiController
 {
     private readonly IProveedorService _service;
     private readonly IMapper _mapper;
 
-    public ProveedorController(IProveedorService service, IMapper mapper)
+    public ProveedoresController(IProveedorService service, IMapper mapper)
     {
         _service = service;
         _mapper = mapper;

@@ -7,12 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
-public sealed class EstadoOrdenController : BaseApiController
+public sealed class EstadosOrdenController : BaseApiController
 {
     private readonly IEstadoOrdenService _estadoOrdenService;
     private readonly IMapper _mapper;
 
-    public EstadoOrdenController(IEstadoOrdenService estadoOrdenService, IMapper mapper)
+    public EstadosOrdenController(IEstadoOrdenService estadoOrdenService, IMapper mapper)
     {
         _estadoOrdenService = estadoOrdenService;
         _mapper = mapper;

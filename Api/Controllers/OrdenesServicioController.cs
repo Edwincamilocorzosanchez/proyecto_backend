@@ -7,12 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
-public class OrdenServicioController : BaseApiController
+public class OrdenesServicioController : BaseApiController
 {
     private readonly IOrdenServicioService _service;
     private readonly IMapper _mapper;
 
-    public OrdenServicioController(IOrdenServicioService service, IMapper mapper)
+    public OrdenesServicioController(IOrdenServicioService service, IMapper mapper)
     {
         _service = service;
         _mapper = mapper;

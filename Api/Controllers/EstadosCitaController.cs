@@ -7,12 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
-public sealed class EstadoCitaController : BaseApiController
+public sealed class EstadosCitaController : BaseApiController
 {
     private readonly IEstadoCitaService _estadoCitaService;
     private readonly IMapper _mapper;
 
-    public EstadoCitaController(IEstadoCitaService estadoCitaService, IMapper mapper)
+    public EstadosCitaController(IEstadoCitaService estadoCitaService, IMapper mapper)
     {
         _estadoCitaService = estadoCitaService;
         _mapper = mapper;

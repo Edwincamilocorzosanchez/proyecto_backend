@@ -232,5 +232,5 @@ ReportesController
 
 
 ## TODO por ahora 
-
+- Hacer lo del DbSeeder
 - hacer lo de los CORS y RateLimiter

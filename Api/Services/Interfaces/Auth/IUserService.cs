@@ -11,4 +11,8 @@ public interface IUserService
     Task<string> AddRoleAsync(AddRoleDto model);
 
     Task<DataUserDto> RefreshTokenAsync(string refreshToken);
+
+    Task<DataUserDto?> GetByIdAsync(int id, CancellationToken ct = default);
+    Task<IEnumerable<DataUserDto>> GetAllAsync(CancellationToken ct = default);
+    Task<int> CountAsync(string? q, CancellationToken ct = default);
 }

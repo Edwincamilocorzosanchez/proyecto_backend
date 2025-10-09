@@ -3,6 +3,8 @@ using Api.DTOs.Auth;
 using Api.Services;
 using Api.Services.Interfaces;
 using Api.Services.Interfaces.Auth;
+using AutoMapper;
+using Domain.Entities.Auth;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers.Auth;
@@ -63,5 +65,17 @@ public class UserController : BaseApiController
             Expires = DateTime.UtcNow.AddDays(10),
         };
         Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
+    }
+
+    // Obtener por id 
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<DataUserDto>> GetByIdAsync(int id, CancellationToken ct)
+    {
+        var user = await _userService.GetByIdAsync(id, ct);
+        if (user == null)
+            return NotFound("Usuario no encontrado.");
+
+        // user ya es DataUserDto
+        return Ok(user); 
     }
 }

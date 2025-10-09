@@ -216,18 +216,6 @@ ReportesController
 
 
 
-# Preguntas
-- hacer la refactorizacion de los controladores
-- hacer la refactorizacion de los servicios
-- hacer que los controladores sean todos plurales o singulares
-- hacer los RateLimiter y CORS en el nivel de la Api
-- que debo de hacer para que el DBSeaderFuncione 
-
-
-
-
-
-
 
 
 

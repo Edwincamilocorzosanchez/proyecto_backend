@@ -9,6 +9,13 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Api.Extensions;
 
+// lista de entidades
+// roles 
+// usuarios base 
+// usuarios extendidos clientes, proveedores, mecanicos, administradores)
+// estados de cita, orden y pago 
+// tipos de movimientos 
+// metodos de pago
 public static class DbSeederExtensions
 {
     public static async Task SeedDatabaseAsync(this WebApplication app)
@@ -25,7 +32,7 @@ public static class DbSeederExtensions
         await SeedProveedoresAsync(db);
         await SeedRepuestosAsync(db);
 
-        // Si quieres, aquí puedes agregar más métodos para clientes, mecanicos, etc.
+        // aqui se pueden agregar mas seeds de entidades
     }
 
     // =========================================
@@ -89,23 +96,23 @@ public static class DbSeederExtensions
     // =========================================
     private static async Task SeedEstadosAsync(AppDbContext db)
     {
-        // Estados de cita
-        var estadosCita = new[] { "Pendiente", "Confirmada", "Cancelada", "Completada" };
-        var existingCita = await db.EstadosCita.Select(e => e.Nombre).ToListAsync();
-        db.EstadosCita.AddRange(
-            estadosCita.Except(existingCita)
-                       .Select(e => new EstadoCita { Nombre = e })
-        );
+        // // Estados de cita
+        // var estadosCita = new[] { "Pendiente", "Confirmada", "Cancelada", "Completada" };
+        // var existingCita = await db.EstadosCita.Select(e => e.Nombre).ToListAsync();
+        // db.EstadosCita.AddRange(
+        //     estadosCita.Except(existingCita)
+        //                .Select(e => new EstadoCita { Nombre = e })
+        // );
 
-        // Estados de orden
-        var estadosOrden = new[] { "Pendiente", "En Proceso", "Finalizada", "Cancelada" };
-        var existingOrden = await db.EstadosOrden.Select(e => e.Nombre).ToListAsync();
-        db.EstadosOrden.AddRange(
-            estadosOrden.Except(existingOrden)
-                        .Select(e => new EstadoOrden { Nombre = e })
-        );
+        // // Estados de orden
+        // var estadosOrden = new[] { "Pendiente", "En Proceso", "Finalizada", "Cancelada" };
+        // var existingOrden = await db.EstadosOrden.Select(e => e.Nombre).ToListAsync();
+        // db.EstadosOrden.AddRange(
+        //     estadosOrden.Except(existingOrden)
+        //                 .Select(e => new EstadoOrden { Nombre = e })
+        // );
 
-        await db.SaveChangesAsync();
+        // await db.SaveChangesAsync();
     }
 
     // =========================================
@@ -113,14 +120,14 @@ public static class DbSeederExtensions
     // =========================================
     private static async Task SeedTiposMovimientoAsync(AppDbContext db)
     {
-        var movimientos = new[] { "Ingreso", "Salida", "Ajuste" };
-        var existing = await db.TiposMovimiento.Select(t => t.Nombre).ToListAsync();
+        // var movimientos = new[] { "Ingreso", "Salida", "Ajuste" };
+        // var existing = await db.TiposMovimiento.Select(t => t.Nombre).ToListAsync();
 
-        db.TiposMovimiento.AddRange(
-            movimientos.Except(existing).Select(m => new TipoMovimiento { Nombre = m })
-        );
+        // db.TiposMovimiento.AddRange(
+        //     movimientos.Except(existing).Select(m => new TipoMovimiento { Nombre = m })
+        // );
 
-        await db.SaveChangesAsync();
+        // await db.SaveChangesAsync();
     }
 
     // =========================================
@@ -128,14 +135,14 @@ public static class DbSeederExtensions
     // =========================================
     private static async Task SeedMetodosPagoAsync(AppDbContext db)
     {
-        var metodos = new[] { "Efectivo", "Tarjeta", "Transferencia" };
-        var existing = await db.MetodosPago.Select(m => m.Nombre).ToListAsync();
+        // var metodos = new[] { "Efectivo", "Tarjeta", "Transferencia" };
+        // var existing = await db.MetodosPago.Select(m => m.Nombre).ToListAsync();
 
-        db.MetodosPago.AddRange(
-            metodos.Except(existing).Select(m => new MetodoPago { Nombre = m })
-        );
+        // db.MetodosPago.AddRange(
+        //     metodos.Except(existing).Select(m => new MetodoPago { Nombre = m })
+        // );
 
-        await db.SaveChangesAsync();
+        // await db.SaveChangesAsync();
     }
 
     // =========================================
@@ -143,17 +150,17 @@ public static class DbSeederExtensions
     // =========================================
     private static async Task SeedTiposServicioAsync(AppDbContext db)
     {
-        if (!await db.TiposServicio.AnyAsync())
-        {
-            var servicios = new List<TipoServicio>
-            {
-                new TipoServicio { Nombre = "Cambio de aceite", Descripcion = "Cambio de aceite y filtro", PrecioBase = 50 },
-                new TipoServicio { Nombre = "Frenos", Descripcion = "Revisión y cambio de frenos", PrecioBase = 80 },
-                new TipoServicio { Nombre = "Diagnóstico", Descripcion = "Diagnóstico completo del vehículo", PrecioBase = 100 },
-            };
-            db.TiposServicio.AddRange(servicios);
-            await db.SaveChangesAsync();
-        }
+        // if (!await db.TiposServicio.AnyAsync())
+        // {
+        //     var servicios = new List<TipoServicio>
+        //     {
+        //         new TipoServicio { Nombre = "Cambio de aceite", Descripcion = "Cambio de aceite y filtro", PrecioBase = 50 },
+        //         new TipoServicio { Nombre = "Frenos", Descripcion = "Revisión y cambio de frenos", PrecioBase = 80 },
+        //         new TipoServicio { Nombre = "Diagnóstico", Descripcion = "Diagnóstico completo del vehículo", PrecioBase = 100 },
+        //     };
+        //     db.TiposServicio.AddRange(servicios);
+        //     await db.SaveChangesAsync();
+        // }
     }
 
     // =========================================
@@ -161,16 +168,16 @@ public static class DbSeederExtensions
     // =========================================
     private static async Task SeedProveedoresAsync(AppDbContext db)
     {
-        if (!await db.Proveedores.AnyAsync())
-        {
-            var proveedores = new List<Proveedor>
-            {
-                new Proveedor { Nombre = "Proveedor A", Telefono = "123456789", Correo = "provA@example.com", Direccion = "Calle 1" },
-                new Proveedor { Nombre = "Proveedor B", Telefono = "987654321", Correo = "provB@example.com", Direccion = "Calle 2" }
-            };
-            db.Proveedores.AddRange(proveedores);
-            await db.SaveChangesAsync();
-        }
+        // if (!await db.Proveedores.AnyAsync())
+        // {
+        //     var proveedores = new List<Proveedor>
+        //     {
+        //         new Proveedor { Nombre = "Proveedor A", Telefono = "123456789", Correo = "provA@example.com", Direccion = "Calle 1" },
+        //         new Proveedor { Nombre = "Proveedor B", Telefono = "987654321", Correo = "provB@example.com", Direccion = "Calle 2" }
+        //     };
+        //     db.Proveedores.AddRange(proveedores);
+        //     await db.SaveChangesAsync();
+        // }
     }
 
     // =========================================
@@ -178,17 +185,17 @@ public static class DbSeederExtensions
     // =========================================
     private static async Task SeedRepuestosAsync(AppDbContext db)
     {
-        if (!await db.Repuestos.AnyAsync())
-        {
-            var proveedor = await db.Proveedores.FirstOrDefaultAsync();
-            var repuestos = new List<Repuesto>
-            {
-                new Repuesto { Codigo = "REP001", Descripcion = "Filtro de aceite", CantidadStock = 20, PrecioUnitario = 15, ProveedorId = proveedor?.Id },
-                new Repuesto { Codigo = "REP002", Descripcion = "Pastillas de freno", CantidadStock = 50, PrecioUnitario = 30, ProveedorId = proveedor?.Id },
-                new Repuesto { Codigo = "REP003", Descripcion = "Batería 12V", CantidadStock = 10, PrecioUnitario = 120, ProveedorId = proveedor?.Id }
-            };
-            db.Repuestos.AddRange(repuestos);
-            await db.SaveChangesAsync();
-        }
+        // if (!await db.Repuestos.AnyAsync())
+        // {
+        //     var proveedor = await db.Proveedores.FirstOrDefaultAsync();
+        //     var repuestos = new List<Repuesto>
+        //     {
+        //         new Repuesto { Codigo = "REP001", Descripcion = "Filtro de aceite", CantidadStock = 20, PrecioUnitario = 15, ProveedorId = proveedor?.Id },
+        //         new Repuesto { Codigo = "REP002", Descripcion = "Pastillas de freno", CantidadStock = 50, PrecioUnitario = 30, ProveedorId = proveedor?.Id },
+        //         new Repuesto { Codigo = "REP003", Descripcion = "Batería 12V", CantidadStock = 10, PrecioUnitario = 120, ProveedorId = proveedor?.Id }
+        //     };
+        //     db.Repuestos.AddRange(repuestos);
+        //     await db.SaveChangesAsync();
+        // }
     }
 }

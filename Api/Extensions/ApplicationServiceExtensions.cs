@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Identity;
 using Domain.Entities.Auth;
 using Api.Services.Implementations;
 using Api.Services.Interfaces;
+using Api.Services.Interfaces.Auth;
+using Api.Services.Implementations.Auth;
 namespace Api.Extensions;
 
 // este archivo define ciertos metodos de extensión para la aplicación, como CORS, JWT, servicios de aplicacion, RateLimiter, errores de validación, etc...

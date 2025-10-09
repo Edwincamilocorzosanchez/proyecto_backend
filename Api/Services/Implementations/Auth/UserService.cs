@@ -6,15 +6,14 @@ using System.Text;
 using Api.DTOs.Auth;
 using Api.Helpers;
 using Application.Abstractions;
-using Application.Abstractions.Auth;
 using Domain.Entities.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
-using Api.Services.Interfaces;
+using Api.Services.Interfaces.Auth;
 
-namespace Api.Services.Implementations;
+namespace Api.Services.Implementations.Auth;
 
 public class UserService : IUserService
 {

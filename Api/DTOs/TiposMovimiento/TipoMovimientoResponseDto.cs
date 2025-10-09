@@ -1,4 +1,4 @@
-namespace Application.DTOs
+namespace Api.DTOs.TiposMovimiento
 {
     public class TipoMovimientoResponseDto
     {

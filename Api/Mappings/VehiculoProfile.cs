@@ -22,7 +22,7 @@ public sealed class VehiculoProfile : Profile
             .ForMember(dest => dest.ClienteCorreo, opt => opt.MapFrom(src => src.Cliente.Correo.Value));
 
         // Crear DTO -> Entidad
-        CreateMap<CrearVehiculoDto, Vehiculo>()
+        CreateMap<CreateVehiculoDto, Vehiculo>()
             .AfterMap((src, dest) =>
             {
                 dest.Id = new IdVO(0); // se generará automáticamente

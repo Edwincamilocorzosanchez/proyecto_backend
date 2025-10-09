@@ -207,5 +207,20 @@ ReportesController
 
 - En cada controlador se debe de colocar el CORS y el RateLimiter que va a aplicar
 
+- como saber si el controlador tiene que utilizar UnitOfWork o services?
+
 # Preguntas
 - que debo de hacer para que el DBSeaderFuncione 
+
+
+
+
+
+
+
+
+
+## TODO por ahora 
+
+- refactorizar el codigo de los controllers para que usen services
+- hacer lo de los CORS y RateLimiter

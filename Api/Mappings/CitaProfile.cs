@@ -25,7 +25,7 @@ public sealed class CitaProfile : Profile
             .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt));
 
         // Crear DTO -> Entidad
-        CreateMap<CrearCitaDto, Cita>()
+        CreateMap<CreateCitaDto, Cita>()
             .ConstructUsing(src => new Cita(
                 new IdVO(0), // se genera automáticamente
                 new IdVO(src.ClienteId),
@@ -36,7 +36,7 @@ public sealed class CitaProfile : Profile
             ));
 
         // Actualizar DTO -> Entidad
-        var actualizarCitaMap = CreateMap<ActualizarCitaDto, Cita>();
+        var actualizarCitaMap = CreateMap<UpdateCitaDto, Cita>();
         actualizarCitaMap.ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
         actualizarCitaMap.AfterMap((src, dest) =>
         {

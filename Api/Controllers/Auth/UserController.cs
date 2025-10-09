@@ -2,6 +2,7 @@ using System;
 using Api.DTOs.Auth;
 using Api.Services;
 using Api.Services.Interfaces;
+using Api.Services.Interfaces.Auth;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers.Auth;

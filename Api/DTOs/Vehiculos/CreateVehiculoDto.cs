@@ -1,7 +1,7 @@
 namespace Api.DTOs.Vehiculos;
 
 // POST /api/vehiculos
-public sealed record CrearVehiculoDto(
+public sealed record CreateVehiculoDto(
     int ClienteId,
     string Marca,
     string Modelo,

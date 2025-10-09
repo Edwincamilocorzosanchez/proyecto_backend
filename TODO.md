@@ -211,3 +211,16 @@ ReportesController
 
 # Preguntas
 - que debo de hacer para que el DBSeaderFuncione 
+
+
+
+
+
+
+
+
+
+## TODO por ahora 
+
+- refactorizar el codigo de los controllers para que usen services
+- hacer lo de los CORS y RateLimiter

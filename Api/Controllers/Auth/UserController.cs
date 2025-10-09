@@ -12,10 +12,11 @@ namespace Api.Controllers.Auth;
 public class UserController : BaseApiController
 {
     private readonly IUserService _userService;
-
-    public UserController(IUserService userService)
+    private readonly IMapper _mapper;
+    public UserController(IUserService userService, IMapper mapper)
     {
         _userService = userService;
+        _mapper = mapper;
     }
     [HttpPost("register")]
     public async Task<ActionResult> RegisterAsync(RegisterDto model)
@@ -75,7 +76,8 @@ public class UserController : BaseApiController
         if (user == null)
             return NotFound("Usuario no encontrado.");
 
-        // user ya es DataUserDto
-        return Ok(user); 
+        // Mapear UserMember -> DataUserDto
+        var result = _mapper.Map<DataUserDto>(user);
+        return Ok(result);
     }
 }

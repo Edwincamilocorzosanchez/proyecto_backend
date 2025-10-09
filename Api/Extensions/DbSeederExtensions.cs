@@ -6,16 +6,12 @@ using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Api.Extensions;
-
-// lista de entidades
-// roles 
-// usuarios base 
-// usuarios extendidos clientes, proveedores, mecanicos, administradores)
-// estados de cita, orden y pago 
-// tipos de movimientos 
-// metodos de pago
 public static class DbSeederExtensions
 {
     public static async Task SeedDatabaseAsync(this WebApplication app)
@@ -23,179 +19,400 @@ public static class DbSeederExtensions
         using var scope = app.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        await SeedRolesAsync(db);
-        await SeedUsersAsync(db);
-        await SeedEstadosAsync(db);
-        await SeedTiposMovimientoAsync(db);
-        await SeedMetodosPagoAsync(db);
-        await SeedTiposServicioAsync(db);
-        await SeedProveedoresAsync(db);
-        await SeedRepuestosAsync(db);
+        await db.Database.MigrateAsync();
 
-        // aqui se pueden agregar mas seeds de entidades
+        await SeedRolesAsync(db); // roles 
+        await SeedBaseUsersAsync(db); // usuarios base
+        await SeedExtendedUsersAsync(db); // extensiones de usuarios (Clientes, Proveedores, Mecanicos, Administradores)
+        await SeedUserRolesAsync(db); // relación usuario - rol
+        await SeedCatalogsAsync(db); // catálogos
+        await SeedVehiculosAsync(db); // vehículos
+        await SeedRepuestosAsync(db); // repuestos
+        await SeedOrdenesYFacturasAsync(db); // ordenes de servicio y facturas
+        await SeedHistorialInventarioAsync(db); // historial de inventario
     }
-
-    // =========================================
-    // Roles
-    // =========================================
+    // -------------------------------------------------------
     private static async Task SeedRolesAsync(AppDbContext db)
     {
-        var existing = await db.Roles.Select(r => r.Name).ToListAsync();
-        var targetRoles = Enum.GetNames(typeof(UserAuthorization.Roles));
+        // Obtiene los nombres de roles ya existentes en la base de datos
+        var existingNames = await db.Roles
+            .Select(r => r.Name)
+            .ToListAsync();
 
-        var toAdd = targetRoles
-            .Except(existing, StringComparer.OrdinalIgnoreCase)
-            .Select(n => new Rol
+        // Obtiene los nombres de roles definidos en el enum
+        var targetNames = Enum.GetNames(typeof(UserAuthorization.Roles));
+
+        // Determina cuáles roles faltan por insertar
+        var toAdd = targetNames
+            .Except(existingNames, StringComparer.OrdinalIgnoreCase)
+            .Select(name => new Rol
             {
-                Name = n,
-                Description = $"{n} role"
+                Name = name,
+                Description = $"{name} role"
             })
             .ToList();
 
-        if (toAdd.Any())
+        // Inserta los roles faltantes
+        if (toAdd.Count > 0)
         {
             db.Roles.AddRange(toAdd);
             await db.SaveChangesAsync();
         }
     }
-
-    // =========================================
-    // Usuarios de prueba
-    // =========================================
-    private static async Task SeedUsersAsync(AppDbContext db)
+    // -------------------------------------------------------
+    private static async Task SeedBaseUsersAsync(AppDbContext db)
     {
         if (await db.UsersMembers.AnyAsync()) return;
 
         var users = new List<UserMember>
         {
-            new UserMember { Username = "admin", Email = "admin@example.com", Password = "1234" },
-            new UserMember { Username = "mecanico1", Email = "mecanico1@example.com", Password = "1234" },
-            new UserMember { Username = "cliente1", Email = "cliente1@example.com", Password = "1234" },
+            new UserMember { Username = "admin1", Email = "admin@taller.com", Password = "admin123" },
+            new UserMember { Username = "cliente1", Email = "cliente@correo.com", Password = "cliente123" },
+            new UserMember { Username = "mecanico1", Email = "mecanico@correo.com", Password = "mecanico123" },
+            new UserMember { Username = "proveedor1", Email = "proveedor@correo.com", Password = "proveedor123" }
         };
 
         db.UsersMembers.AddRange(users);
         await db.SaveChangesAsync();
+    }
+    // -------------------------------------------------------
+    private static async Task SeedExtendedUsersAsync(AppDbContext db)
+    {
+        var users = await db.UsersMembers.ToListAsync();
 
-        // Asignar roles
-        var adminRole = await db.Roles.FirstOrDefaultAsync(r => r.Name == "Admin");
-        var mecanicoRole = await db.Roles.FirstOrDefaultAsync(r => r.Name == "Mecanico");
-        var clienteRole = await db.Roles.FirstOrDefaultAsync(r => r.Name == "Cliente");
+        // Clientes
+        if (!await db.Clientes.AnyAsync())
+        {
+            var clienteUser = users.FirstOrDefault(u => u.Username == "cliente1");
+            if (clienteUser != null)
+            {
+                db.Clientes.Add(new Cliente
+                {
+                    Id = new IdVO(clienteUser.Id),
+                    Nombre = new NombreVO("Juan Pérez"),
+                    Correo = new CorreoVO(clienteUser.Email!),
+                    Telefono = new TelefonoVO("3001234567"),
+                    Direccion = new DireccionVO("Cra 12 #45-67, Bogotá")
+                });
+            }
+        }
 
-        if (adminRole != null)
-            db.UserMemberRols.Add(new UserMemberRol { UserMemberId = users[0].Id, RolId = adminRole.Id });
-        if (mecanicoRole != null)
-            db.UserMemberRols.Add(new UserMemberRol { UserMemberId = users[1].Id, RolId = mecanicoRole.Id });
-        if (clienteRole != null)
-            db.UserMemberRols.Add(new UserMemberRol { UserMemberId = users[2].Id, RolId = clienteRole.Id });
+        // Mecanicos
+        if (!await db.Mecanicos.AnyAsync())
+        {
+            var mecUser = users.FirstOrDefault(u => u.Username == "mecanico1");
+            if (mecUser != null)
+            {
+                db.Mecanicos.Add(new Mecanico
+                {
+                    Id = new IdVO (mecUser.Id),
+                    Nombre = new NombreVO("Carlos Gómez"),
+                    Telefono = new TelefonoVO("3017654321"),
+                    Especialidad = new EspecialidadVO("Frenos y Suspensión")
+                });
+            }
+        }
+
+        // Administradores
+        if (!await db.Administradores.AnyAsync())
+        {
+            var adminUser = users.FirstOrDefault(u => u.Username == "admin1");
+            if (adminUser != null)
+            {
+                db.Administradores.Add(new Administrador
+                {
+                    Id = new IdVO (adminUser.Id),
+                    Nombre = new NombreVO("Laura Torres"),
+                    Telefono = new TelefonoVO("3025556666"),
+                    NivelAcceso = new NivelAccesoVO("Total"),
+                    AreaResponsabilidad = new DescripcionVO("Gestión General")
+                });
+            }
+        }
+
+        // Proveedores
+        if (!await db.Proveedores.AnyAsync())
+        {
+            var provUser = users.FirstOrDefault(u => u.Username == "proveedor1");
+            if (provUser != null)
+            {
+                db.Proveedores.Add(new Proveedor
+                {
+                    Id = new IdVO (provUser.Id),
+                    Nombre = new NombreVO("Repuestos ABC"),
+                    Telefono = new TelefonoVO("3041112222"),
+                    Correo = new CorreoVO(provUser.Email!),
+                    Direccion = new DireccionVO("Zona Industrial 45")
+                });
+            }
+        }
 
         await db.SaveChangesAsync();
     }
 
-    // =========================================
-    // Estados de cita y orden
-    // =========================================
-    private static async Task SeedEstadosAsync(AppDbContext db)
+    // -------------------------------------------------------
+    private static async Task SeedUserRolesAsync(AppDbContext db)
     {
-        // // Estados de cita
-        // var estadosCita = new[] { "Pendiente", "Confirmada", "Cancelada", "Completada" };
-        // var existingCita = await db.EstadosCita.Select(e => e.Nombre).ToListAsync();
-        // db.EstadosCita.AddRange(
-        //     estadosCita.Except(existingCita)
-        //                .Select(e => new EstadoCita { Nombre = e })
-        // );
+        if (await db.UserMemberRols.AnyAsync()) return;
 
-        // // Estados de orden
-        // var estadosOrden = new[] { "Pendiente", "En Proceso", "Finalizada", "Cancelada" };
-        // var existingOrden = await db.EstadosOrden.Select(e => e.Nombre).ToListAsync();
-        // db.EstadosOrden.AddRange(
-        //     estadosOrden.Except(existingOrden)
-        //                 .Select(e => new EstadoOrden { Nombre = e })
-        // );
+        var users = await db.UsersMembers.ToListAsync();
+        var roles = await db.Roles.ToListAsync();
 
-        // await db.SaveChangesAsync();
+        var userRoles = new List<UserMemberRol>
+        {
+            new UserMemberRol { UserMemberId = users.First(u => u.Username == "admin1").Id, RolId = roles.First(r => r.Name == "Admin").Id },
+            new UserMemberRol { UserMemberId = users.First(u => u.Username == "cliente1").Id, RolId = roles.First(r => r.Name == "Cliente").Id },
+            new UserMemberRol { UserMemberId = users.First(u => u.Username == "mecanico1").Id, RolId = roles.First(r => r.Name == "Mecanico").Id },
+            new UserMemberRol { UserMemberId = users.First(u => u.Username == "proveedor1").Id, RolId = roles.First(r => r.Name == "Proveedor").Id }
+        };
+
+        db.UserMemberRols.AddRange(userRoles);
+        await db.SaveChangesAsync();
     }
 
-    // =========================================
-    // Tipos de movimiento
-    // =========================================
-    private static async Task SeedTiposMovimientoAsync(AppDbContext db)
+    // -------------------------------------------------------
+    private static async Task SeedCatalogsAsync(AppDbContext db)
     {
-        // var movimientos = new[] { "Ingreso", "Salida", "Ajuste" };
-        // var existing = await db.TiposMovimiento.Select(t => t.Nombre).ToListAsync();
+        // Estados Cita
+        if (!await db.EstadosCita.AnyAsync())
+            db.EstadosCita.AddRange(new[]
+            {
+                new EstadoCita { Nombre = new NombreVO("Pendiente") },
+                new EstadoCita { Nombre = new NombreVO("Confirmada") },
+                new EstadoCita { Nombre = new NombreVO("Finalizada") },
+                new EstadoCita { Nombre = new NombreVO("Cancelada") }
+            });
 
-        // db.TiposMovimiento.AddRange(
-        //     movimientos.Except(existing).Select(m => new TipoMovimiento { Nombre = m })
-        // );
+        // Estados Orden
+        if (!await db.EstadosOrden.AnyAsync())
+            db.EstadosOrden.AddRange(new[]
+            {
+                new EstadoOrden { Nombre = new NombreVO("Pendiente") },
+                new EstadoOrden { Nombre = new NombreVO("En Proceso") },
+                new EstadoOrden { Nombre = new NombreVO("Completada") },
+                new EstadoOrden { Nombre = new NombreVO("Cancelada") }
+            });
 
-        // await db.SaveChangesAsync();
+        // Estados Pago
+        if (!await db.EstadosPago.AnyAsync())
+            db.EstadosPago.AddRange(new[]
+            {
+                new EstadoPago { Nombre = new NombreVO("Pendiente") },
+                new EstadoPago { Nombre = new NombreVO("Pagado") },
+                new EstadoPago { Nombre = new NombreVO("Rechazado") }
+            });
+
+        // Tipos Movimiento
+        if (!await db.TiposMovimiento.AnyAsync())
+            db.TiposMovimiento.AddRange(new[]
+            {
+                new TipoMovimiento { Nombre = new NombreVO("Ingreso") },
+                new TipoMovimiento { Nombre = new NombreVO("Salida") }
+            });
+
+        // Métodos Pago
+        if (!await db.MetodosPago.AnyAsync())
+            db.MetodosPago.AddRange(new[]
+            {
+                new MetodoPago { Nombre = new NombreVO("Efectivo") },
+                new MetodoPago { Nombre = new NombreVO("Tarjeta") },
+                new MetodoPago { Nombre = new NombreVO("Transferencia") }
+            });
+
+        // Tipos Servicio
+        if (!await db.TiposServicio.AnyAsync())
+            db.TiposServicio.AddRange(new[]
+            {
+                new TipoServicio
+                {
+                    Nombre = new NombreVO("Cambio de Aceite"),
+                    Descripcion = new DescripcionVO("Cambio de aceite y filtro"),
+                    PrecioBase = new DineroVO(120000)
+                },
+                new TipoServicio
+                {
+                    Nombre = new NombreVO("Alineación"),
+                    Descripcion = new DescripcionVO("Alineación de ruedas"),
+                    PrecioBase = new DineroVO(80000)
+                },
+                new TipoServicio
+                {
+                    Nombre = new NombreVO("Balanceo"),
+                    Descripcion = new DescripcionVO("Balanceo de ruedas"),
+                    PrecioBase = new DineroVO(60000)
+                },
+                new TipoServicio
+                {
+                    Nombre = new NombreVO("Diagnóstico"),
+                    Descripcion = new DescripcionVO("Revisión general del vehículo"),
+                    PrecioBase = new DineroVO(100000)
+                }
+            });
+
+        await db.SaveChangesAsync();
     }
 
-    // =========================================
-    // Métodos de pago
-    // =========================================
-    private static async Task SeedMetodosPagoAsync(AppDbContext db)
+    // -------------------------------------------------------
+    private static async Task SeedVehiculosAsync(AppDbContext db)
     {
-        // var metodos = new[] { "Efectivo", "Tarjeta", "Transferencia" };
-        // var existing = await db.MetodosPago.Select(m => m.Nombre).ToListAsync();
+        if (await db.Vehiculos.AnyAsync()) return;
 
-        // db.MetodosPago.AddRange(
-        //     metodos.Except(existing).Select(m => new MetodoPago { Nombre = m })
-        // );
+        var cliente = await db.Clientes.FirstOrDefaultAsync();
+        if (cliente == null) return;
 
-        // await db.SaveChangesAsync();
+        db.Vehiculos.Add(new Vehiculo
+        {
+            ClienteId = cliente.Id,
+            Marca = new NombreVO("Toyota"),
+            Modelo = new NombreVO("Corolla"),
+            Anio = new AnioVehiculoVO(2020),
+            Vin = new VinVO("JTDBR32E820123456"),
+            Kilometraje = new KilometrajeVO(45000)
+        });
+
+        await db.SaveChangesAsync();
     }
 
-    // =========================================
-    // Tipos de servicio
-    // =========================================
-    private static async Task SeedTiposServicioAsync(AppDbContext db)
-    {
-        // if (!await db.TiposServicio.AnyAsync())
-        // {
-        //     var servicios = new List<TipoServicio>
-        //     {
-        //         new TipoServicio { Nombre = "Cambio de aceite", Descripcion = "Cambio de aceite y filtro", PrecioBase = 50 },
-        //         new TipoServicio { Nombre = "Frenos", Descripcion = "Revisión y cambio de frenos", PrecioBase = 80 },
-        //         new TipoServicio { Nombre = "Diagnóstico", Descripcion = "Diagnóstico completo del vehículo", PrecioBase = 100 },
-        //     };
-        //     db.TiposServicio.AddRange(servicios);
-        //     await db.SaveChangesAsync();
-        // }
-    }
-
-    // =========================================
-    // Proveedores de prueba
-    // =========================================
-    private static async Task SeedProveedoresAsync(AppDbContext db)
-    {
-        // if (!await db.Proveedores.AnyAsync())
-        // {
-        //     var proveedores = new List<Proveedor>
-        //     {
-        //         new Proveedor { Nombre = "Proveedor A", Telefono = "123456789", Correo = "provA@example.com", Direccion = "Calle 1" },
-        //         new Proveedor { Nombre = "Proveedor B", Telefono = "987654321", Correo = "provB@example.com", Direccion = "Calle 2" }
-        //     };
-        //     db.Proveedores.AddRange(proveedores);
-        //     await db.SaveChangesAsync();
-        // }
-    }
-
-    // =========================================
-    // Repuestos de prueba
-    // =========================================
+    // -------------------------------------------------------
     private static async Task SeedRepuestosAsync(AppDbContext db)
     {
-        // if (!await db.Repuestos.AnyAsync())
-        // {
-        //     var proveedor = await db.Proveedores.FirstOrDefaultAsync();
-        //     var repuestos = new List<Repuesto>
-        //     {
-        //         new Repuesto { Codigo = "REP001", Descripcion = "Filtro de aceite", CantidadStock = 20, PrecioUnitario = 15, ProveedorId = proveedor?.Id },
-        //         new Repuesto { Codigo = "REP002", Descripcion = "Pastillas de freno", CantidadStock = 50, PrecioUnitario = 30, ProveedorId = proveedor?.Id },
-        //         new Repuesto { Codigo = "REP003", Descripcion = "Batería 12V", CantidadStock = 10, PrecioUnitario = 120, ProveedorId = proveedor?.Id }
-        //     };
-        //     db.Repuestos.AddRange(repuestos);
-        //     await db.SaveChangesAsync();
-        // }
+        // Evitar duplicados
+        if (await db.Repuestos.AnyAsync()) return;
+
+        // Buscar proveedor existente
+        var proveedor = await db.Proveedores.FirstOrDefaultAsync();
+        if (proveedor == null) return;
+
+        // Crear repuestos con VO en lugar de strings
+        db.Repuestos.AddRange(new[]
+        {
+            new Repuesto
+            {
+                Codigo = new CodigoRepuestoVO("REP001"),
+                Descripcion = new DescripcionVO("Filtro de aceite"),
+                CantidadStock = new CantidadVO(50),
+                PrecioUnitario = new DineroVO(20000),
+                ProveedorId = proveedor.Id
+            },
+            new Repuesto
+            {
+                Codigo = new CodigoRepuestoVO("REP002"),
+                Descripcion = new DescripcionVO("Pastillas de freno"),
+                CantidadStock = new CantidadVO(30),
+                PrecioUnitario = new DineroVO(45000),
+                ProveedorId = proveedor.Id
+            },
+            new Repuesto
+            {
+                Codigo = new CodigoRepuestoVO("REP003"),
+                Descripcion = new DescripcionVO("Batería 12V"),
+                CantidadStock = new CantidadVO(10),
+                PrecioUnitario = new DineroVO(150000),
+                ProveedorId = proveedor.Id
+            }
+        });
+
+        await db.SaveChangesAsync();
+    }
+
+    // -------------------------------------------------------
+    private static async Task SeedOrdenesYFacturasAsync(AppDbContext db)
+    {
+        if (await db.OrdenesServicio.AnyAsync()) return;
+
+        var vehiculo = await db.Vehiculos.FirstOrDefaultAsync();
+        var mecanico = await db.Mecanicos.FirstOrDefaultAsync();
+        var tipoServicio = await db.TiposServicio.FirstOrDefaultAsync();
+        var estadoOrden = await db.EstadosOrden.FirstOrDefaultAsync();
+
+        if (vehiculo == null || mecanico == null || tipoServicio == null || estadoOrden == null) return;
+
+        // Crear la orden usando VO para fechas
+        var orden = new OrdenServicio
+        {
+            VehiculoId = vehiculo.Id,
+            MecanicoId = mecanico.Id,
+            TipoServicioId = tipoServicio.Id,
+            EstadoId = estadoOrden.Id,
+            FechaIngreso = new FechaHistoricaVO(DateTime.UtcNow),
+            FechaEntregaEstimada = new FechaHistoricaVO(DateTime.UtcNow.AddDays(2))
+        };
+
+        db.OrdenesServicio.Add(orden);
+        await db.SaveChangesAsync();
+
+        // Detalle con Value Object para costo
+        var repuesto = await db.Repuestos.FirstOrDefaultAsync();
+        if (repuesto != null)
+        {
+            db.DetallesOrden.Add(new DetalleOrden
+            {
+                OrdenServicioId = orden.Id,
+                RepuestoId = repuesto.Id,
+                Cantidad = new CantidadVO(2),
+                Costo = new DineroVO(repuesto.PrecioUnitario.Value * 2)
+            });
+
+            await db.SaveChangesAsync();
+        }
+
+        // Calcular subtotal en base al valor interno del VO
+        var subtotal = await db.DetallesOrden
+            .Where(d => d.OrdenServicioId == orden.Id)
+            .SumAsync(d => d.Costo.Value);
+
+        // Factura con fechas y dinero como VO
+        db.Facturas.Add(new Factura
+        {
+            OrdenServicioId = orden.Id,
+            MontoRepuestos = new DineroVO(subtotal),
+            ManoObra = new DineroVO(50000),
+            Total = new DineroVO(subtotal + 50000),
+            FechaGeneracion = new FechaHistoricaVO(DateTime.UtcNow)
+        });
+
+        await db.SaveChangesAsync();
+
+        // Pago con VO
+        var factura = await db.Facturas.FirstOrDefaultAsync();
+        var metodo = await db.MetodosPago.FirstOrDefaultAsync();
+        var estadoPago = await db.EstadosPago.FirstOrDefaultAsync();
+
+        if (factura != null && metodo != null && estadoPago != null)
+        {
+            db.Pagos.Add(new Pago
+            {
+                FacturaId = factura.Id,
+                MetodoPagoId = metodo.Id,
+                EstadoPagoId = estadoPago.Id,
+                Monto = factura.Total,
+                FechaPago = new FechaHistoricaVO(DateTime.UtcNow)
+            });
+
+            await db.SaveChangesAsync();
+        }
+    }
+
+    // -------------------------------------------------------
+    private static async Task SeedHistorialInventarioAsync(AppDbContext db)
+    {
+        if (await db.HistorialesInventario.AnyAsync()) return;
+
+        var repuesto = await db.Repuestos.FirstOrDefaultAsync();
+        var admin = await db.Administradores.FirstOrDefaultAsync();
+        var tipoMov = await db.TiposMovimiento.FirstOrDefaultAsync();
+
+        if (repuesto == null || admin == null || tipoMov == null) return;
+
+        db.HistorialesInventario.Add(new HistorialInventario
+        {
+            RepuestoId = repuesto.Id,
+            AdminId = admin.Id,
+            TipoMovimientoId = tipoMov.Id,
+            Cantidad = new CantidadVO(10),
+            Observaciones = new DescripcionVO("Carga inicial de stock")
+        });
+
+        await db.SaveChangesAsync();
     }
 }

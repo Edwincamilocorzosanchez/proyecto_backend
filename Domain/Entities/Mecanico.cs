@@ -9,7 +9,8 @@ public class Mecanico : BaseEntity
     public NombreVO Nombre { get; set; } = null!;
     public TelefonoVO? Telefono { get; set; }
     public EspecialidadVO? Especialidad { get; set; }
-    public EstadoVO IsActive { get; set; } = null!;
+    // valor por defecto true
+    public EstadoVO IsActive { get; set; } = new EstadoVO(true);
     // relaciones
     // Clave foránea real (int)
     public int UserId { get; set; }
@@ -17,14 +18,17 @@ public class Mecanico : BaseEntity
     // relacion uno a muchos
     public ICollection<OrdenServicio> OrdenesServicio { get; set; } = new List<OrdenServicio>();
     // constructores
-    public Mecanico() { }
-    public Mecanico(IdVO id, NombreVO nombre, TelefonoVO? telefono, EspecialidadVO? especialidad, EstadoVO isActive, int userId)
+    public Mecanico()
+    {
+        IsActive = new EstadoVO(true); // garantiza que nunca será null
+    }
+    public Mecanico(IdVO id, NombreVO nombre, TelefonoVO? telefono, EspecialidadVO? especialidad, EstadoVO? isActive, int userId)
     {
         Id = id;
         Nombre = nombre;
         Telefono = telefono;
         Especialidad = especialidad;
-        IsActive = isActive;
+        IsActive = isActive ?? new EstadoVO(true); // valor por defecto si no se pasa
         UserId = userId;
     }
 }

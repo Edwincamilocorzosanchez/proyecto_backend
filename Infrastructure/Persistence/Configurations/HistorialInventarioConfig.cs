@@ -37,7 +37,7 @@ public class HistorialInventarioConfig : IEntityTypeConfiguration<HistorialInven
 
         builder.Property(h => h.FechaMovimiento)
             .HasConversion(f => f.Value, value => new FechaHistoricaVO(value))
-            .HasColumnType("timestamp")
+            .HasColumnType("timestamp with time zone")
             .IsRequired();
 
         builder.Property(h => h.Observaciones)

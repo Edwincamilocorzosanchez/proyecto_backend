@@ -10,7 +10,8 @@ public class Cliente : BaseEntity
     public CorreoVO Correo { get; set; } = null!;
     public TelefonoVO Telefono { get; set; } = null!;
     public DireccionVO Direccion { get; set; } = null!;
-    public EstadoVO IsActive { get; set; } = null!;
+    // valor por defecto true
+    public EstadoVO IsActive { get; set; } = new EstadoVO(true);
 
     // Clave foránea real (int)
     public int UserId { get; set; }
@@ -20,15 +21,18 @@ public class Cliente : BaseEntity
     public ICollection<Vehiculo> Vehiculos { get; set; } = new List<Vehiculo>();
 
     // constructores
-    public Cliente() { }
-    public Cliente(IdVO id, NombreVO nombre, CorreoVO correo, TelefonoVO telefono, DireccionVO direccion, EstadoVO isActive, int userId)
+    public Cliente()
+    {
+        IsActive = new EstadoVO(true); // garantiza que nunca será null
+    }
+    public Cliente(IdVO id, NombreVO nombre, CorreoVO correo, TelefonoVO telefono, DireccionVO direccion, EstadoVO? isActive, int userId)
     {
         Id = id;
         Nombre = nombre;
         Correo = correo;
         Telefono = telefono;
         Direccion = direccion;
-        IsActive = isActive;
+        IsActive = isActive ?? new EstadoVO(true); // valor por defecto si no se pasa
         UserId = userId;
     }
 }

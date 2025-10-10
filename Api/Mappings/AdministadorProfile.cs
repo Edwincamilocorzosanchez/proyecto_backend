@@ -1,3 +1,4 @@
+// Api/Mappings/AdministradorProfile.cs
 using Api.DTOs.Administradores;
 using AutoMapper;
 using Domain.Entities;
@@ -9,7 +10,15 @@ public sealed class AdministradorProfile : Profile
 {
     public AdministradorProfile()
     {
-        // Entidad ->  DTO
+        // Configuración global para todos los ValueObjects simples
+        CreateMap<IdVO, int>().ConvertUsing(vo => vo.Value);
+        CreateMap<NombreVO, string>().ConvertUsing(vo => vo.Value);
+        CreateMap<TelefonoVO, string>().ConvertUsing(vo => vo.Value);
+        CreateMap<NivelAccesoVO, string>().ConvertUsing(vo => vo.Value);
+        CreateMap<DescripcionVO, string>().ConvertUsing(vo => vo.Value);
+        CreateMap<EstadoVO, bool>().ConvertUsing(vo => vo.Value);
+
+        // Entidad -> DTO
         CreateMap<Administrador, AdministradorDto>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.Value))
             .ForMember(dest => dest.Nombre, opt => opt.MapFrom(src => src.Nombre.Value))
@@ -24,7 +33,7 @@ public sealed class AdministradorProfile : Profile
         // Create DTO -> Entidad
         CreateMap<CreateAdministradorDto, Administrador>()
             .ConstructUsing(src => new Administrador(
-                new IdVO(0), // se genera automáticamente (por EF o dominio)
+                new IdVO(0), // EF generará el Id
                 new NombreVO(src.Nombre),
                 new TelefonoVO(src.Telefono),
                 new NivelAccesoVO(src.NivelAcceso),
@@ -33,25 +42,16 @@ public sealed class AdministradorProfile : Profile
                 src.UserId
             ));
 
-        // Update DTO -> Entidad 
+        // Update DTO -> Entidad (actualización parcial)
         var updateMap = CreateMap<UpdateAdministradorDto, Administrador>();
         updateMap.ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
         updateMap.AfterMap((src, dest) =>
         {
-            if (src.Nombre != null)
-                dest.Nombre = new NombreVO(src.Nombre);
-
-            if (src.Telefono != null)
-                dest.Telefono = new TelefonoVO(src.Telefono);
-
-            if (src.NivelAcceso != null)
-                dest.NivelAcceso = new NivelAccesoVO(src.NivelAcceso);
-
-            if (src.AreaResponsabilidad != null)
-                dest.AreaResponsabilidad = new DescripcionVO(src.AreaResponsabilidad);
-
-            if (src.IsActive.HasValue)
-                dest.IsActive = new EstadoVO(src.IsActive.Value);
+            if (src.Nombre != null) dest.Nombre = new NombreVO(src.Nombre);
+            if (src.Telefono != null) dest.Telefono = new TelefonoVO(src.Telefono);
+            if (src.NivelAcceso != null) dest.NivelAcceso = new NivelAccesoVO(src.NivelAcceso);
+            if (src.AreaResponsabilidad != null) dest.AreaResponsabilidad = new DescripcionVO(src.AreaResponsabilidad);
+            if (src.IsActive.HasValue) dest.IsActive = new EstadoVO(src.IsActive.Value);
         });
     }
 }

@@ -6,10 +6,6 @@ using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Api.Extensions;
 public static class DbSeederExtensions
@@ -30,6 +26,9 @@ public static class DbSeederExtensions
         await SeedRepuestosAsync(db); // repuestos
         await SeedOrdenesYFacturasAsync(db); // ordenes de servicio y facturas
         await SeedHistorialInventarioAsync(db); // historial de inventario
+        await SeedCitasAsync(db); // citas
+        await SeedFacturasAsync(db); // facturas
+        await SeedPagosAsync(db); // pagos
     }
     // -------------------------------------------------------
     private static async Task SeedRolesAsync(AppDbContext db)
@@ -62,18 +61,35 @@ public static class DbSeederExtensions
     // -------------------------------------------------------
     private static async Task SeedBaseUsersAsync(AppDbContext db)
     {
-        if (await db.UsersMembers.AnyAsync()) return;
+        var existingUsernames = await db.UsersMembers
+            .Select(u => u.Username)
+            .ToListAsync();
 
-        var users = new List<UserMember>
+        var users = new List<UserMember>();
+
+        void AddIfNotExists(string username, string email, string password)
         {
-            new UserMember { Username = "admin1", Email = "admin@taller.com", Password = "admin123" },
-            new UserMember { Username = "cliente1", Email = "cliente@correo.com", Password = "cliente123" },
-            new UserMember { Username = "mecanico1", Email = "mecanico@correo.com", Password = "mecanico123" },
-            new UserMember { Username = "proveedor1", Email = "proveedor@correo.com", Password = "proveedor123" }
-        };
+            if (!existingUsernames.Contains(username))
+            {
+                users.Add(new UserMember
+                {
+                    Username = username,
+                    Email = email,
+                    Password = password
+                });
+            }
+        }
 
-        db.UsersMembers.AddRange(users);
-        await db.SaveChangesAsync();
+        AddIfNotExists("admin1", "admin@taller.com", "admin123");
+        AddIfNotExists("cliente1", "cliente@correo.com", "cliente123");
+        AddIfNotExists("mecanico1", "mecanico@correo.com", "mecanico123");
+        AddIfNotExists("proveedor1", "proveedor@correo.com", "proveedor123");
+
+        if (users.Count > 0)
+        {
+            db.UsersMembers.AddRange(users);
+            await db.SaveChangesAsync();
+        }
     }
     // -------------------------------------------------------
     private static async Task SeedExtendedUsersAsync(AppDbContext db)
@@ -86,14 +102,15 @@ public static class DbSeederExtensions
             var clienteUser = users.FirstOrDefault(u => u.Username == "cliente1");
             if (clienteUser != null)
             {
-                db.Clientes.Add(new Cliente
-                {
-                    Id = new IdVO(clienteUser.Id),
-                    Nombre = new NombreVO("Juan Pérez"),
-                    Correo = new CorreoVO(clienteUser.Email!),
-                    Telefono = new TelefonoVO("3001234567"),
-                    Direccion = new DireccionVO("Cra 12 #45-67, Bogotá")
-                });
+            db.Clientes.Add(new Cliente
+            {
+                Nombre = new NombreVO("Juan Pérez"),
+                Correo = new CorreoVO(clienteUser.Email!),
+                Telefono = new TelefonoVO("3001234567"),
+                Direccion = new DireccionVO("Cra 12 #45-67, Bogotá"),
+                UserId = clienteUser.Id,
+                IsActive = new EstadoVO(true)
+            });
             }
         }
 
@@ -105,10 +122,11 @@ public static class DbSeederExtensions
             {
                 db.Mecanicos.Add(new Mecanico
                 {
-                    Id = new IdVO (mecUser.Id),
                     Nombre = new NombreVO("Carlos Gómez"),
                     Telefono = new TelefonoVO("3017654321"),
-                    Especialidad = new EspecialidadVO("Frenos y Suspensión")
+                    Especialidad = new EspecialidadVO("Frenos y Suspensión"),
+                    UserId = mecUser.Id,
+                    IsActive = new EstadoVO(true)
                 });
             }
         }
@@ -121,11 +139,12 @@ public static class DbSeederExtensions
             {
                 db.Administradores.Add(new Administrador
                 {
-                    Id = new IdVO (adminUser.Id),
                     Nombre = new NombreVO("Laura Torres"),
                     Telefono = new TelefonoVO("3025556666"),
                     NivelAcceso = new NivelAccesoVO("Total"),
-                    AreaResponsabilidad = new DescripcionVO("Gestión General")
+                    AreaResponsabilidad = new DescripcionVO("Gestión General"),
+                    UserId = adminUser.Id,
+                    IsActive = new EstadoVO(true)
                 });
             }
         }
@@ -138,15 +157,15 @@ public static class DbSeederExtensions
             {
                 db.Proveedores.Add(new Proveedor
                 {
-                    Id = new IdVO (provUser.Id),
                     Nombre = new NombreVO("Repuestos ABC"),
                     Telefono = new TelefonoVO("3041112222"),
                     Correo = new CorreoVO(provUser.Email!),
-                    Direccion = new DireccionVO("Zona Industrial 45")
+                    Direccion = new DireccionVO("Zona Industrial 45"),
+                    UserId = provUser.Id,
+                    IsActive = new EstadoVO(true)
                 });
             }
         }
-
         await db.SaveChangesAsync();
     }
 
@@ -160,7 +179,7 @@ public static class DbSeederExtensions
 
         var userRoles = new List<UserMemberRol>
         {
-            new UserMemberRol { UserMemberId = users.First(u => u.Username == "admin1").Id, RolId = roles.First(r => r.Name == "Admin").Id },
+            new UserMemberRol { UserMemberId = users.First(u => u.Username == "admin1").Id, RolId = roles.First(r => r.Name == "Administrador").Id },
             new UserMemberRol { UserMemberId = users.First(u => u.Username == "cliente1").Id, RolId = roles.First(r => r.Name == "Cliente").Id },
             new UserMemberRol { UserMemberId = users.First(u => u.Username == "mecanico1").Id, RolId = roles.First(r => r.Name == "Mecanico").Id },
             new UserMemberRol { UserMemberId = users.First(u => u.Username == "proveedor1").Id, RolId = roles.First(r => r.Name == "Proveedor").Id }
@@ -357,9 +376,10 @@ public static class DbSeederExtensions
         }
 
         // Calcular subtotal en base al valor interno del VO
-        var subtotal = await db.DetallesOrden
+        var subtotal = (await db.DetallesOrden
             .Where(d => d.OrdenServicioId == orden.Id)
-            .SumAsync(d => d.Costo.Value);
+            .ToListAsync()) // <-- Aquí
+            .Sum(d => d.Costo.Value);
 
         // Factura con fechas y dinero como VO
         db.Facturas.Add(new Factura
@@ -410,7 +430,114 @@ public static class DbSeederExtensions
             AdminId = admin.Id,
             TipoMovimientoId = tipoMov.Id,
             Cantidad = new CantidadVO(10),
+            FechaMovimiento = new FechaHistoricaVO(DateTime.UtcNow),
             Observaciones = new DescripcionVO("Carga inicial de stock")
+        });
+
+        await db.SaveChangesAsync();
+    }
+    // -------------------------------------------------------
+    private static async Task SeedCitasAsync(AppDbContext db)
+    {
+        if (await db.Citas.AnyAsync()) return;
+
+        var cliente = await db.Clientes.FirstOrDefaultAsync();
+        var vehiculo = await db.Vehiculos.FirstOrDefaultAsync();
+        var estadoCita = await db.EstadosCita.FirstOrDefaultAsync(); // asegúrate que existan estados
+
+        if (cliente == null || vehiculo == null || estadoCita == null)
+            return;
+
+        db.Citas.AddRange(new[]
+        {
+            new Cita
+            {
+                Id = new IdVO(1),
+                ClienteId = cliente.Id,
+                VehiculoId = vehiculo.Id,
+                FechaCita = new FechaCitaVO(DateTime.UtcNow.AddDays(3)),
+                Motivo = new DescripcionVO("Revisión general y cambio de aceite"),
+                EstadoId = estadoCita.Id,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new Cita
+            {
+                Id = new IdVO(2),
+                ClienteId = cliente.Id,
+                VehiculoId = vehiculo.Id,
+                FechaCita = new FechaCitaVO(DateTime.UtcNow.AddDays(5)),
+                Motivo = new DescripcionVO("Chequeo de frenos y suspensión"),
+                EstadoId = estadoCita.Id,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            }
+        });
+
+        await db.SaveChangesAsync();
+    }
+    // -------------------------------------------------------
+    private static async Task SeedFacturasAsync(AppDbContext db)
+    {
+        if (await db.Facturas.AnyAsync()) return;
+
+        var orden = await db.OrdenesServicio.FirstOrDefaultAsync();
+        var repuesto = await db.Repuestos.FirstOrDefaultAsync();
+        var admin = await db.Administradores.FirstOrDefaultAsync();
+        var tipoMov = await db.TiposMovimiento.FirstOrDefaultAsync();
+
+        if (orden == null || repuesto == null || admin == null || tipoMov == null) return;
+
+        db.Facturas.AddRange(new[]
+        {
+            new Factura
+            {
+                OrdenServicioId = orden.Id,
+                MontoRepuestos = new DineroVO(repuesto.PrecioUnitario.Value * 2),
+                ManoObra = new DineroVO(50000),
+                Total = new DineroVO(repuesto.PrecioUnitario.Value * 2 + 50000),
+                FechaGeneracion = new FechaHistoricaVO(DateTime.UtcNow)
+            },
+            new Factura
+            {
+                OrdenServicioId = orden.Id,
+                MontoRepuestos = new DineroVO(repuesto.PrecioUnitario.Value * 2),
+                ManoObra = new DineroVO(50000),
+                Total = new DineroVO(repuesto.PrecioUnitario.Value * 2 + 50000),
+                FechaGeneracion = new FechaHistoricaVO(DateTime.UtcNow)
+            }
+        });
+        await db.SaveChangesAsync();
+    }
+    // -------------------------------------------------------
+    private static async Task SeedPagosAsync(AppDbContext db)
+    {
+        if (await db.Pagos.AnyAsync()) return;
+
+        var factura = await db.Facturas.FirstOrDefaultAsync();
+        var metodo = await db.MetodosPago.FirstOrDefaultAsync();
+        var estado = await db.EstadosPago.FirstOrDefaultAsync();
+
+        if (factura == null || metodo == null || estado == null) return;
+
+        db.Pagos.AddRange(new[]
+        {
+            new Pago
+            {
+                FacturaId = factura.Id,
+                MetodoPagoId = metodo.Id,
+                EstadoPagoId = estado.Id,
+                Monto = factura.Total,
+                FechaPago = new FechaHistoricaVO(DateTime.UtcNow)
+            },
+            new Pago
+            {
+                FacturaId = factura.Id,
+                MetodoPagoId = metodo.Id,
+                EstadoPagoId = estado.Id,
+                Monto = factura.Total,
+                FechaPago = new FechaHistoricaVO(DateTime.UtcNow)
+            }
         });
 
         await db.SaveChangesAsync();

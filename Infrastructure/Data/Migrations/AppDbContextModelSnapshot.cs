@@ -3,7 +3,6 @@ using System;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,11 +11,9 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251008173232_InitialCreate")]
-    partial class InitialCreate
+    partial class AppDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -28,8 +25,11 @@ namespace Infrastructure.Data.Migrations
             modelBuilder.Entity("Domain.Entities.Administrador", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AreaResponsabilidad")
                         .IsRequired()
@@ -281,8 +281,11 @@ namespace Infrastructure.Data.Migrations
             modelBuilder.Entity("Domain.Entities.Cliente", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Correo")
                         .IsRequired()
@@ -437,7 +440,7 @@ namespace Infrastructure.Data.Migrations
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<DateTime>("FechaGeneracion")
-                        .HasColumnType("timestamp");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal>("ManoObra")
                         .HasColumnType("decimal(10,2)");
@@ -479,7 +482,7 @@ namespace Infrastructure.Data.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("FechaMovimiento")
-                        .HasColumnType("timestamp");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Observaciones")
                         .HasMaxLength(255)
@@ -505,8 +508,11 @@ namespace Infrastructure.Data.Migrations
             modelBuilder.Entity("Domain.Entities.Mecanico", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -590,10 +596,10 @@ namespace Infrastructure.Data.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("FechaEntregaEstimada")
-                        .HasColumnType("timestamp");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("FechaIngreso")
-                        .HasColumnType("timestamp");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("MecanicoId")
                         .HasColumnType("integer");
@@ -683,8 +689,11 @@ namespace Infrastructure.Data.Migrations
             modelBuilder.Entity("Domain.Entities.Proveedor", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Correo")
                         .HasMaxLength(100)

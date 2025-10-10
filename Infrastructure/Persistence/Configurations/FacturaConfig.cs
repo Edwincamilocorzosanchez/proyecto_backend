@@ -37,7 +37,7 @@ public class FacturaConfiguration : IEntityTypeConfiguration<Factura>
 
         builder.Property(f => f.FechaGeneracion)
             .HasConversion(fv => fv.Value, value => new FechaHistoricaVO(value))
-            .HasColumnType("timestamp")
+            .HasColumnType("timestamp with time zone")
             .IsRequired();
 
                 // agregar las columnas del base entity

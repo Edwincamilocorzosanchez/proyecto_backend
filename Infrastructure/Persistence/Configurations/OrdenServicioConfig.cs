@@ -34,12 +34,12 @@ public class OrdenServicioConfig: IEntityTypeConfiguration<OrdenServicio>
 
         builder.Property(o => o.FechaIngreso)
             .HasConversion(f => f.Value, value => new FechaHistoricaVO(value))
-            .HasColumnType("timestamp")
+            .HasColumnType("timestamp with time zone")
             .IsRequired();
 
         builder.Property(o => o.FechaEntregaEstimada)
             .HasConversion(f => f.Value, value => new FechaHistoricaVO(value))
-            .HasColumnType("timestamp")
+            .HasColumnType("timestamp with time zone")
             .IsRequired();
 
         builder.Property(m => m.CreatedAt)

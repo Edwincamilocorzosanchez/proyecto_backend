@@ -383,8 +383,8 @@ namespace Infrastructure.Data.Migrations
                     MecanicoId = table.Column<int>(type: "integer", nullable: false),
                     TipoServicioId = table.Column<int>(type: "integer", nullable: false),
                     EstadoId = table.Column<int>(type: "integer", nullable: false),
-                    FechaIngreso = table.Column<DateTime>(type: "timestamp", nullable: false),
-                    FechaEntregaEstimada = table.Column<DateTime>(type: "timestamp", nullable: false),
+                    FechaIngreso = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    FechaEntregaEstimada = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     TipoServicioId1 = table.Column<int>(type: "integer", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
@@ -433,7 +433,7 @@ namespace Infrastructure.Data.Migrations
                     AdminId = table.Column<int>(type: "integer", nullable: true),
                     TipoMovimientoId = table.Column<int>(type: "integer", nullable: false),
                     Cantidad = table.Column<int>(type: "integer", nullable: false),
-                    FechaMovimiento = table.Column<DateTime>(type: "timestamp", nullable: false),
+                    FechaMovimiento = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Observaciones = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true)
                 },
                 constraints: table =>
@@ -495,7 +495,7 @@ namespace Infrastructure.Data.Migrations
                     MontoRepuestos = table.Column<decimal>(type: "numeric(10,2)", nullable: false),
                     ManoObra = table.Column<decimal>(type: "numeric(10,2)", nullable: false),
                     Total = table.Column<decimal>(type: "numeric(10,2)", nullable: false),
-                    FechaGeneracion = table.Column<DateTime>(type: "timestamp", nullable: false),
+                    FechaGeneracion = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },

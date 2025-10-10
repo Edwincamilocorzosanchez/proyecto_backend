@@ -51,7 +51,7 @@ namespace Infrastructure.Persistence.Repositories
         {
             return await _context.Administradores
                 .Include(a => a.User)
-                .FirstOrDefaultAsync(a => a.Id.Value == id.Value, ct);
+                .FirstOrDefaultAsync(a => a.Id == id, ct);
         }
 
         public async Task<IReadOnlyList<Administrador>> GetAllAsync(CancellationToken ct = default)

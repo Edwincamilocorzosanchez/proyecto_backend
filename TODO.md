@@ -220,12 +220,9 @@ ReportesController
 
 
 ## TODO por ahora 
-- corregir los errores que aparecen de ejecucion
-- Hacer lo del DbSeeder, ahora tengo que mirar cuales si insertaron y cuales no 
-- debugear endpoints 
+- debugear endpoints, primero mirar GET, despues POST, PUT, DELETE
 - hacer lo de los CORS y RateLimiter
 - mirar lo de Johlver y saber que metodos requieren autenticación
 
 
 
-falta pagos 

@@ -30,6 +30,8 @@ Console.WriteLine(builder.Configuration.GetConnectionString("Postgres"));
 // Swagger y middlewares
 if (app.Environment.IsDevelopment())
 {
+    // agregar traces completos y errores detallador
+    app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {

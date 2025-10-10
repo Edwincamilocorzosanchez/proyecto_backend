@@ -6,10 +6,6 @@ using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Api.Extensions;
 public static class DbSeederExtensions
@@ -30,6 +26,9 @@ public static class DbSeederExtensions
         await SeedRepuestosAsync(db); // repuestos
         await SeedOrdenesYFacturasAsync(db); // ordenes de servicio y facturas
         await SeedHistorialInventarioAsync(db); // historial de inventario
+        await SeedCitasAsync(db); // citas
+        await SeedFacturasAsync(db); // facturas
+        await SeedPagosAsync(db); // pagos
     }
     // -------------------------------------------------------
     private static async Task SeedRolesAsync(AppDbContext db)
@@ -433,6 +432,112 @@ public static class DbSeederExtensions
             Cantidad = new CantidadVO(10),
             FechaMovimiento = new FechaHistoricaVO(DateTime.UtcNow),
             Observaciones = new DescripcionVO("Carga inicial de stock")
+        });
+
+        await db.SaveChangesAsync();
+    }
+    // -------------------------------------------------------
+    private static async Task SeedCitasAsync(AppDbContext db)
+    {
+        if (await db.Citas.AnyAsync()) return;
+
+        var cliente = await db.Clientes.FirstOrDefaultAsync();
+        var vehiculo = await db.Vehiculos.FirstOrDefaultAsync();
+        var estadoCita = await db.EstadosCita.FirstOrDefaultAsync(); // asegúrate que existan estados
+
+        if (cliente == null || vehiculo == null || estadoCita == null)
+            return;
+
+        db.Citas.AddRange(new[]
+        {
+            new Cita
+            {
+                Id = new IdVO(1),
+                ClienteId = cliente.Id,
+                VehiculoId = vehiculo.Id,
+                FechaCita = new FechaCitaVO(DateTime.UtcNow.AddDays(3)),
+                Motivo = new DescripcionVO("Revisión general y cambio de aceite"),
+                EstadoId = estadoCita.Id,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new Cita
+            {
+                Id = new IdVO(2),
+                ClienteId = cliente.Id,
+                VehiculoId = vehiculo.Id,
+                FechaCita = new FechaCitaVO(DateTime.UtcNow.AddDays(5)),
+                Motivo = new DescripcionVO("Chequeo de frenos y suspensión"),
+                EstadoId = estadoCita.Id,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            }
+        });
+
+        await db.SaveChangesAsync();
+    }
+    // -------------------------------------------------------
+    private static async Task SeedFacturasAsync(AppDbContext db)
+    {
+        if (await db.Facturas.AnyAsync()) return;
+
+        var orden = await db.OrdenesServicio.FirstOrDefaultAsync();
+        var repuesto = await db.Repuestos.FirstOrDefaultAsync();
+        var admin = await db.Administradores.FirstOrDefaultAsync();
+        var tipoMov = await db.TiposMovimiento.FirstOrDefaultAsync();
+
+        if (orden == null || repuesto == null || admin == null || tipoMov == null) return;
+
+        db.Facturas.AddRange(new[]
+        {
+            new Factura
+            {
+                OrdenServicioId = orden.Id,
+                MontoRepuestos = new DineroVO(repuesto.PrecioUnitario.Value * 2),
+                ManoObra = new DineroVO(50000),
+                Total = new DineroVO(repuesto.PrecioUnitario.Value * 2 + 50000),
+                FechaGeneracion = new FechaHistoricaVO(DateTime.UtcNow)
+            },
+            new Factura
+            {
+                OrdenServicioId = orden.Id,
+                MontoRepuestos = new DineroVO(repuesto.PrecioUnitario.Value * 2),
+                ManoObra = new DineroVO(50000),
+                Total = new DineroVO(repuesto.PrecioUnitario.Value * 2 + 50000),
+                FechaGeneracion = new FechaHistoricaVO(DateTime.UtcNow)
+            }
+        });
+        await db.SaveChangesAsync();
+    }
+    // -------------------------------------------------------
+    private static async Task SeedPagosAsync(AppDbContext db)
+    {
+        if (await db.Pagos.AnyAsync()) return;
+
+        var factura = await db.Facturas.FirstOrDefaultAsync();
+        var metodo = await db.MetodosPago.FirstOrDefaultAsync();
+        var estado = await db.EstadosPago.FirstOrDefaultAsync();
+
+        if (factura == null || metodo == null || estado == null) return;
+
+        db.Pagos.AddRange(new[]
+        {
+            new Pago
+            {
+                FacturaId = factura.Id,
+                MetodoPagoId = metodo.Id,
+                EstadoPagoId = estado.Id,
+                Monto = factura.Total,
+                FechaPago = new FechaHistoricaVO(DateTime.UtcNow)
+            },
+            new Pago
+            {
+                FacturaId = factura.Id,
+                MetodoPagoId = metodo.Id,
+                EstadoPagoId = estado.Id,
+                Monto = factura.Total,
+                FechaPago = new FechaHistoricaVO(DateTime.UtcNow)
+            }
         });
 
         await db.SaveChangesAsync();

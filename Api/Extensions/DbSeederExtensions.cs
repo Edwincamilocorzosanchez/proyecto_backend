@@ -377,9 +377,10 @@ public static class DbSeederExtensions
         }
 
         // Calcular subtotal en base al valor interno del VO
-        var subtotal = await db.DetallesOrden
+        var subtotal = (await db.DetallesOrden
             .Where(d => d.OrdenServicioId == orden.Id)
-            .SumAsync(d => d.Costo.Value);
+            .ToListAsync()) // <-- Aquí
+            .Sum(d => d.Costo.Value);
 
         // Factura con fechas y dinero como VO
         db.Facturas.Add(new Factura
@@ -430,6 +431,7 @@ public static class DbSeederExtensions
             AdminId = admin.Id,
             TipoMovimientoId = tipoMov.Id,
             Cantidad = new CantidadVO(10),
+            FechaMovimiento = new FechaHistoricaVO(DateTime.UtcNow),
             Observaciones = new DescripcionVO("Carga inicial de stock")
         });
 

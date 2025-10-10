@@ -225,3 +225,7 @@ ReportesController
 - debugear endpoints 
 - hacer lo de los CORS y RateLimiter
 - mirar lo de Johlver y saber que metodos requieren autenticación
+
+
+
+falta pagos 

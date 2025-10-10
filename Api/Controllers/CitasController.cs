@@ -22,9 +22,9 @@ public class CitasController : BaseApiController
     }
 
     // ============================================================
-    // GET /api/citas
+    // GET /api/citas/all
     // ============================================================
-    [HttpGet]
+    [HttpGet("all")]
     public async Task<ActionResult<IEnumerable<CitaDto>>> GetAll(CancellationToken ct)
     {
         var citas = await _service.GetAllAsync(ct);

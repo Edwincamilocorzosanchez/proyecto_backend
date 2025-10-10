@@ -10,19 +10,17 @@ public sealed class CitaProfile : Profile
 {
     public CitaProfile()
     {
+        // Convertir FechaCitaVO a DateTime de forma explicita
+        CreateMap<FechaCitaVO, DateTime>().ConvertUsing(src => src.Value);
+
         // Entidad ->  DTO
         CreateMap<Cita, CitaDto>()
-            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.Value))
-            .ForMember(dest => dest.ClienteId, opt => opt.MapFrom(src => src.ClienteId.Value))
             .ForMember(dest => dest.ClienteNombre, opt => opt.MapFrom(src => src.Cliente.Nombre.Value))
-            .ForMember(dest => dest.VehiculoId, opt => opt.MapFrom(src => src.VehiculoId.Value))
             .ForMember(dest => dest.VehiculoPlaca, opt => opt.MapFrom(src => src.Vehiculo.Vin.Value))
-            .ForMember(dest => dest.FechaCita, opt => opt.MapFrom(src => src.FechaCita.Value))
+            .ForMember(dest => dest.FechaCita, opt => opt.MapFrom(src => src.FechaCita)) // AutoMapper usará el ConvertUsing
             .ForMember(dest => dest.Motivo, opt => opt.MapFrom(src => src.Motivo != null ? src.Motivo.Value : null))
-            .ForMember(dest => dest.EstadoId, opt => opt.MapFrom(src => src.EstadoId.Value))
-            .ForMember(dest => dest.EstadoNombre, opt => opt.MapFrom(src => src.Estado.Nombre.Value))
-            .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
-            .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt));
+            .ForMember(dest => dest.EstadoNombre, opt => opt.MapFrom(src => src.Estado.Nombre.Value));
+
 
         // Crear DTO -> Entidad
         CreateMap<CreateCitaDto, Cita>()

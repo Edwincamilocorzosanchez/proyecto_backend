@@ -16,8 +16,10 @@ public sealed class MecanicoProfile : Profile
             .ForMember(dest => dest.Telefono, opt => opt.MapFrom(src => src.Telefono != null ? src.Telefono.Value : null))
             .ForMember(dest => dest.Especialidad, opt => opt.MapFrom(src => src.Especialidad != null ? src.Especialidad.Value : null))
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive.Value))
-            .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId));
-
+            .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
+            .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
+            .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt));
+            
         // Crear DTO -> Entidad
         CreateMap<CreateMecanicoDto, Mecanico>()
             .AfterMap((src, dest) =>

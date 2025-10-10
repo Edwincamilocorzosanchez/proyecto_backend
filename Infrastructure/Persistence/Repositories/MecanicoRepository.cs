@@ -18,7 +18,7 @@ public class MecanicoRepository: IMecanicoRepository
             .Include(m => m.User) // relación con UserMember
             .Include(m => m.OrdenesServicio) // relación uno a muchos
             .AsNoTracking()
-            .FirstOrDefaultAsync(m => m.Id.Value == id.Value, ct);
+            .FirstOrDefaultAsync(m => m.Id == id, ct);
     }
 
     public async Task<IReadOnlyList<Mecanico>> GetAllAsync(CancellationToken ct = default)

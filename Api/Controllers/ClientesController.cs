@@ -20,9 +20,9 @@ public class ClientesController : BaseApiController
     }
 
     // ============================================================
-    // GET /api/clientes
+    // GET /api/clientes/all
     // ============================================================
-    [HttpGet]
+    [HttpGet("all")]
     public async Task<ActionResult<IEnumerable<ClienteDto>>> GetAll(CancellationToken ct)
     {
         var clientes = await _service.GetAllAsync();
@@ -43,26 +43,6 @@ public class ClientesController : BaseApiController
         catch (KeyNotFoundException ex)
         {
             return NotFound(new { message = ex.Message });
-        }
-    }
-
-    // ============================================================
-    // GET /api/clientes/user/{userId}
-    // ============================================================
-    [HttpGet("user/{userId:int}")]
-    public async Task<ActionResult<ClienteDto>> GetByUserId(int userId, CancellationToken ct)
-    {
-        try
-        {
-            var cliente = await _service.GetByIdAsync(userId, ct);
-            if (cliente == null)
-                return NotFound(new { message = $"No se encontró el cliente con UserId {userId}" });
-
-            return Ok(cliente);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { message = ex.Message });
         }
     }
 

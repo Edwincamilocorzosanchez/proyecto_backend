@@ -9,29 +9,31 @@ public sealed class DetalleOrdenProfile : Profile
 {
     public DetalleOrdenProfile()
     {
-        // Entidad -> DTO
+        // ✅ Entidad -> DTO
         CreateMap<DetalleOrden, DetalleOrdenDto>()
             .ForMember(dest => dest.OrdenServicioId, opt => opt.MapFrom(src => src.OrdenServicioId.Value))
             .ForMember(dest => dest.RepuestoId, opt => opt.MapFrom(src => src.RepuestoId.Value))
             .ForMember(dest => dest.Cantidad, opt => opt.MapFrom(src => src.Cantidad.Value))
             .ForMember(dest => dest.Costo, opt => opt.MapFrom(src => src.Costo.Value));
 
-        // Crear DTO -> Entidad
+        // ✅ Crear DTO -> Entidad (nuevo registro)
         CreateMap<CreateDetalleOrdenDto, DetalleOrden>()
-            .AfterMap((src, dest) =>
-            {
-                dest.OrdenServicioId = new IdVO(src.OrdenServicioId);
-                dest.RepuestoId = new IdVO(src.RepuestoId);
-                dest.Cantidad = new CantidadVO(src.Cantidad);
-                dest.Costo = new DineroVO(src.Costo);
-            });
+            .ConstructUsing(src => new DetalleOrden(
+                new IdVO(src.OrdenServicioId),
+                new IdVO(src.RepuestoId),
+                new CantidadVO(src.Cantidad),
+                new DineroVO(src.Costo)
+            ));
 
-        // Actualizar DTO -> Entidad
+        // ✅ Actualizar DTO -> Entidad (actualización)
         CreateMap<UpdateDetalleOrdenDto, DetalleOrden>()
             .AfterMap((src, dest) =>
             {
-                dest.Cantidad = new CantidadVO(src.Cantidad);
-                dest.Costo = new DineroVO(src.Costo);
+                if (src.Cantidad > 0)
+                    dest.Cantidad = new CantidadVO(src.Cantidad);
+
+                if (src.Costo > 0)
+                    dest.Costo = new DineroVO(src.Costo);
             });
     }
 }

@@ -15,7 +15,8 @@ public class AdministradorConfig : IEntityTypeConfiguration<Administrador>
 
         builder.Property(a => a.Id)
             .HasConversion(v => v.Value, v => new IdVO(v))
-            .HasColumnName("id");
+            .HasColumnName("id")
+            .ValueGeneratedOnAdd();
 
         builder.Property(a => a.Nombre)
             .HasConversion(v => v.Value, v => new NombreVO(v))

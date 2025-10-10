@@ -15,7 +15,8 @@ public class MecanicoConfig : IEntityTypeConfiguration<Mecanico>
 
         builder.Property(m => m.Id)
             .HasConversion(v => v.Value, v => new IdVO(v))
-            .HasColumnName("id");
+            .HasColumnName("id")
+            .ValueGeneratedOnAdd();
 
         builder.Property(m => m.Nombre)
             .HasConversion(

@@ -14,7 +14,8 @@ public class ProveedorConfig : IEntityTypeConfiguration<Proveedor>
         builder.HasKey(p => p.Id);
         builder.Property(p => p.Id)
             .HasConversion(id => id.Value, value => new IdVO(value))
-            .HasColumnName("id");
+            .HasColumnName("id")
+            .ValueGeneratedOnAdd();
 
         builder.Property(p => p.Nombre)
             .HasConversion(n => n.Value, value => new NombreVO(value))

@@ -22,7 +22,6 @@ Despues de este paso se debe de abrir pgadmin con el localhost:8080 y crear la b
 cd .. 
 dotnet ef migrations add InitialCreate --project Infrastructure --startup-project Api -o Data/Migrations
 dotnet ef database update --project Infrastructure --startup-project Api   --connection "Host=localhost;Port=5433;Database=backend_cs;Username=postgres;Password=postgres"
-
 ```
 
 ### 3. Ejecutar el proyecto con swagger

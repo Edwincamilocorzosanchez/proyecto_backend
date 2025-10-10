@@ -129,7 +129,8 @@ namespace Infrastructure.Data.Migrations
                 name: "administradores",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "integer", nullable: false),
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     nombre = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     telefono = table.Column<string>(type: "text", nullable: false),
                     nivel_acceso = table.Column<string>(type: "text", nullable: false),
@@ -154,7 +155,8 @@ namespace Infrastructure.Data.Migrations
                 name: "clientes",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "integer", nullable: false),
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     nombre = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     correo = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     telefono = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
@@ -179,7 +181,8 @@ namespace Infrastructure.Data.Migrations
                 name: "mecanicos",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "integer", nullable: false),
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     nombre = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     telefono = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
                     especialidad = table.Column<string>(type: "character varying(60)", maxLength: 60, nullable: true),
@@ -203,7 +206,8 @@ namespace Infrastructure.Data.Migrations
                 name: "proveedores",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "integer", nullable: false),
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     nombre = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     telefono = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
                     correo = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),

@@ -59,15 +59,20 @@ public static class ApplicationServiceExtensions
         services.AddScoped<ICitaService, CitaService>();
         services.AddScoped<IClienteService, ClienteService>();
         services.AddScoped<IDetalleOrdenService, DetalleOrdenService>();
+        services.AddScoped<IEstadoCitaService, EstadoCitaService>();
+        services.AddScoped<IEstadoPagoService, EstadoPagoService>();
+        services.AddScoped<IEstadoOrdenService, EstadoOrdenService>();
         services.AddScoped<IFacturaService, FacturaService>();
         services.AddScoped<IHistorialInventarioService, HistorialInventarioService>();
         services.AddScoped<IMecanicoService, MecanicoService>();
+        services.AddScoped<IMetodoPagoService, MetodoPagoService>();
         services.AddScoped<IOrdenServicioService, OrdenServicioService>();
         services.AddScoped<IPagoService, PagoService>();
         services.AddScoped<IProveedorService, ProveedorService>();
         services.AddScoped<IRepuestoService, RepuestoService>();
         services.AddScoped<ITipoServicioService, TipoServicioService>();
         services.AddScoped<IVehiculoService, VehiculoService>();
+        //revision de endpoints
         // este es el servicio de autenticación
         services.AddScoped<IUserService, UserService>();
 

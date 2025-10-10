@@ -15,7 +15,7 @@ public class ClienteRepository : IClienteRepository
     {
         return await _context.Clientes
             .Include(c => c.Vehiculos)
-            .FirstOrDefaultAsync(c => c.Id.Value == id.Value, ct);
+            .FirstOrDefaultAsync(c => c.Id == id, ct);
     }
 
     public async Task<IReadOnlyList<Cliente>> GetAllAsync(CancellationToken ct = default)

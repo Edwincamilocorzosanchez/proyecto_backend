@@ -18,7 +18,7 @@ public sealed class MecanicosController : BaseApiController
         _mapper = mapper;
     }
 
-    // ✅ GET: api/Mecanicos/all
+    // GET: api/Mecanicos/all
     [HttpGet("all")]
     public async Task<ActionResult<IEnumerable<MecanicoDto>>> GetAllAsync(CancellationToken ct)
     {
@@ -27,7 +27,7 @@ public sealed class MecanicosController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ GET: api/Mecanicos/activos
+    // GET: api/Mecanicos/activos
     [HttpGet("activos")]
     public async Task<ActionResult<IEnumerable<MecanicoDto>>> GetActiveAsync(CancellationToken ct)
     {

@@ -7,5 +7,7 @@ public sealed record ClienteDto(
     string Telefono,
     string Direccion,
     bool IsActive,
-    int UserId
+    int UserId,
+    DateTime CreatedAt,
+    DateTime UpdatedAt
 );

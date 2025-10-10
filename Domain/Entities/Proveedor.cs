@@ -10,7 +10,8 @@ public class Proveedor : BaseEntity
     public TelefonoVO? Telefono { get; set; }
     public CorreoVO? Correo { get; set; }
     public DireccionVO? Direccion { get; set; }
-    public EstadoVO IsActive { get; set; } = null!;
+    // valor por defecto true
+    public EstadoVO IsActive { get; set; } = new EstadoVO(true);
 
     // relaciones
     // Clave foránea real (int)
@@ -20,15 +21,18 @@ public class Proveedor : BaseEntity
     public ICollection<Repuesto> Repuestos { get; set; } = new List<Repuesto>();    
 
     // constructores
-    public Proveedor() { }
-    public Proveedor(IdVO id, NombreVO nombre, TelefonoVO? telefono, CorreoVO? correo, DireccionVO? direccion, EstadoVO isActive, int userId)
+    public Proveedor()
+    {
+        IsActive = new EstadoVO(true); // garantiza que nunca será null
+    }
+    public Proveedor(IdVO id, NombreVO nombre, TelefonoVO? telefono, CorreoVO? correo, DireccionVO? direccion, EstadoVO? isActive, int userId)
     {
         Id = id;
         Nombre = nombre;
         Telefono = telefono;
         Correo = correo;
         Direccion = direccion;
-        IsActive = isActive;
+        IsActive = isActive ?? new EstadoVO(true); // valor por defecto si no se pasa
         UserId = userId;
     }
 }

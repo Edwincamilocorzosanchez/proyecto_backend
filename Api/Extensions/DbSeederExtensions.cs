@@ -80,7 +80,7 @@ public static class DbSeederExtensions
     {
         var users = await db.UsersMembers.ToListAsync();
 
-        // Clientes
+        //  Clientes
         if (!await db.Clientes.AnyAsync())
         {
             var clienteUser = users.FirstOrDefault(u => u.Username == "cliente1");
@@ -92,12 +92,14 @@ public static class DbSeederExtensions
                     Nombre = new NombreVO("Juan Pérez"),
                     Correo = new CorreoVO(clienteUser.Email!),
                     Telefono = new TelefonoVO("3001234567"),
-                    Direccion = new DireccionVO("Cra 12 #45-67, Bogotá")
+                    Direccion = new DireccionVO("Cra 12 #45-67, Bogotá"),
+                    User = clienteUser,
+                    IsActive = new EstadoVO(true)
                 });
             }
         }
 
-        // Mecanicos
+        //  Mecanicos
         if (!await db.Mecanicos.AnyAsync())
         {
             var mecUser = users.FirstOrDefault(u => u.Username == "mecanico1");
@@ -105,10 +107,12 @@ public static class DbSeederExtensions
             {
                 db.Mecanicos.Add(new Mecanico
                 {
-                    Id = new IdVO (mecUser.Id),
+                    Id = new IdVO(mecUser.Id),
                     Nombre = new NombreVO("Carlos Gómez"),
                     Telefono = new TelefonoVO("3017654321"),
-                    Especialidad = new EspecialidadVO("Frenos y Suspensión")
+                    Especialidad = new EspecialidadVO("Frenos y Suspensión"),
+                    User = mecUser,
+                    IsActive = new EstadoVO(true)
                 });
             }
         }
@@ -121,11 +125,13 @@ public static class DbSeederExtensions
             {
                 db.Administradores.Add(new Administrador
                 {
-                    Id = new IdVO (adminUser.Id),
+                    Id = new IdVO(adminUser.Id),
                     Nombre = new NombreVO("Laura Torres"),
                     Telefono = new TelefonoVO("3025556666"),
                     NivelAcceso = new NivelAccesoVO("Total"),
-                    AreaResponsabilidad = new DescripcionVO("Gestión General")
+                    AreaResponsabilidad = new DescripcionVO("Gestión General"),
+                    User = adminUser,
+                    IsActive = new EstadoVO(true)
                 });
             }
         }
@@ -138,16 +144,16 @@ public static class DbSeederExtensions
             {
                 db.Proveedores.Add(new Proveedor
                 {
-                    Id = new IdVO (provUser.Id),
+                    Id = new IdVO(provUser.Id),
                     Nombre = new NombreVO("Repuestos ABC"),
                     Telefono = new TelefonoVO("3041112222"),
                     Correo = new CorreoVO(provUser.Email!),
-                    Direccion = new DireccionVO("Zona Industrial 45")
+                    Direccion = new DireccionVO("Zona Industrial 45"),
+                    User = provUser,
+                    IsActive = new EstadoVO(true)
                 });
             }
         }
-
-        await db.SaveChangesAsync();
     }
 
     // -------------------------------------------------------
@@ -160,7 +166,7 @@ public static class DbSeederExtensions
 
         var userRoles = new List<UserMemberRol>
         {
-            new UserMemberRol { UserMemberId = users.First(u => u.Username == "admin1").Id, RolId = roles.First(r => r.Name == "Admin").Id },
+            new UserMemberRol { UserMemberId = users.First(u => u.Username == "admin1").Id, RolId = roles.First(r => r.Name == "Administrador").Id },
             new UserMemberRol { UserMemberId = users.First(u => u.Username == "cliente1").Id, RolId = roles.First(r => r.Name == "Cliente").Id },
             new UserMemberRol { UserMemberId = users.First(u => u.Username == "mecanico1").Id, RolId = roles.First(r => r.Name == "Mecanico").Id },
             new UserMemberRol { UserMemberId = users.First(u => u.Username == "proveedor1").Id, RolId = roles.First(r => r.Name == "Proveedor").Id }

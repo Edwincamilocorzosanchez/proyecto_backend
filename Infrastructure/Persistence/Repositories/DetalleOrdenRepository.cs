@@ -29,7 +29,7 @@ public sealed class DetalleOrdenRepository : IDetalleOrdenRepository
             .Include(d => d.OrdenServicio)
             .Include(d => d.Repuesto)
             .AsNoTracking()
-            .Where(d => d.OrdenServicioId.Value == ordenServicioId.Value)
+            .Where(d => d.OrdenServicioId == ordenServicioId) // ✅ sin .Value
             .ToListAsync(ct);
     }
 
@@ -39,7 +39,7 @@ public sealed class DetalleOrdenRepository : IDetalleOrdenRepository
             .Include(d => d.OrdenServicio)
             .Include(d => d.Repuesto)
             .AsNoTracking()
-            .Where(d => d.RepuestoId.Value == repuestoId.Value)
+            .Where(d => d.RepuestoId == repuestoId) // ✅ sin .Value
             .ToListAsync(ct);
     }
 
@@ -53,8 +53,8 @@ public sealed class DetalleOrdenRepository : IDetalleOrdenRepository
     {
         var existing = await _context.DetallesOrden
             .FirstOrDefaultAsync(d =>
-                d.OrdenServicioId.Value == detalle.OrdenServicioId.Value &&
-                d.RepuestoId.Value == detalle.RepuestoId.Value,
+                d.OrdenServicioId == detalle.OrdenServicioId &&   // ✅
+                d.RepuestoId == detalle.RepuestoId,
                 ct);
 
         if (existing is null)
@@ -69,8 +69,8 @@ public sealed class DetalleOrdenRepository : IDetalleOrdenRepository
     {
         var existing = await _context.DetallesOrden
             .FirstOrDefaultAsync(d =>
-                d.OrdenServicioId.Value == ordenServicioId.Value &&
-                d.RepuestoId.Value == repuestoId.Value,
+                d.OrdenServicioId == ordenServicioId &&   // ✅
+                d.RepuestoId == repuestoId,
                 ct);
 
         if (existing is null)
@@ -81,3 +81,4 @@ public sealed class DetalleOrdenRepository : IDetalleOrdenRepository
         return true;
     }
 }
+

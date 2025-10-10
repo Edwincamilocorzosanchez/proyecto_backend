@@ -18,7 +18,8 @@ public class CitaRepository : ICitaRepository
         return await _context.Citas
             .Include(c => c.Cliente)
             .Include(c => c.Vehiculo)
-            .FirstOrDefaultAsync(c => c.Id.Value == id.Value, ct);
+            .Include(c => c.Estado)
+            .FirstOrDefaultAsync(c => c.Id == id, ct); // ✅ Sin .Value
     }
 
     public async Task<IReadOnlyList<Cita>> GetAllAsync(CancellationToken ct = default)
@@ -35,7 +36,7 @@ public class CitaRepository : ICitaRepository
         return await _context.Citas
             .Include(c => c.Cliente)
             .Include(c => c.Vehiculo)
-            .Where(c => c.ClienteId == clienteId)
+            .Where(c => c.ClienteId == clienteId) // ✅ Sin .Value
             .ToListAsync(ct);
     }
 
@@ -44,7 +45,7 @@ public class CitaRepository : ICitaRepository
         return await _context.Citas
             .Include(c => c.Cliente)
             .Include(c => c.Vehiculo)
-            .Where(c => c.VehiculoId == vehiculoId)
+            .Where(c => c.VehiculoId == vehiculoId) // ✅ Sin .Value
             .ToListAsync(ct);
     }
 
@@ -53,7 +54,7 @@ public class CitaRepository : ICitaRepository
         return await _context.Citas
             .Include(c => c.Cliente)
             .Include(c => c.Vehiculo)
-            .Where(c => c.FechaCita.Value.Date == fecha.Value.Date)
+            .Where(c => c.FechaCita == fecha) // ✅ Igual, EF entiende el VO
             .ToListAsync(ct);
     }
 
@@ -61,23 +62,21 @@ public class CitaRepository : ICitaRepository
     {
         await _context.Citas.AddAsync(cita, ct);
         await _context.SaveChangesAsync(ct);
-        return cita.Id.Value.GetHashCode();
+        return cita.Id.Value; // ✅ Aquí sí puedes usar .Value, ya está en memoria
     }
 
     public async Task<bool> UpdateAsync(Cita cita, CancellationToken ct = default)
     {
         _context.Citas.Update(cita);
-        var updated = await _context.SaveChangesAsync(ct);
-        return updated > 0;
+        return await _context.SaveChangesAsync(ct) > 0;
     }
 
     public async Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default)
     {
-        var cita = await _context.Citas.FirstOrDefaultAsync(c => c.Id.Value == id.Value, ct);
-        if (cita == null) return false;
+        var cita = await _context.Citas.FirstOrDefaultAsync(c => c.Id == id, ct); // ✅ Sin .Value
+        if (cita is null) return false;
 
         _context.Citas.Remove(cita);
-        var deleted = await _context.SaveChangesAsync(ct);
-        return deleted > 0;
+        return await _context.SaveChangesAsync(ct) > 0;
     }
 }

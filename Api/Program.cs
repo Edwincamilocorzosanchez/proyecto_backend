@@ -1,4 +1,5 @@
 using Api.Extensions;
+using Api.Mappings;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +14,8 @@ builder.Services.ConfigureCors();
 builder.Services.AddApplicationServices();
 builder.Services.AddJwt(builder.Configuration);
 builder.Services.AddValidationErrors();
+builder.Services.AddAutoMapper(typeof(ValueObjectProfile).Assembly);
+
 
 // Configurar DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>

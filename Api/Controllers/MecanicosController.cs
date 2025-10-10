@@ -18,8 +18,8 @@ public sealed class MecanicosController : BaseApiController
         _mapper = mapper;
     }
 
-    // ✅ GET: api/Mecanicos
-    [HttpGet]
+    // ✅ GET: api/Mecanicos/all
+    [HttpGet("all")]
     public async Task<ActionResult<IEnumerable<MecanicoDto>>> GetAllAsync(CancellationToken ct)
     {
         var mecanicos = await _mecanicoService.GetAllAsync(ct);

@@ -80,4 +80,13 @@ public class UserController : BaseApiController
         var result = _mapper.Map<DataUserDto>(user);
         return Ok(result);
     }
+    // obtener todos los usuarios creados
+    [HttpGet("all")]
+    public async Task<ActionResult<IEnumerable<DataUserDto>>> GetAllAsync(CancellationToken ct)
+    {
+        var users = await _userService.GetAllAsync(ct);
+        var result = _mapper.Map<IEnumerable<DataUserDto>>(users);
+        return Ok(result);
+    }
+    
 }

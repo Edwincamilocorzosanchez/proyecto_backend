@@ -24,9 +24,10 @@ public class CitaRepository : ICitaRepository
     public async Task<IReadOnlyList<Cita>> GetAllAsync(CancellationToken ct = default)
     {
         return await _context.Citas
-            .Include(c => c.Cliente)
-            .Include(c => c.Vehiculo)
-            .ToListAsync(ct);
+        .Include(c => c.Cliente)  // ⚠ cargar Cliente
+        .Include(c => c.Vehiculo) // ⚠ cargar Vehiculo
+        .Include(c => c.Estado)   // ⚠ cargar Estado
+        .ToListAsync(ct);
     }
 
     public async Task<IReadOnlyList<Cita>> GetByClienteIdAsync(IdVO clienteId, CancellationToken ct = default)
@@ -52,7 +53,7 @@ public class CitaRepository : ICitaRepository
         return await _context.Citas
             .Include(c => c.Cliente)
             .Include(c => c.Vehiculo)
-            .Where(c => c.FechaCita == fecha)
+            .Where(c => c.FechaCita.Value.Date == fecha.Value.Date)
             .ToListAsync(ct);
     }
 

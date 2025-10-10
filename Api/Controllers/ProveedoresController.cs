@@ -18,8 +18,8 @@ public class ProveedoresController : BaseApiController
         _mapper = mapper;
     }
 
-    // ✅ GET: api/Proveedor
-    [HttpGet]
+    // ✅ GET: api/Proveedor/all
+    [HttpGet("all")]
     public async Task<ActionResult<IEnumerable<ProveedorDto>>> GetAllAsync(CancellationToken ct)
     {
         var proveedores = await _service.GetAllAsync(ct);

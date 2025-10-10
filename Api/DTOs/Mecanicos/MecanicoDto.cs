@@ -6,5 +6,7 @@ public record MecanicoDto(
     string? Telefono,
     string? Especialidad,
     bool IsActive,
-    int UserId
+    int UserId,
+    DateTime CreatedAt,
+    DateTime UpdatedAt
 );

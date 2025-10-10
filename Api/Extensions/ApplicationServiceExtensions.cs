@@ -29,8 +29,13 @@ public static class ApplicationServiceExtensions
             // estos son los dominios permitidos para la aplicación
             HashSet<String> allowed = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             {
-                "https://app.ejemplo.com",
-                "https://admin.ejemplo.com"
+                "localhost:5173",
+                "localhost:5500",
+                "localhost:5501",
+                "localhost:5001",
+                "localhost:4200",
+                "localhost:8080",
+                "localhost:8081",
             };
             // este es el comportamiento de CORS
             options.AddPolicy("CorsPolicy", builder =>

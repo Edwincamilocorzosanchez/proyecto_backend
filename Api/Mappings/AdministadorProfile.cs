@@ -11,12 +11,12 @@ public sealed class AdministradorProfile : Profile
     public AdministradorProfile()
     {
         // Configuración global para todos los ValueObjects simples
-        CreateMap<IdVO, int>().ConvertUsing(vo => vo.Value);
-        CreateMap<NombreVO, string>().ConvertUsing(vo => vo.Value);
-        CreateMap<TelefonoVO, string>().ConvertUsing(vo => vo.Value);
-        CreateMap<NivelAccesoVO, string>().ConvertUsing(vo => vo.Value);
-        CreateMap<DescripcionVO, string>().ConvertUsing(vo => vo.Value);
-        CreateMap<EstadoVO, bool>().ConvertUsing(vo => vo.Value);
+        // CreateMap<IdVO, int>().ConvertUsing(vo => vo.Value);
+        // CreateMap<NombreVO, string>().ConvertUsing(vo => vo.Value);
+        // CreateMap<TelefonoVO, string>().ConvertUsing(vo => vo.Value);
+        // CreateMap<NivelAccesoVO, string>().ConvertUsing(vo => vo.Value);
+        // CreateMap<DescripcionVO, string>().ConvertUsing(vo => vo.Value);
+        // CreateMap<EstadoVO, bool>().ConvertUsing(vo => vo.Value);
 
         // Entidad -> DTO
         CreateMap<Administrador, AdministradorDto>()

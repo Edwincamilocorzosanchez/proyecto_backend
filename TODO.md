@@ -224,5 +224,28 @@ ReportesController
 - hacer lo de los CORS y RateLimiter
 - mirar lo de Johlver y saber que metodos requieren autenticación
 
+implementar el GET all en usuarios
 
+arreglar todo cita
 
+arreglar mecanicos por id
+
+### metodos GET que funcionan 
+USER
+- Get por id
+- Get all
+
+PROVEEDORES
+- Get all
+
+MECANICOS
+- Get activos
+- Get all
+
+CLIENTES
+- Get all
+
+ADMINISTRADORES
+- Get by nivel
+- Get all
+- Get by id

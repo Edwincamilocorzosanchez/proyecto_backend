@@ -32,10 +32,16 @@ public class AdministradoresController : BaseApiController
     [HttpGet("{id:int}")]
     public async Task<ActionResult<AdministradorDto>> GetById(int id, CancellationToken ct)
     {
-        var admin = await _service.GetByIdAsync(new IdVO(id), ct);
-        if (admin is null) return NotFound();
-
-        return Ok(_mapper.Map<AdministradorDto>(admin));
+        try 
+        {
+            var admin = await _service.GetByIdAsync(new IdVO(id), ct);
+            if (admin is null) return NotFound();
+            return Ok(_mapper.Map<AdministradorDto>(admin));
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = ex.Message });
+        }
     }
 
     [HttpPost]

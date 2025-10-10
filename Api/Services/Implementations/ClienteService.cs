@@ -24,7 +24,7 @@ public class ClienteService : IClienteService
         return _mapper.Map<IEnumerable<ClienteDto>>(clientes);
     }
 
-    public async Task<ClienteDto> GetByIdAsync(int id, CancellationToken ct = default)
+    public async Task<ClienteDto?> GetByIdAsync(int id, CancellationToken ct = default)
     {
         var cliente = await _unitOfWork.Clientes.GetByIdAsync(new IdVO(id));
         if (cliente == null)
@@ -71,7 +71,7 @@ public class ClienteService : IClienteService
         cliente.IsActive = new EstadoVO(dto.IsActive);
 
         await _unitOfWork.Clientes.UpdateAsync(cliente);
-        await _unitOfWork.SaveChanges(); // 👈 importante
+        await _unitOfWork.SaveChanges();
 
         return _mapper.Map<ClienteDto>(cliente);
     }
@@ -83,8 +83,7 @@ public class ClienteService : IClienteService
             return false;
 
         await _unitOfWork.Clientes.DeleteAsync(cliente.Id);
-        await _unitOfWork.SaveChanges(); // 👈 importante
-
+        await _unitOfWork.SaveChanges();
         return true;
     }
 }

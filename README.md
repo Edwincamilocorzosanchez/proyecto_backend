@@ -28,3 +28,31 @@ dotnet ef database update --project Infrastructure --startup-project Api   --con
 ```
 dotnet  watch run --project Api --startup-project Api
 ```
+
+## Configuracion del proyecto 
+```json
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "ConnectionStrings": {
+    "PostgresDocker": "Host=db;Port=5432;Database=backend_cs;Username=postgres;Password=postgres",
+    "PostgresLocal": "Host=localhost;Port=5433;Database=backend_cs;Username=postgres;Password=postgres"
+  },
+  "JWT": {
+    "Key": "njMCY^UbEskeAFL6eDzHuqY!s^x6Qrwe",
+    "Issuer": "MyStoreApi",
+    "Audience": "MyStoreApiUser",
+    "DurationInMinutes":  1
+  }
+}
+```
+
+el Key es la clave de encriptación de JWT, el Issuer es el nombre del emisor del JWT y el Audience es el nombre del receptor del JWT.
+
+El Issuer es quien emite el token, en este caso la ejecucion del backend 
+El Audience es quien recibe el token, en este caso el frontend 
+La duración del token es de 1 minuto, esto es para que el token no expire y se vuelva a emitir.

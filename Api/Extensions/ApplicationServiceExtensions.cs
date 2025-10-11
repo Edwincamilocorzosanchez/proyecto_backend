@@ -139,9 +139,7 @@ public static class ApplicationServiceExtensions
             //     opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
             //     opt.AutoReplenishment = true;
             // });
-
         });
-
         return services;
     }
     // este es el metodo para agregar el JWT

@@ -42,13 +42,6 @@ GenerarFactura: al cerrar la orden, calcula mano de obra más repuestos y crea l
 # Validaciones 
  validar que un vehículo no esté agendado en dos órdenes simultáneas, calcular fechas estimadas según tipo de servicio y reglas de inventario que impiden usar repuestos fuera de stock.
 
-| 🧑‍💻 Persona                                            | Módulo / Área                  | Tablas principales                                                                                                                             | Flujo completo                                                                                        | Dependencias                                          |
-| -------------------------------------------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| **Desarrollador A – Gestión de Usuarios y Citas**        | **Usuarios, Clientes y Citas** | `clientes`, `vehiculos`, `citas`, `estados_cita`                                                                                               | Registro y gestión de clientes → registro de vehículos → agendamiento de citas.                       | Se apoya en `users_members` y `roles` (solo lectura). |
-| **Desarrollador B – Operaciones y Servicios del Taller** | **Órdenes y Servicios**        | `tipo_servicio`, `orden_servicio`, `detalle_orden`, `mecanicos`, `estados_orden`                                                               | Asignación de mecánicos, gestión de órdenes, servicios realizados, estado del trabajo, piezas usadas. | Se apoya en vehículos (de A) y repuestos (de C).      |
-| **Desarrollador C – Inventario, Facturación y Pagos**    | **Inventario y Finanzas**      | `repuestos`, `historial_inventario`, `proveedores`, `facturas`, `pagos`, `metodos_pago`, `tipos_movimiento`, `estados_pago`, `administradores` | Gestión de stock, entradas/salidas, proveedores, facturación y pagos.                                 | Se apoya en órdenes (de B) para generar facturas.     |
-
-
 
 ## Listado de verbos HTTP
 
@@ -221,6 +214,7 @@ ReportesController
 
 ## TODO por ahora 
 - debugear endpoints, primero mirar GET, despues POST, PUT, DELETE
+- refactorizar los seeder para que no tenga un archivo muy grande, esto se refacotriza en la carpeta HELPERS
 - hacer lo de los CORS y RateLimiter
 - mirar lo de Johlver y saber que metodos requieren autenticación
 

@@ -57,9 +57,9 @@ public static class ApplicationServiceExtensions
     // este método registra los servicios de la aplicación
     public static void AddApplicationServices(this IServiceCollection services)
     {
-        // estp registrar el hasher de contraseñas
+        // PasswordHasher
         services.AddScoped<IPasswordHasher<UserMember>, PasswordHasher<UserMember>>();
-        // registrar servicios 
+        // Servicios de dominio / aplicación
         services.AddScoped<IAdministradorService, AdministradorService>();
         services.AddScoped<ICitaService, CitaService>();
         services.AddScoped<IClienteService, ClienteService>();
@@ -77,7 +77,6 @@ public static class ApplicationServiceExtensions
         services.AddScoped<IRepuestoService, RepuestoService>();
         services.AddScoped<ITipoServicioService, TipoServicioService>();
         services.AddScoped<IVehiculoService, VehiculoService>();
-        // este es el servicio de autenticación
         services.AddScoped<IUserService, UserService>();
 
         // esto es para agregar los servicios de persistencia
@@ -85,10 +84,8 @@ public static class ApplicationServiceExtensions
 
         // esto es para agregar los servicios de MediatR
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
-        // esto es para agregar los servicios de validación
         services.AddValidatorsFromAssembly(typeof(Program).Assembly);
-        services.AddAutoMapper(typeof(Program).Assembly);
-        // esto aparentemente es para agregar directamente todos los mapeos
+        // AutoMapper: detecta automáticamente todos los perfiles de todos los proyectos
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
     }
     // este es el meetodo para agregar el RateLimiter 

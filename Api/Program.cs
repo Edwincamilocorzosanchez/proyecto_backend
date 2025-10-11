@@ -14,8 +14,6 @@ builder.Services.ConfigureCors();
 builder.Services.AddApplicationServices();
 builder.Services.AddJwt(builder.Configuration);
 builder.Services.AddValidationErrors();
-builder.Services.AddAutoMapper(typeof(ValueObjectProfile).Assembly);
-
 
 // Configurar DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>

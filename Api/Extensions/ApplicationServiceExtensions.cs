@@ -77,12 +77,15 @@ public static class ApplicationServiceExtensions
         services.AddScoped<IRepuestoService, RepuestoService>();
         services.AddScoped<ITipoServicioService, TipoServicioService>();
         services.AddScoped<IVehiculoService, VehiculoService>();
-        //revision de endpoints
         // este es el servicio de autenticación
         services.AddScoped<IUserService, UserService>();
 
+        // esto es para agregar los servicios de persistencia
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        // esto es para agregar los servicios de MediatR
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+        // esto es para agregar los servicios de validación
         services.AddValidatorsFromAssembly(typeof(Program).Assembly);
         services.AddAutoMapper(typeof(Program).Assembly);
         // esto aparentemente es para agregar directamente todos los mapeos

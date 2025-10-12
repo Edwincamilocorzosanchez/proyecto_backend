@@ -7,6 +7,7 @@ using Api.Services.Interfaces;
 using Domain.Entities;
 using Domain.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api.Controllers;
 
@@ -27,9 +28,16 @@ public class CitasController : BaseApiController
     [HttpGet("all")]
     public async Task<ActionResult<IEnumerable<CitaDto>>> GetAll(CancellationToken ct)
     {
-        var citas = await _service.GetAllAsync(ct);
-        var result = _mapper.Map<IEnumerable<CitaDto>>(citas);
-        return Ok(result);
+        try
+        {
+            var citas = await _service.GetAllAsync(ct);
+            var result = _mapper.Map<IEnumerable<CitaDto>>(citas);
+            return Ok(result);
+        }
+        catch
+        {
+            return StatusCode(500, new { message = "Ocurrió un error al obtener las citas. Por favor, inténtalo de nuevo más tarde." });
+        }
     }
 
     // ============================================================
@@ -38,12 +46,33 @@ public class CitasController : BaseApiController
     [HttpGet("{id:int}")]
     public async Task<ActionResult<CitaDto>> GetById(int id, CancellationToken ct)
     {
-        var cita = await _service.GetByIdAsync(new IdVO(id), ct);
-        if (cita is null)
-            return NotFound(new { message = $"No se encontró la cita con ID {id}" });
+        try
+        {
+            if (id <= 0)
+                return BadRequest(new { message = "El ID proporcionado no es válido. Debe ser mayor que cero." });
 
-        var dto = _mapper.Map<CitaDto>(cita);
-        return Ok(dto);
+            var cita = await _service.GetByIdAsync(new IdVO(id), ct);
+            if (cita is null)
+                return NotFound(new { message = $"No se encontró ninguna cita con el ID {id}." });
+
+            var dto = _mapper.Map<CitaDto>(cita);
+            return Ok(dto);
+        }
+        catch (ArgumentException ex)
+        {
+            // Errores relacionados con parámetros o Value Objects
+            return BadRequest(new { message = "Error de argumento.", detail = ex.Message });
+        }
+        catch (DbUpdateException ex)
+        {
+            // Errores de base de datos (como claves foráneas o fallos en la consulta)
+            return StatusCode(500, new { message = "Error en la base de datos al obtener la cita.", detail = ex.InnerException?.Message ?? ex.Message });
+        }
+        catch (Exception ex)
+        {
+            // Cualquier otro tipo de error inesperado
+            return StatusCode(500, new { message = "Ocurrió un error inesperado al obtener la cita.", detail = ex.Message });
+        }
     }
 
     // ============================================================

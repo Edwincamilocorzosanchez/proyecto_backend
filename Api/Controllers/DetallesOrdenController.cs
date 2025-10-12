@@ -29,6 +29,14 @@ public class DetallesOrdenController : BaseApiController
         return Ok(result);
     }
 
+    [HttpGet("repuesto/{repuestoId:int}")]
+    public async Task<ActionResult<IEnumerable<DetalleOrdenDto>>> GetByRepuesto(int repuestoId, CancellationToken ct)
+    {
+        var detalles = await _detalleOrdenService.GetByRepuestoIdAsync(new IdVO(repuestoId), ct);
+        var result = _mapper.Map<IEnumerable<DetalleOrdenDto>>(detalles);
+        return Ok(result);
+    }
+
     // ============================================================
     // GET /api/detalleorden/{ordenServicioId}/{repuestoId}
     // ============================================================

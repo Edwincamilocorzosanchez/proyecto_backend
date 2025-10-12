@@ -7,6 +7,7 @@ using Api.Services.Interfaces;
 using Domain.Entities;
 using Domain.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api.Controllers;
 
@@ -24,23 +25,67 @@ public class AdministradoresController : BaseApiController
     [HttpGet("all")]
     public async Task<ActionResult<IEnumerable<AdministradorDto>>> GetAll(CancellationToken ct)
     {
-        var admins = await _service.GetAllAsync(ct);
-        var dto = _mapper.Map<IEnumerable<AdministradorDto>>(admins);
-        return Ok(dto);
+        try
+        {
+            var admins = await _service.GetAllAsync(ct);
+
+            if (admins == null || !admins.Any())
+                return NotFound(new { message = "No se encontraron administradores registrados." });
+
+            var dto = _mapper.Map<IEnumerable<AdministradorDto>>(admins);
+            return Ok(dto);
+        }
+        catch (OperationCanceledException)
+        {
+            // Cuando se cancela la solicitud (por ejemplo, timeout o cancelación manual)
+            return StatusCode(499, new { message = "La operación fue cancelada por el cliente." });
+        }
+        catch (DbUpdateException ex)
+        {
+            // Errores relacionados con la base de datos
+            return StatusCode(500, new { message = "Error al consultar los datos en la base de datos.", detail = ex.InnerException?.Message });
+        }
+        catch (Exception ex)
+        {
+            // Errores inesperados
+            return StatusCode(500, new { message = "Ocurrió un error inesperado al obtener los administradores.", detail = ex.Message });
+        }
     }
 
     [HttpGet("{id:int}")]
     public async Task<ActionResult<AdministradorDto>> GetById(int id, CancellationToken ct)
     {
-        try 
+        try
         {
+            if (id <= 0)
+                return BadRequest(new { message = "El ID debe ser mayor que 0." });
+
             var admin = await _service.GetByIdAsync(new IdVO(id), ct);
-            if (admin is null) return NotFound();
+
+            if (admin is null)
+                return NotFound(new { message = $"No se encontró un administrador con ID {id}." });
+
             return Ok(_mapper.Map<AdministradorDto>(admin));
+        }
+        catch (ArgumentException ex)
+        {
+            // Errores de argumentos inválidos, por ejemplo en el Value Object IdVO
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            // Cuando un repositorio o servicio lanza que no existe el registro
+            return NotFound(new { message = ex.Message });
+        }
+        catch (DbUpdateException ex)
+        {
+            // Errores de base de datos
+            return StatusCode(500, new { message = "Error al acceder a la base de datos.", detail = ex.InnerException?.Message });
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new { message = ex.Message });
+            // Error inesperado
+            return StatusCode(500, new { message = "Ocurrió un error inesperado.", detail = ex.Message });
         }
     }
 
@@ -99,10 +144,21 @@ public class AdministradoresController : BaseApiController
     [HttpGet("nivel/{nivel}")]
     public async Task<ActionResult<IEnumerable<AdministradorDto>>> GetByNivelAcceso(string nivel, CancellationToken ct)
     {
-        var all = await _service.GetAllAsync(ct);
-        var filtered = all.Where(a => a.NivelAcceso.Value.Equals(nivel, StringComparison.OrdinalIgnoreCase));
+        try
+        {
+            var admins = await _service.GetAllAsync(ct);
+            var filtered = admins
+                .Where(a => a.NivelAcceso.Value.Equals(nivel, StringComparison.OrdinalIgnoreCase))
+                .ToList();
 
-        var dto = _mapper.Map<IEnumerable<AdministradorDto>>(filtered);
-        return Ok(dto);
+            if (filtered.Count == 0)
+                return NotFound(new { message = $"No se encontraron administradores con nivel de acceso '{nivel}'." });
+
+            return Ok(_mapper.Map<IEnumerable<AdministradorDto>>(filtered));
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Error al obtener los administradores por nivel de acceso.", detail = ex.Message });
+        }
     }
 }

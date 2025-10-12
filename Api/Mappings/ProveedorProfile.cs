@@ -10,6 +10,9 @@ public sealed class ProveedorProfile : Profile
 {
     public ProveedorProfile()
     {
+         // Conversión general de EstadoVO → bool
+        CreateMap<EstadoVO, bool>().ConvertUsing(vo => vo.Value);
+
         // Entidad -> DTO simple
         CreateMap<Proveedor, ProveedorDto>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.Value))

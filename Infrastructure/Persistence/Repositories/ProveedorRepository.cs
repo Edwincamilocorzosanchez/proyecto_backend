@@ -30,30 +30,35 @@ namespace Infrastructure.Persistence.Repositories
 
         public async Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default)
         {
-            var proveedor = await _context.Proveedores.FirstOrDefaultAsync(p => p.Id.Value == id.Value, ct);
-            if (proveedor == null) return false;
+            var proveedor = await _context.Proveedores
+                .FirstOrDefaultAsync(p => p.Id.Value == id.Value, ct);
+
+            if (proveedor is null) return false;
 
             _context.Proveedores.Remove(proveedor);
-            var deleted = await _context.SaveChangesAsync(ct);
-            return deleted > 0;
+            return await _context.SaveChangesAsync(ct) > 0;
         }
-        
+
         public async Task<bool> ExistsByNombreAsync(NombreVO nombre, CancellationToken ct = default)
         {
+            // ✅ comparar el valor primitivo, no el VO directamente
             return await _context.Proveedores
-                .AnyAsync(p => p.Nombre == nombre, ct);
+                .AnyAsync(p => p.Nombre.Value == nombre.Value, ct);
         }
 
         public async Task<IReadOnlyList<Proveedor>> GetActivosAsync(CancellationToken ct = default)
         {
+            // EF puede traducir correctamente .Value al campo booleano de la BD
             return await _context.Proveedores
-                .Where(p => p.IsActive.Value)
+                .Where(p => p.IsActive.Value) 
                 .Include(p => p.Repuestos)
                 .ToListAsync(ct);
         }
 
+
         public async Task<Proveedor?> GetByIdAsync(IdVO id, CancellationToken ct = default)
         {
+            // ✅ comparar por el valor interno
             return await _context.Proveedores
                 .Include(p => p.Repuestos)
                 .FirstOrDefaultAsync(p => p.Id.Value == id.Value, ct);
@@ -61,9 +66,10 @@ namespace Infrastructure.Persistence.Repositories
 
         public async Task<Proveedor?> GetByNombreAsync(NombreVO nombre, CancellationToken ct = default)
         {
+            // ✅ comparar por el valor interno
             return await _context.Proveedores
                 .Include(p => p.Repuestos)
-                .FirstOrDefaultAsync(p => p.Nombre == nombre, ct);
+                .FirstOrDefaultAsync(p => p.Nombre.Value == nombre.Value, ct);
         }
 
         public async Task<IReadOnlyList<Proveedor>> GetAllAsync(CancellationToken ct = default)

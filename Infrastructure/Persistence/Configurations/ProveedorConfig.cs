@@ -12,10 +12,15 @@ public class ProveedorConfig : IEntityTypeConfiguration<Proveedor>
         builder.ToTable("proveedores");
 
         builder.HasKey(p => p.Id);
+
         builder.Property(p => p.Id)
-            .HasConversion(id => id.Value, value => new IdVO(value))
+            .HasConversion(
+                id => id.Value,            // al guardar en la BD
+                value => new IdVO(value)   // al leer desde la BD
+            )
             .HasColumnName("id")
-            .ValueGeneratedOnAdd();
+            .IsRequired();
+
 
         builder.Property(p => p.Nombre)
             .HasConversion(n => n.Value, value => new NombreVO(value))
@@ -44,9 +49,15 @@ public class ProveedorConfig : IEntityTypeConfiguration<Proveedor>
             .HasColumnName("direccion")
             .HasMaxLength(255);
 
+        // 👇 Aquí el cambio importante
         builder.Property(p => p.IsActive)
-            .HasConversion(e => e.Value, value => new EstadoVO(value))
-            .HasColumnName("is_active");
+            .HasConversion(
+                estado => estado.Value,           // cómo guardar el bool en BD
+                value => new EstadoVO(value)      // cómo reconstruir el VO desde BD
+            )
+            .HasColumnType("boolean")
+            .IsRequired();
+
 
         builder.Property(m => m.CreatedAt)
             .HasColumnName("created_at")
@@ -56,7 +67,6 @@ public class ProveedorConfig : IEntityTypeConfiguration<Proveedor>
             .HasColumnName("updated_at")
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-        // FK explicita por el modelo de usuario
         builder.Property(a => a.UserId)
             .HasColumnName("user_id")
             .IsRequired();

@@ -18,14 +18,14 @@ public sealed class EstadoCitaRepository : IEstadoCitaRepository
     {
         return await _context.EstadosCita
             .AsNoTracking()
-            .FirstOrDefaultAsync(e => e.Id.Value == id.Value, ct);
+            .FirstOrDefaultAsync(e => e.Id == id, ct);
     }
 
     public async Task<EstadoCita?> GetByNombreAsync(NombreVO nombre, CancellationToken ct = default)
     {
         return await _context.EstadosCita
             .AsNoTracking()
-            .FirstOrDefaultAsync(e => e.Nombre.Value == nombre.Value, ct);
+            .FirstOrDefaultAsync(e => e.Nombre == nombre, ct);
     }
 
     public async Task<IReadOnlyList<EstadoCita>> GetAllAsync(CancellationToken ct = default)

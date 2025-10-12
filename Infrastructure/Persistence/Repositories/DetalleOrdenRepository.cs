@@ -18,8 +18,8 @@ public sealed class DetalleOrdenRepository : IDetalleOrdenRepository
             .Include(d => d.Repuesto)
             .AsNoTracking()
             .FirstOrDefaultAsync(d =>
-                d.OrdenServicioId.Value == ordenServicioId.Value &&
-                d.RepuestoId.Value == repuestoId.Value,
+                d.OrdenServicioId == ordenServicioId &&
+                d.RepuestoId == repuestoId,
                 ct);
     }
 

@@ -2,6 +2,7 @@ using Api.Services.Interfaces;
 using Application.Abstractions;
 using Domain.Entities;
 using Domain.ValueObjects;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Api.Services.Implementations;
 
@@ -16,6 +17,9 @@ public class DetalleOrdenService : IDetalleOrdenService
 
     public async Task<DetalleOrden?> GetByIdAsync(IdVO ordenServicioId, IdVO repuestoId, CancellationToken ct = default)
         => await _unitOfWork.DetalleOrden.GetByIdsAsync(ordenServicioId, repuestoId, ct);
+
+    public async Task<IReadOnlyList<DetalleOrden>> GetByRepuestoIdAsync(IdVO repuestoId, CancellationToken ct = default)
+        => await _unitOfWork.DetalleOrden.GetByRepuestoIdAsync(repuestoId, ct);
 
     public async Task<IReadOnlyList<DetalleOrden>> GetByOrdenIdAsync(IdVO ordenServicioId, CancellationToken ct = default)
         => await _unitOfWork.DetalleOrden.GetByOrdenServicioIdAsync(ordenServicioId, ct);

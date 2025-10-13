@@ -18,8 +18,8 @@ public sealed class EstadosOrdenController : BaseApiController
         _mapper = mapper;
     }
 
-    // ✅ GET: api/EstadoOrden
-    [HttpGet]
+    // ✅ GET: api/EstadoOrden/all
+    [HttpGet("all")]
     public async Task<ActionResult<IEnumerable<EstadoOrdenDto>>> GetAllAsync(CancellationToken ct)
     {
         var estados = await _estadoOrdenService.ObtenerTodosAsync(ct);

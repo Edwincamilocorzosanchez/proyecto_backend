@@ -15,14 +15,14 @@ public sealed class EstadoOrdenRepository : IEstadoOrdenRepository
     {
         return await _context.EstadosOrden
             .AsNoTracking()
-            .FirstOrDefaultAsync(e => e.Id.Value == id.Value, ct);
+            .FirstOrDefaultAsync(e => e.Id == id, ct);
     }
 
     public async Task<EstadoOrden?> GetByNombreAsync(NombreVO nombre, CancellationToken ct = default)
     {
         return await _context.EstadosOrden
             .AsNoTracking()
-            .FirstOrDefaultAsync(e => e.Nombre.Value == nombre.Value, ct);
+            .FirstOrDefaultAsync(e => e.Nombre == nombre, ct);
     }
 
     public async Task<IReadOnlyList<EstadoOrden>> GetAllAsync(CancellationToken ct = default)

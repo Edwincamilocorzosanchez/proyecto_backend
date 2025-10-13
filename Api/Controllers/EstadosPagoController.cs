@@ -18,8 +18,8 @@ public sealed class EstadosPagoController : BaseApiController
         _mapper = mapper;
     }
 
-    // ✅ GET: api/EstadoPago
-    [HttpGet]
+    // ✅ GET: api/EstadoPago/all
+    [HttpGet("all")]
     public async Task<ActionResult<IEnumerable<EstadoPagoDto>>> GetAllAsync(CancellationToken ct)
     {
         var estados = await _estadoPagoService.ObtenerTodosAsync(ct);

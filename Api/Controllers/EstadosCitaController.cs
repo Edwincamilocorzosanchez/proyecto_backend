@@ -18,8 +18,8 @@ public sealed class EstadosCitaController : BaseApiController
         _mapper = mapper;
     }
 
-    // ✅ GET: api/EstadoCita
-    [HttpGet]
+    // ✅ GET: api/EstadoCita/all
+    [HttpGet("all")]
     public async Task<ActionResult<IEnumerable<EstadoCitaDto>>> GetAllAsync(CancellationToken ct)
     {
         var estados = await _estadoCitaService.ObtenerTodosAsync(ct);

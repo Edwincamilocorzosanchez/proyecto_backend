@@ -40,13 +40,13 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<EstadoPago?> GetByIdAsync(IdVO id, CancellationToken ct = default)
         {
             return await _context.EstadosPago
-                .FirstOrDefaultAsync(e => e.Id.Value == id.Value, ct);
+                .FirstOrDefaultAsync(e => e.Id == id, ct);
         }
 
         public async Task<EstadoPago?> GetByNombreAsync(NombreVO nombre, CancellationToken ct = default)
         {
             return await _context.EstadosPago
-                .FirstOrDefaultAsync(e => e.Nombre.Value == nombre.Value, ct);
+                .FirstOrDefaultAsync(e => e.Nombre == nombre, ct);
         }
 
         public async Task<IReadOnlyList<EstadoPago>> GetAllAsync(CancellationToken ct = default)

@@ -16,7 +16,7 @@ public sealed class FacturaProfile : Profile
             .ForMember(dest => dest.MontoRepuestos, opt => opt.MapFrom(src => src.MontoRepuestos.Value))
             .ForMember(dest => dest.ManoObra, opt => opt.MapFrom(src => src.ManoObra.Value))
             .ForMember(dest => dest.Total, opt => opt.MapFrom(src => src.Total.Value))
-            .ForMember(dest => dest.FechaGeneracion, opt => opt.MapFrom(src => src.FechaGeneracion.Value));
+            .ForMember(dest => dest.FechaGeneracion, opt => opt.MapFrom(src => src.FechaGeneracion));
 
         // Crear DTO -> Entidad
         CreateMap<CreateFacturaDto, Factura>()

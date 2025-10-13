@@ -28,7 +28,7 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default)
         {
             var historial = await _context.HistorialesInventario
-                .FirstOrDefaultAsync(h => h.Id.Value == id.Value, ct);
+                .FirstOrDefaultAsync(h => h.Id == id, ct);
 
             if (historial == null) return false;
 
@@ -43,7 +43,7 @@ namespace Infrastructure.Persistence.Repositories
                 .Include(h => h.Repuesto)
                 .Include(h => h.Administrador)
                 .Include(h => h.TipoMovimiento)
-                .FirstOrDefaultAsync(h => h.Id.Value == id.Value, ct);
+                .FirstOrDefaultAsync(h => h.Id == id, ct);
         }
 
         public async Task<IReadOnlyList<HistorialInventario>> GetByRepuestoIdAsync(IdVO repuestoId, CancellationToken ct = default)

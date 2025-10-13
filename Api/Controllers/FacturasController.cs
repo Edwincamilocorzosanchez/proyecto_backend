@@ -18,8 +18,8 @@ public sealed class FacturasController : BaseApiController
         _mapper = mapper;
     }
 
-    // ✅ GET: api/facturas
-    [HttpGet]
+    // ✅ GET: api/facturas/all
+    [HttpGet("all")]
     public async Task<ActionResult<IEnumerable<FacturaDto>>> GetAllAsync(CancellationToken ct)
     {
         var facturas = await _facturaService.GetAllAsync(ct);

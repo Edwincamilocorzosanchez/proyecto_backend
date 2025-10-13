@@ -33,7 +33,7 @@ namespace Infrastructure.Persistence.Repositories
             var factura = await _context.Facturas
                 .Include(f => f.Pagos)
                 .Include(f => f.OrdenServicio)
-                .FirstOrDefaultAsync(f => f.Id.Value == id.Value, ct);
+                .FirstOrDefaultAsync(f => f.Id == id, ct);
 
             if (factura == null) return false;
 
@@ -47,7 +47,7 @@ namespace Infrastructure.Persistence.Repositories
             return await _context.Facturas
                 .Include(f => f.Pagos)
                 .Include(f => f.OrdenServicio)
-                .FirstOrDefaultAsync(f => f.Id.Value == id.Value, ct);
+                .FirstOrDefaultAsync(f => f.Id == id, ct);
         }
 
         public async Task<IReadOnlyList<Factura>> GetAllAsync(CancellationToken ct = default)
@@ -63,7 +63,7 @@ namespace Infrastructure.Persistence.Repositories
             return await _context.Facturas
                 .Include(f => f.Pagos)
                 .Include(f => f.OrdenServicio)
-                .Where(f => f.OrdenServicioId.Value == ordenServicioId.Value)
+                .Where(f => f.OrdenServicioId == ordenServicioId)
                 .ToListAsync(ct);
         }
     }

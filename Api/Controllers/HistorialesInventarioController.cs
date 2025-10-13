@@ -19,8 +19,8 @@ public class HistorialesInventarioController : BaseApiController
         _mapper = mapper;
     }
 
-    // ✅ GET: api/HistorialesInventario
-    [HttpGet]
+    // ✅ GET: api/HistorialesInventario/all
+    [HttpGet("all")]
     public async Task<ActionResult<IEnumerable<HistorialInventarioDto>>> GetAll(CancellationToken ct)
     {
         var historiales = await _historialInventarioService.GetAllAsync(ct);

@@ -15,7 +15,8 @@ public class HistorialInventarioConfig : IEntityTypeConfiguration<HistorialInven
         builder.HasKey(h => h.Id);
         builder.Property(h => h.Id)
             .HasConversion(id => id.Value, value => new IdVO(value))
-            .ValueGeneratedOnAdd();
+            .UseIdentityByDefaultColumn();
+
 
         builder.Property(h => h.RepuestoId)
             .HasConversion(id => id.Value, value => new IdVO(value))

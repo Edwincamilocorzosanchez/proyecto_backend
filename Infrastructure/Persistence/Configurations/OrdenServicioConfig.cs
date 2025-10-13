@@ -14,7 +14,8 @@ public class OrdenServicioConfig: IEntityTypeConfiguration<OrdenServicio>
         builder.HasKey(o => o.Id);
         builder.Property(o => o.Id)
             .HasConversion(id => id.Value, value => new IdVO(value))
-            .ValueGeneratedOnAdd();
+            .UseIdentityByDefaultColumn();
+
 
         builder.Property(o => o.VehiculoId)
             .HasConversion(id => id.Value, value => new IdVO(value))

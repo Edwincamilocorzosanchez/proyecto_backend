@@ -15,7 +15,8 @@ public class TipoServicioConfig : IEntityTypeConfiguration<TipoServicio>
         builder.Property(ts => ts.Id)
             .HasConversion(id => id.Value, value => new IdVO(value))
             .HasColumnName("id")
-            .ValueGeneratedOnAdd();
+            .UseIdentityByDefaultColumn();
+
 
         builder.Property(ts => ts.Nombre)
             .HasConversion(n => n.Value, value => new NombreVO(value))

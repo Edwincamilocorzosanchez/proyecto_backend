@@ -15,7 +15,8 @@ public class VehiculoConfig : IEntityTypeConfiguration<Vehiculo>
         builder.Property(v => v.Id)
             .HasConversion(id => id.Value, value => new IdVO(value))
             .HasColumnName("id")
-            .ValueGeneratedOnAdd();
+            .UseIdentityByDefaultColumn();
+
 
         builder.Property(v => v.ClienteId)
             .HasConversion(id => id.Value, value => new IdVO(value))

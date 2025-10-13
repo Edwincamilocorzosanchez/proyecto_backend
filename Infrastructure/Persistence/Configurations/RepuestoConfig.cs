@@ -15,7 +15,8 @@ public class RepuestoConfiguration : IEntityTypeConfiguration<Repuesto>
         builder.Property(r => r.Id)
             .HasConversion(id => id.Value, value => new IdVO(value))
             .HasColumnName("id")
-            .ValueGeneratedOnAdd();
+            .UseIdentityByDefaultColumn();
+
 
         builder.Property(r => r.Codigo)
             .HasConversion(c => c.Value, value => new CodigoRepuestoVO(value))

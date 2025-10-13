@@ -15,7 +15,8 @@ public class TipoMovimientoConfig : IEntityTypeConfiguration<TipoMovimiento>
         builder.Property(tm => tm.Id)
             .HasConversion(id => id.Value, value => new IdVO(value))
             .HasColumnName("id")
-            .ValueGeneratedOnAdd();
+            .UseIdentityByDefaultColumn();
+
 
         builder.Property(tm => tm.Nombre)
             .HasConversion(n => n.Value, value => new NombreVO(value))

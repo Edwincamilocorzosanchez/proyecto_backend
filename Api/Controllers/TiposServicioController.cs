@@ -18,8 +18,8 @@ public class TiposServicioController : BaseApiController
         _mapper = mapper;
     }
 
-    // ✅ GET: api/TipoServicio
-    [HttpGet]
+    // ✅ GET: api/TipoServicio/all
+    [HttpGet("all")]
     public async Task<ActionResult<IEnumerable<TipoServicioDto>>> GetAllAsync(CancellationToken ct)
     {
         var tipos = await _service.GetAllAsync(ct);

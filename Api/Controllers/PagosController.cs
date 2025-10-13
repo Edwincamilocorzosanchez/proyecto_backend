@@ -20,8 +20,8 @@ public class PagosController : BaseApiController
         _mapper = mapper;
     }
 
-    // ✅ GET: api/Pago
-    [HttpGet]
+    // ✅ GET: api/Pago/all
+    [HttpGet("all")]
     public async Task<ActionResult<IEnumerable<PagoDto>>> GetAllAsync(CancellationToken ct)
     {
         var pagos = await _service.GetAllAsync(ct);

@@ -18,30 +18,30 @@ public class TiposMovimientoController : BaseApiController
         _mapper = mapper;
     }
 
-    // ✅ GET: api/TipoMovimiento
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<TipoMovimientoResponseDto>>> GetAllAsync(CancellationToken ct)
+    // ✅ GET: api/TipoMovimiento/all
+    [HttpGet("all")]
+    public async Task<ActionResult<IEnumerable<TipoMovimientoDto>>> GetAllAsync(CancellationToken ct)
     {
         var tipos = await _service.ObtenerTodosAsync(ct);
-        var result = _mapper.Map<IEnumerable<TipoMovimientoResponseDto>>(tipos);
+        var result = _mapper.Map<IEnumerable<TipoMovimientoDto>>(tipos);
         return Ok(result);
     }
 
     // ✅ GET: api/TipoMovimiento/{id}
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<TipoMovimientoResponseDto>> GetByIdAsync(int id, CancellationToken ct)
+    public async Task<ActionResult<TipoMovimientoDto>> GetByIdAsync(int id, CancellationToken ct)
     {
         var tipo = await _service.ObtenerPorIdAsync(new IdVO(id), ct);
         if (tipo == null)
             return NotFound($"No se encontró el tipo de movimiento con ID {id}.");
 
-        var result = _mapper.Map<TipoMovimientoResponseDto>(tipo);
+        var result = _mapper.Map<TipoMovimientoDto>(tipo);
         return Ok(result);
     }
 
     // ✅ POST: api/TipoMovimiento
     [HttpPost]
-    public async Task<ActionResult<TipoMovimientoResponseDto>> CreateAsync([FromBody] CreateTipoMovimientoDto dto, CancellationToken ct)
+    public async Task<ActionResult<TipoMovimientoDto>> CreateAsync([FromBody] CreateTipoMovimientoDto dto, CancellationToken ct)
     {
         if (dto == null)
             return BadRequest("Datos inválidos.");
@@ -57,7 +57,7 @@ public class TiposMovimientoController : BaseApiController
             return Conflict(ex.Message);
         }
 
-        var result = _mapper.Map<TipoMovimientoResponseDto>(tipo);
+        var result = _mapper.Map<TipoMovimientoDto>(tipo);
         return CreatedAtAction(nameof(GetByIdAsync), new { id = tipo.Id.Value }, result);
     }
 

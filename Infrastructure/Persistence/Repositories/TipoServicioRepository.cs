@@ -17,7 +17,7 @@ public class TipoServicioRepository : ITipoServicioRepository
         return await _context.TiposServicio
             .Include(t => t.OrdenesServicio)
             .AsNoTracking()
-            .FirstOrDefaultAsync(t => t.Id.Value == id.Value, ct);
+            .FirstOrDefaultAsync(t => t.Id == id, ct);
     }
 
     public async Task<TipoServicio?> GetByNombreAsync(NombreVO nombre, CancellationToken ct = default)
@@ -25,7 +25,7 @@ public class TipoServicioRepository : ITipoServicioRepository
         return await _context.TiposServicio
             .Include(t => t.OrdenesServicio)
             .AsNoTracking()
-            .FirstOrDefaultAsync(t => t.Nombre.Value == nombre.Value, ct);
+            .FirstOrDefaultAsync(t => t.Nombre == nombre, ct);
     }
 
     public async Task<IReadOnlyList<TipoServicio>> GetAllAsync(CancellationToken ct = default)
@@ -45,7 +45,7 @@ public class TipoServicioRepository : ITipoServicioRepository
     public async Task<bool> UpdateAsync(TipoServicio tipo, CancellationToken ct = default)
     {
         var existing = await _context.TiposServicio
-            .FirstOrDefaultAsync(t => t.Id.Value == tipo.Id.Value, ct);
+            .FirstOrDefaultAsync(t => t.Id == tipo.Id, ct);
 
         if (existing is null)
             return false;
@@ -62,7 +62,7 @@ public class TipoServicioRepository : ITipoServicioRepository
     public async Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default)
     {
         var existing = await _context.TiposServicio
-            .FirstOrDefaultAsync(t => t.Id.Value == id.Value, ct);
+            .FirstOrDefaultAsync(t => t.Id == id, ct);
 
         if (existing is null)
             return false;

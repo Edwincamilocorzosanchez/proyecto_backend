@@ -1,6 +1,6 @@
 namespace Api.DTOs.Proveedores;
 
-public record CreateProveedorDto(
+public sealed record CreateProveedorDto(
     string Nombre,
     string? Telefono,
     string? Correo,

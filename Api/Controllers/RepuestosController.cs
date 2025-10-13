@@ -18,8 +18,8 @@ public class RepuestosController : BaseApiController
         _mapper = mapper;
     }
 
-    // ✅ GET: api/Repuesto
-    [HttpGet]
+    // ✅ GET: api/Repuesto/all
+    [HttpGet("all")]
     public async Task<ActionResult<IEnumerable<RepuestoDto>>> GetAllAsync(CancellationToken ct)
     {
         var repuestos = await _service.GetAllAsync(ct);

@@ -18,8 +18,8 @@ public class OrdenesServicioController : BaseApiController
         _mapper = mapper;
     }
 
-    // ✅ GET: api/OrdenServicio
-    [HttpGet]
+    // ✅ GET: api/OrdenServicio/all
+    [HttpGet("all")]
     public async Task<ActionResult<IEnumerable<OrdenServicioDto>>> GetAllAsync(CancellationToken ct)
     {
         var ordenes = await _service.GetAllAsync(ct);

@@ -34,7 +34,7 @@ namespace Infrastructure.Persistence.Repositories
 
         public async Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default)
         {
-            var pago = await _context.Pagos.FirstOrDefaultAsync(p => p.Id.Value == id.Value, ct);
+            var pago = await _context.Pagos.FirstOrDefaultAsync(p => p.Id == id, ct);
             if (pago == null) return false;
 
             _context.Pagos.Remove(pago);
@@ -48,7 +48,7 @@ namespace Infrastructure.Persistence.Repositories
                 .Include(p => p.MetodoPago)
                 .Include(p => p.EstadoPago)
                 .Include(p => p.Factura)
-                .FirstOrDefaultAsync(p => p.Id.Value == id.Value, ct);
+                .FirstOrDefaultAsync(p => p.Id == id, ct);
         }
 
         public async Task<IReadOnlyList<Pago>> GetByFacturaIdAsync(IdVO facturaId, CancellationToken ct = default)

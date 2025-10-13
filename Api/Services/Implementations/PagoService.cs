@@ -53,7 +53,7 @@ public class PagoService : IPagoService
             throw new InvalidOperationException("La factura asociada no existe.");
 
         var pagos = await _unitOfWork.Pagos.GetByFacturaIdAsync(pago.FacturaId, ct);
-        var totalPagadoSinEste = pagos.Where(p => p.Id.Value != pago.Id.Value).Sum(p => p.Monto.Value);
+        var totalPagadoSinEste = pagos.Where(p => p.Id != pago.Id).Sum(p => p.Monto.Value);
 
         if (totalPagadoSinEste + pago.Monto.Value > factura.Total.Value)
             throw new InvalidOperationException("El pago actualizado excede el total pendiente de la factura.");

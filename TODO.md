@@ -224,22 +224,6 @@ arreglar todo cita
 
 arreglar mecanicos por id
 
-### metodos GET que funcionan 
-USER
-- Get por id
-- Get all
+### metodos GET que debo arreglar 
 
-PROVEEDORES
-- Get all
-
-MECANICOS
-- Get activos
-- Get all
-
-CLIENTES
-- Get all
-
-ADMINISTRADORES
-- Get by nivel
-- Get all
-- Get by id
+orden servicio id 

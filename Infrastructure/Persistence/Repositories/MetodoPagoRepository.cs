@@ -31,7 +31,7 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default)
         {
             var metodo = await _context.MetodosPago
-                .FirstOrDefaultAsync(m => m.Id.Value == id.Value, ct);
+                .FirstOrDefaultAsync(m => m.Id == id, ct);
 
             if (metodo == null) return false;
 
@@ -43,7 +43,7 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<MetodoPago?> GetByIdAsync(IdVO id, CancellationToken ct = default)
         {
             return await _context.MetodosPago
-                .FirstOrDefaultAsync(m => m.Id.Value == id.Value, ct);
+                .FirstOrDefaultAsync(m => m.Id == id, ct);
         }
 
         public async Task<MetodoPago?> GetByNombreAsync(NombreVO nombre, CancellationToken ct = default)

@@ -76,6 +76,7 @@ public static class ApplicationServiceExtensions
         services.AddScoped<IProveedorService, ProveedorService>();
         services.AddScoped<IRepuestoService, RepuestoService>();
         services.AddScoped<ITipoServicioService, TipoServicioService>();
+        services.AddScoped<ITipoMovimientoService, TipoMovimientoService>();
         services.AddScoped<IVehiculoService, VehiculoService>();
         services.AddScoped<IUserService, UserService>();
 

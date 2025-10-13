@@ -9,24 +9,23 @@ public sealed class TipoMovimientoProfile : Profile
 {
     public TipoMovimientoProfile()
     {
-        // Entidad -> DTO de respuesta
+        // Entidad → DTO
         CreateMap<TipoMovimiento, TipoMovimientoDto>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.Value))
             .ForMember(dest => dest.Nombre, opt => opt.MapFrom(src => src.Nombre.Value));
 
-        // Crear DTO -> Entidad
+        // Crear DTO → Entidad
         CreateMap<CreateTipoMovimientoDto, TipoMovimiento>()
-            .AfterMap((src, dest) =>
-            {
-                dest.Id = new IdVO(0); // se generará automáticamente
-                dest.Nombre = new NombreVO(src.Nombre);
-            });
+            .ConstructUsing(src => new TipoMovimiento(
+                IdVO.CreateNew(),
+                new NombreVO(src.Nombre)
+            ));
 
-        // Actualizar DTO -> Entidad
+        // Actualizar DTO → Entidad
         CreateMap<UpdateTipoMovimientoDto, TipoMovimiento>()
-            .AfterMap((src, dest) =>
-            {
-                dest.Nombre = new NombreVO(src.Nombre);
-            });
+            .ConstructUsing(src => new TipoMovimiento(
+                new IdVO(src.Id),
+                new NombreVO(src.Nombre)
+            ));
     }
 }

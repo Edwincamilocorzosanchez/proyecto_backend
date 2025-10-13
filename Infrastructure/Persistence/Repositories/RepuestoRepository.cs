@@ -27,7 +27,7 @@ namespace Infrastructure.Persistence.Repositories
 
         public async Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default)
         {
-            var repuesto = await _context.Repuestos.FirstOrDefaultAsync(r => r.Id.Value == id.Value, ct);
+            var repuesto = await _context.Repuestos.FirstOrDefaultAsync(r => r.Id == id, ct);
             if (repuesto == null) return false;
 
             _context.Repuestos.Remove(repuesto);
@@ -47,7 +47,7 @@ namespace Infrastructure.Persistence.Repositories
         {
             return await _context.Repuestos
                 .Include(r => r.Proveedor)
-                .FirstOrDefaultAsync(r => r.Id.Value == id.Value, ct);
+            .FirstOrDefaultAsync(r => r.Id == id, ct);
         }
 
         public async Task<Repuesto?> GetByCodigoAsync(CodigoRepuestoVO codigo, CancellationToken ct = default)

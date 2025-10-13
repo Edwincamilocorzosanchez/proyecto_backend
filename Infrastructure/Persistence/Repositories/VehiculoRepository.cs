@@ -17,7 +17,7 @@ public class VehiculoRepository: IVehiculoRepository
             .Include(v => v.Citas)
             .Include(v => v.OrdenesServicio)
             .AsNoTracking()
-            .FirstOrDefaultAsync(v => v.Id.Value == id.Value, ct);
+            .FirstOrDefaultAsync(v => v.Id == id, ct);
     }
 
     public async Task<Vehiculo?> GetByVinAsync(VinVO vin, CancellationToken ct = default)
@@ -37,7 +37,7 @@ public class VehiculoRepository: IVehiculoRepository
             .Include(v => v.Citas)
             .Include(v => v.OrdenesServicio)
             .AsNoTracking()
-            .Where(v => v.ClienteId.Value == clienteId.Value)
+            .Where(v => v.ClienteId == clienteId)
             .ToListAsync(ct);
     }
 
@@ -66,7 +66,7 @@ public class VehiculoRepository: IVehiculoRepository
     public async Task<bool> UpdateAsync(Vehiculo vehiculo, CancellationToken ct = default)
     {
         var existing = await _context.Vehiculos
-            .FirstOrDefaultAsync(v => v.Id.Value == vehiculo.Id.Value, ct);
+            .FirstOrDefaultAsync(v => v.Id == vehiculo.Id, ct);
 
         if (existing is null)
             return false;
@@ -86,7 +86,7 @@ public class VehiculoRepository: IVehiculoRepository
     public async Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default)
     {
         var existing = await _context.Vehiculos
-            .FirstOrDefaultAsync(v => v.Id.Value == id.Value, ct);
+            .FirstOrDefaultAsync(v => v.Id == id, ct);
 
         if (existing is null)
             return false;

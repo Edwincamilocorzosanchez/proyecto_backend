@@ -18,8 +18,8 @@ public class MetodosPagoController : BaseApiController
         _mapper = mapper;
     }
 
-    // ✅ GET: api/MetodoPago
-    [HttpGet]
+    // ✅ GET: api/MetodoPago/all
+    [HttpGet("all")]
     public async Task<ActionResult<IEnumerable<MetodoPagoDto>>> GetAllAsync(CancellationToken ct)
     {
         var metodos = await _service.ObtenerTodosAsync(ct);
@@ -32,6 +32,18 @@ public class MetodosPagoController : BaseApiController
     public async Task<ActionResult<MetodoPagoDto>> GetByIdAsync(int id, CancellationToken ct)
     {
         var metodo = await _service.ObtenerPorIdAsync(new IdVO(id), ct);
+        if (metodo is null)
+            return NotFound("Método de pago no encontrado.");
+
+        var result = _mapper.Map<MetodoPagoDto>(metodo);
+        return Ok(result);
+    }
+
+    // GET: api/MetodoPago/nombre/{nombre}
+    [HttpGet("nombre/{nombre}")]
+    public async Task<ActionResult<MetodoPagoDto>> GetByNombreAsync(string nombre, CancellationToken ct)
+    {
+        var metodo = await _service.ObtenerPorNombreAsync(new NombreVO(nombre), ct);
         if (metodo is null)
             return NotFound("Método de pago no encontrado.");
 

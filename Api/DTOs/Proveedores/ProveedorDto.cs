@@ -1,6 +1,6 @@
 namespace Api.DTOs.Proveedores;
 
-public record ProveedorDto(
+public sealed record ProveedorDto(
     int Id,
     string Nombre,
     string? Telefono,

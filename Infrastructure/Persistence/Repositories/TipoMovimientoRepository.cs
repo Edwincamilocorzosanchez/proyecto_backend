@@ -33,7 +33,7 @@ public class TipoMovimientoRepository : ITipoMovimientoRepository
 
     public async Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default)
     {
-        var tipo = await _context.TiposMovimiento.FirstOrDefaultAsync(t => t.Id.Value == id.Value, ct);
+        var tipo = await _context.TiposMovimiento.FirstOrDefaultAsync(t => t.Id == id, ct);
         if (tipo == null) return false;
 
         _context.TiposMovimiento.Remove(tipo);
@@ -44,7 +44,7 @@ public class TipoMovimientoRepository : ITipoMovimientoRepository
     public async Task<TipoMovimiento?> GetByIdAsync(IdVO id, CancellationToken ct = default)
     {
         return await _context.TiposMovimiento
-            .FirstOrDefaultAsync(t => t.Id.Value == id.Value, ct);
+            .FirstOrDefaultAsync(t => t.Id == id, ct);
     }
 
     public async Task<TipoMovimiento?> GetByNombreAsync(NombreVO nombre, CancellationToken ct = default)

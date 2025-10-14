@@ -181,10 +181,10 @@ public static class ApplicationServiceExtensions
         {
             // Política que exige rol Admin
             options.AddPolicy("Admins", policy =>
-                policy.RequireRole("Administrator"));
+                policy.RequireRole("Administrador"));
 
-            options.AddPolicy("Others", policy =>
-                policy.RequireRole("Other"));
+            options.AddPolicy("Clientes", policy =>
+                policy.RequireRole("Cliente"));
 
             options.AddPolicy("Pro", policy =>
                 policy.RequireRole("Professional"));

@@ -16,7 +16,8 @@ public class MetodoPagoConfig : IEntityTypeConfiguration<MetodoPago>
         builder.Property(m => m.Id)
             .HasConversion(v => v.Value, value => new IdVO(value))
             .HasColumnName("id")
-            .ValueGeneratedOnAdd();
+            .UseIdentityByDefaultColumn();
+
 
         builder.Property(m => m.Nombre)
             .HasConversion(n => n.Value, value => new NombreVO(value))

@@ -19,6 +19,7 @@ public class ProveedorConfig : IEntityTypeConfiguration<Proveedor>
                 value => new IdVO(value)   // al leer desde la BD
             )
             .HasColumnName("id")
+            .UseIdentityAlwaysColumn()
             .IsRequired();
 
 
@@ -49,13 +50,14 @@ public class ProveedorConfig : IEntityTypeConfiguration<Proveedor>
             .HasColumnName("direccion")
             .HasMaxLength(255);
 
-        // 👇 Aquí el cambio importante
         builder.Property(p => p.IsActive)
             .HasConversion(
-                estado => estado.Value,           // cómo guardar el bool en BD
-                value => new EstadoVO(value)      // cómo reconstruir el VO desde BD
+                estado => estado.Value,
+                value => new EstadoVO(value)
             )
+            .HasColumnName("is_active")
             .HasColumnType("boolean")
+            .HasDefaultValueSql("TRUE") // PostgreSQL lo entiende directamente
             .IsRequired();
 
 

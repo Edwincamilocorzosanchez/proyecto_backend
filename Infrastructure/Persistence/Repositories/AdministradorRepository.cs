@@ -32,7 +32,7 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default)
         {
             var admin = await _context.Administradores
-                .FirstOrDefaultAsync(a => a.Id.Value == id.Value, ct);
+                .FirstOrDefaultAsync(a => a.Id == id, ct);
 
             if (admin == null) return false;
 

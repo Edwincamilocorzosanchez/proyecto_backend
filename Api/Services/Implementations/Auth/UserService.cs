@@ -265,7 +265,8 @@ public class UserService : IUserService
         {
             throw new InvalidOperationException("JWT Key cannot be null or empty.");
         }
-        var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwt.Key));
+        var keyBytes = Convert.FromBase64String(_jwt.Key);
+        var symmetricSecurityKey = new SymmetricSecurityKey(keyBytes);
         var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
         var jwtSecurityToken = new JwtSecurityToken(
             issuer: _jwt.Issuer,

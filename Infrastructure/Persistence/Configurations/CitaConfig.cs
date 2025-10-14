@@ -15,7 +15,7 @@ public class CitaConfig : IEntityTypeConfiguration<Cita>
         builder.Property(c => c.Id)
             .HasConversion(v => v.Value, v => new IdVO(v))
             .HasColumnName("id")
-            .ValueGeneratedOnAdd();
+            .UseIdentityByDefaultColumn();
 
         builder.Property(c => c.ClienteId)
             .HasConversion(v => v.Value, v => new IdVO(v))

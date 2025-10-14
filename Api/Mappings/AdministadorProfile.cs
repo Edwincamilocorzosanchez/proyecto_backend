@@ -32,15 +32,14 @@ public sealed class AdministradorProfile : Profile
 
         // Create DTO -> Entidad
         CreateMap<CreateAdministradorDto, Administrador>()
-            .ConstructUsing(src => new Administrador(
-                new IdVO(0), // EF generará el Id
-                new NombreVO(src.Nombre),
-                new TelefonoVO(src.Telefono),
-                new NivelAccesoVO(src.NivelAcceso),
-                new DescripcionVO(src.AreaResponsabilidad),
-                new EstadoVO(src.IsActive),
-                src.UserId
-            ));
+            .AfterMap((src, dest) =>
+            {
+                dest.Nombre = new NombreVO(src.Nombre);
+                dest.Telefono = new TelefonoVO(src.Telefono);
+                dest.NivelAcceso = new NivelAccesoVO(src.NivelAcceso);
+                dest.AreaResponsabilidad = new DescripcionVO(src.AreaResponsabilidad);
+                dest.IsActive = new EstadoVO(true);
+            });
 
         // Update DTO -> Entidad (actualización parcial)
         var updateMap = CreateMap<UpdateAdministradorDto, Administrador>();

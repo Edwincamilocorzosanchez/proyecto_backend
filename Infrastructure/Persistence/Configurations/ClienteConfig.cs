@@ -15,7 +15,8 @@ public class ClienteConfiguration : IEntityTypeConfiguration<Cliente>
         builder.Property(c => c.Id)
             .HasConversion(v => v.Value, v => new IdVO(v))
             .HasColumnName("id")
-            .ValueGeneratedOnAdd();
+            .UseIdentityByDefaultColumn();
+
 
         builder.Property(c => c.Nombre)
             .HasConversion(v => v.Value, v => new NombreVO(v))

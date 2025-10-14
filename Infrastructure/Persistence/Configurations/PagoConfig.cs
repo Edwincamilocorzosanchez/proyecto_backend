@@ -15,7 +15,8 @@ public class PagoConfig : IEntityTypeConfiguration<Pago>
         builder.Property(p => p.Id)
             .HasConversion(id => id.Value, value => new IdVO(value))
             .HasColumnName("id")
-            .ValueGeneratedOnAdd();
+            .UseIdentityByDefaultColumn();
+
 
         builder.Property(p => p.FacturaId)
             .HasConversion(id => id.Value, value => new IdVO(value))

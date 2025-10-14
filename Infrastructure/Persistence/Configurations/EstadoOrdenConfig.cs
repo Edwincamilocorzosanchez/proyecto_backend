@@ -16,7 +16,8 @@ public class EstadoOrdenConfig : IEntityTypeConfiguration<EstadoOrden>
         builder.Property(e => e.Id)
             .HasConversion(id => id.Value, value => new IdVO(value))
             .HasColumnName("id")
-            .ValueGeneratedOnAdd();
+            .UseIdentityByDefaultColumn();
+
 
         builder.Property(e => e.Nombre)
             .HasConversion(n => n.Value, value => new NombreVO(value))

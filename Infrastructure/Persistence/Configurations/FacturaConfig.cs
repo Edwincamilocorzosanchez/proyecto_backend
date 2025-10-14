@@ -14,7 +14,8 @@ public class FacturaConfiguration : IEntityTypeConfiguration<Factura>
         builder.HasKey(f => f.Id);
         builder.Property(f => f.Id)
             .HasConversion(id => id.Value, value => new IdVO(value))
-            .ValueGeneratedOnAdd();
+            .UseIdentityByDefaultColumn();
+
 
         builder.Property(f => f.OrdenServicioId)
             .HasConversion(id => id.Value, value => new IdVO(value))

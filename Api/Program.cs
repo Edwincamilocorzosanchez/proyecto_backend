@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Agregar controladores y Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddCustomRateLimiter();
 
 // 🔸 Swagger con configuración JWT integrada
 builder.Services.AddSwaggerGen(options =>
@@ -91,11 +92,23 @@ await app.SeedDatabaseAsync();
 app.UseCors("CorsPolicy");
 app.UseHttpsRedirection();
 
-// app.UseRateLimiter();
+app.UseRateLimiter();
 
+app.Use(async (context, next) =>
+{
+    await next();
+
+    if (context.Response.StatusCode == 401)
+    {
+        Console.WriteLine("❌ Token inválido o no autorizado:");
+        Console.WriteLine($"Path: {context.Request.Path}");
+        Console.WriteLine($"Auth Header: {context.Request.Headers["Authorization"]}");
+    }
+});
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
+// "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJob2xhIiwianRpIjoiY2EyZmQ4NTMtZjQ0NS00YzY2LTgwZjMtY2Y0ZjhkNTJkZTg5IiwiZW1haWwiOiJzZXJ2b3IxMjNAZ21haWwuY29tIiwidWlkIjoiOCIsInJvbGVzIjoiQ2xpZW50ZSIsImV4cCI6MTc2MDQ0NTQzMCwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NTAwMSIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0OjUwMDEifQ.O94nO0qYlb17YoAKD-hEOgbZRmhbqAfHvNxuKDLvIOM";

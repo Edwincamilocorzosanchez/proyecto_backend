@@ -98,80 +98,80 @@ public class UserService : IUserService
         }
     }
 
-    public async Task<DataUserDto> GetTokenAsync(LoginDto model)
-    {
-        DataUserDto datosUsuarioDto = new DataUserDto();
-        if (string.IsNullOrEmpty(model.Username))
-        {
-            datosUsuarioDto.IsAuthenticated = false;
-            datosUsuarioDto.Message = "El nombre de usuario no puede ser nulo o vacío.";
-            return datosUsuarioDto;
-        }
-        var usuario = await _unitOfWork.UserMembers
-                    .GetByUserNameAsync(model.Username);
+    // public async Task<DataUserDto> GetTokenAsync(LoginDto model)
+    // {
+    //     DataUserDto datosUsuarioDto = new DataUserDto();
+    //     if (string.IsNullOrEmpty(model.Username))
+    //     {
+    //         datosUsuarioDto.IsAuthenticated = false;
+    //         datosUsuarioDto.Message = "El nombre de usuario no puede ser nulo o vacío.";
+    //         return datosUsuarioDto;
+    //     }
+    //     var usuario = await _unitOfWork.UserMembers
+    //                 .GetByUserNameAsync(model.Username);
 
-        if (usuario == null)
-        {
-            datosUsuarioDto.IsAuthenticated = false;
-            datosUsuarioDto.Message = $"No existe ningún usuario con el username {model.Username}.";
-            return datosUsuarioDto;
-        }
+    //     if (usuario == null)
+    //     {
+    //         datosUsuarioDto.IsAuthenticated = false;
+    //         datosUsuarioDto.Message = $"No existe ningún usuario con el username {model.Username}.";
+    //         return datosUsuarioDto;
+    //     }
 
-        if (string.IsNullOrEmpty(model.Password))
-        {
-            datosUsuarioDto.IsAuthenticated = false;
-            datosUsuarioDto.Message = $"La contraseña no puede ser nula o vacía para el usuario {usuario.Username}.";
-            return datosUsuarioDto;
-        }
+    //     if (string.IsNullOrEmpty(model.Password))
+    //     {
+    //         datosUsuarioDto.IsAuthenticated = false;
+    //         datosUsuarioDto.Message = $"La contraseña no puede ser nula o vacía para el usuario {usuario.Username}.";
+    //         return datosUsuarioDto;
+    //     }
 
-        var resultado = _passwordHasher.VerifyHashedPassword(usuario, usuario.Password, model.Password);
+    //     var resultado = _passwordHasher.VerifyHashedPassword(usuario, usuario.Password, model.Password);
 
-        if (resultado == PasswordVerificationResult.Success)
-        {
-            datosUsuarioDto.IsAuthenticated = true;
-            JwtSecurityToken jwtSecurityToken = CreateJwtToken(usuario);
-            datosUsuarioDto.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
-            datosUsuarioDto.Email = usuario.Email;
-            datosUsuarioDto.UserName = usuario.Username;
-            datosUsuarioDto.Roles = usuario.Rols
-                                            .Select(u => u.Name)
-                                            .ToList();
+    //     if (resultado == PasswordVerificationResult.Success)
+    //     {
+    //         datosUsuarioDto.IsAuthenticated = true;
+    //         JwtSecurityToken jwtSecurityToken = CreateJwtToken(usuario);
+    //         datosUsuarioDto.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+    //         datosUsuarioDto.Email = usuario.Email;
+    //         datosUsuarioDto.UserName = usuario.Username;
+    //         datosUsuarioDto.Roles = usuario.Rols
+    //                                         .Select(u => u.Name)
+    //                                         .ToList();
 
-            if (usuario.RefreshTokens.Any(a => a.IsActive))
-            {
-                var activeRefreshToken = usuario.RefreshTokens.Where(a => a.IsActive == true).FirstOrDefault();
-                if (activeRefreshToken != null)
-                {
-                    datosUsuarioDto.RefreshToken = activeRefreshToken.Token;
-                    datosUsuarioDto.RefreshTokenExpiration = activeRefreshToken.Expires;
-                }
-                else
-                {
-                    // If no active refresh token is found, create a new one
-                    var refreshToken = CreateRefreshToken();
-                    datosUsuarioDto.RefreshToken = refreshToken.Token;
-                    datosUsuarioDto.RefreshTokenExpiration = refreshToken.Expires;
-                    usuario.RefreshTokens.Add(refreshToken);
-                    await _unitOfWork.UserMembers.UpdateAsync(usuario);
-                    await _unitOfWork.SaveChanges();
-                }
-            }
-            else
-            {
-                var refreshToken = CreateRefreshToken();
-                datosUsuarioDto.RefreshToken = refreshToken.Token;
-                datosUsuarioDto.RefreshTokenExpiration = refreshToken.Expires;
-                usuario.RefreshTokens.Add(refreshToken);
-                await _unitOfWork.UserMembers.UpdateAsync(usuario);
-                await _unitOfWork.SaveChanges();
-            }
+    //         if (usuario.RefreshTokens.Any(a => a.IsActive))
+    //         {
+    //             var activeRefreshToken = usuario.RefreshTokens.Where(a => a.IsActive == true).FirstOrDefault();
+    //             if (activeRefreshToken != null)
+    //             {
+    //                 datosUsuarioDto.RefreshToken = activeRefreshToken.Token;
+    //                 datosUsuarioDto.RefreshTokenExpiration = activeRefreshToken.Expires;
+    //             }
+    //             else
+    //             {
+    //                 // If no active refresh token is found, create a new one
+    //                 var refreshToken = CreateRefreshToken();
+    //                 datosUsuarioDto.RefreshToken = refreshToken.Token;
+    //                 datosUsuarioDto.RefreshTokenExpiration = refreshToken.Expires;
+    //                 usuario.RefreshTokens.Add(refreshToken);
+    //                 await _unitOfWork.UserMembers.UpdateAsync(usuario);
+    //                 await _unitOfWork.SaveChanges();
+    //             }
+    //         }
+    //         else
+    //         {
+    //             var refreshToken = CreateRefreshToken();
+    //             datosUsuarioDto.RefreshToken = refreshToken.Token;
+    //             datosUsuarioDto.RefreshTokenExpiration = refreshToken.Expires;
+    //             usuario.RefreshTokens.Add(refreshToken);
+    //             await _unitOfWork.UserMembers.UpdateAsync(usuario);
+    //             await _unitOfWork.SaveChanges();
+    //         }
 
-            return datosUsuarioDto;
-        }
-        datosUsuarioDto.IsAuthenticated = false;
-        datosUsuarioDto.Message = $"Credenciales incorrectas para el usuario {usuario.Username}.";
-        return datosUsuarioDto;
-    }
+    //         return datosUsuarioDto;
+    //     }
+    //     datosUsuarioDto.IsAuthenticated = false;
+    //     datosUsuarioDto.Message = $"Credenciales incorrectas para el usuario {usuario.Username}.";
+    //     return datosUsuarioDto;
+    // }
     public async Task<DataUserDto> GetTokenAsync(LoginDto model, CancellationToken ct = default)
     {
         var dto = new DataUserDto { IsAuthenticated = false };
@@ -251,7 +251,7 @@ public class UserService : IUserService
         var roleClaims = new List<Claim>();
         foreach (var role in roles)
         {
-            roleClaims.Add(new Claim("roles", role.Name));
+            roleClaims.Add(new Claim(ClaimTypes.Role, role.Name));
         }
         var claims = new[]
         {
@@ -265,8 +265,7 @@ public class UserService : IUserService
         {
             throw new InvalidOperationException("JWT Key cannot be null or empty.");
         }
-        var keyBytes = Convert.FromBase64String(_jwt.Key);
-        var symmetricSecurityKey = new SymmetricSecurityKey(keyBytes);
+        var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwt.Key));
         var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
         var jwtSecurityToken = new JwtSecurityToken(
             issuer: _jwt.Issuer,

@@ -20,13 +20,15 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 {
     var isDocker = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
     string connectionString = builder.Configuration.GetConnectionString(isDocker ? "PostgresDocker" : "PostgresLocal")!;
-    options.UseNpgsql(connectionString);
-    options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+    options.UseNpgsql(connectionString)
+            .EnableDetailedErrors()                 // 🔍 muestra excepciones detalladas
+            .EnableSensitiveDataLogging()            // 🔍 muestra valores reales en las queries
+            .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 });
 
 var app = builder.Build();
 // muestra la conexion a la base de datos de Postgres
-Console.WriteLine(builder.Configuration.GetConnectionString("Postgres"));
+Console.WriteLine(builder.Configuration.GetConnectionString("PostgresLocal"));
 
 // Swagger y middlewares
 if (app.Environment.IsDevelopment())

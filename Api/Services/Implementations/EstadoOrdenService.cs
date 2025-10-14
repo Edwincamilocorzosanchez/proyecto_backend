@@ -14,7 +14,7 @@ namespace Api.Services.Implementations
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<int> CrearAsync(EstadoOrden estadoOrden, CancellationToken ct = default)
+        public async Task<EstadoOrden> CrearAsync(EstadoOrden estadoOrden, CancellationToken ct = default)
         {
             var existente = await _unitOfWork.EstadoOrden.GetByNombreAsync(estadoOrden.Nombre, ct);
             if (existente != null)

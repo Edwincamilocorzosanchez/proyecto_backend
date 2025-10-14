@@ -32,16 +32,18 @@ public sealed class EstadoOrdenRepository : IEstadoOrdenRepository
             .ToListAsync(ct);
     }
 
-    public async Task<int> AddAsync(EstadoOrden estado, CancellationToken ct = default)
+    public async Task<EstadoOrden> AddAsync(EstadoOrden estado, CancellationToken ct = default)
     {
         await _context.EstadosOrden.AddAsync(estado, ct);
-        return await _context.SaveChangesAsync(ct);
+        await _context.SaveChangesAsync(ct);
+        return estado; // 👉 ahora tiene el ID generado por la base de datos
     }
+
 
     public async Task<bool> UpdateAsync(EstadoOrden estado, CancellationToken ct = default)
     {
         var existing = await _context.EstadosOrden
-            .FirstOrDefaultAsync(e => e.Id.Value == estado.Id.Value, ct);
+            .FirstOrDefaultAsync(e => e.Id.Value.Equals(estado.Id.Value), ct);
 
         if (existing is null)
             return false;

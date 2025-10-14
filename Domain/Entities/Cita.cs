@@ -18,9 +18,8 @@ public class Cita : BaseEntity
 
     // constructores
     public Cita() { }
-    public Cita(IdVO id, IdVO clienteId, IdVO vehiculoId, FechaCitaVO fechaCita, DescripcionVO? motivo, IdVO estadoId)
+    public Cita( IdVO clienteId, IdVO vehiculoId, FechaCitaVO fechaCita, DescripcionVO? motivo, IdVO estadoId)
     {
-        Id = id;
         ClienteId = clienteId;
         VehiculoId = vehiculoId;
         FechaCita = fechaCita;

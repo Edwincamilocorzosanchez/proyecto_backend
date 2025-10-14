@@ -62,9 +62,9 @@ public sealed class EstadosOrdenController : BaseApiController
                 new NombreVO(dto.Nombre)
             );
 
-            await _estadoOrdenService.CrearAsync(estado, ct);
+            var creado = await _estadoOrdenService.CrearAsync(estado, ct);
 
-            var result = _mapper.Map<EstadoOrdenDto>(estado);
+            var result = _mapper.Map<EstadoOrdenDto>(creado);
             return CreatedAtAction(nameof(GetByIdAsync), new { id = estado.Id.Value }, result);
         }
         catch (Exception ex)

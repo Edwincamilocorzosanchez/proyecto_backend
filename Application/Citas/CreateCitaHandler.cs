@@ -17,7 +17,6 @@ public class CreateCitaHandler : IRequestHandler<CreateCita, IdVO>
     public async Task<IdVO> Handle(CreateCita request, CancellationToken cancellationToken)
     {
         var cita = new Cita(
-            id: IdVO.CreateNew(),
             clienteId: request.ClienteId,
             vehiculoId: request.VehiculoId,
             fechaCita: request.FechaCita,

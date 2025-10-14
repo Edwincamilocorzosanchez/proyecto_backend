@@ -5,7 +5,7 @@ namespace Api.Services.Interfaces
 {
     public interface IEstadoOrdenService
     {
-        Task<int> CrearAsync(EstadoOrden estadoOrden, CancellationToken ct = default);
+        Task<EstadoOrden> CrearAsync(EstadoOrden estadoOrden, CancellationToken ct = default);
         Task<bool> ActualizarAsync(EstadoOrden estadoOrden, CancellationToken ct = default);
         Task<bool> EliminarAsync(IdVO id, CancellationToken ct = default);
         Task<EstadoOrden?> ObtenerPorIdAsync(IdVO id, CancellationToken ct = default);

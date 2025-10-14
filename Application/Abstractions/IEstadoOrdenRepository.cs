@@ -10,7 +10,7 @@ public interface IEstadoOrdenRepository
     Task<EstadoOrden?> GetByNombreAsync(NombreVO nombre, CancellationToken ct = default);
     Task<IReadOnlyList<EstadoOrden>> GetAllAsync(CancellationToken ct = default);
 
-    Task<int> AddAsync(EstadoOrden estado, CancellationToken ct = default);
+    Task<EstadoOrden> AddAsync(EstadoOrden estado, CancellationToken ct = default);
     Task<bool> UpdateAsync(EstadoOrden estado, CancellationToken ct = default);
     Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default);
 }

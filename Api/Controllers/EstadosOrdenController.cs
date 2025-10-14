@@ -3,10 +3,12 @@ using Api.Services.Interfaces;
 using AutoMapper;
 using Domain.Entities;
 using Domain.ValueObjects;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
+[Authorize(Roles = "Administrador")]
 public sealed class EstadosOrdenController : BaseApiController
 {
     private readonly IEstadoOrdenService _estadoOrdenService;
@@ -18,7 +20,7 @@ public sealed class EstadosOrdenController : BaseApiController
         _mapper = mapper;
     }
 
-    // ✅ GET: api/EstadoOrden/all
+    //  GET: api/EstadoOrden/all
     [HttpGet("all")]
     public async Task<ActionResult<IEnumerable<EstadoOrdenDto>>> GetAllAsync(CancellationToken ct)
     {
@@ -27,7 +29,7 @@ public sealed class EstadosOrdenController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ GET: api/EstadoOrden/{id}
+    //  GET: api/EstadoOrden/{id}
     [HttpGet("{id:int}")]
     public async Task<ActionResult<EstadoOrdenDto>> GetByIdAsync(int id, CancellationToken ct)
     {
@@ -39,7 +41,7 @@ public sealed class EstadosOrdenController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ GET: api/EstadoOrden/nombre/{nombre}
+    //  GET: api/EstadoOrden/nombre/{nombre}
     [HttpGet("nombre/{nombre}")]
     public async Task<ActionResult<EstadoOrdenDto>> GetByNombreAsync(string nombre, CancellationToken ct)
     {
@@ -51,7 +53,7 @@ public sealed class EstadosOrdenController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ POST: api/EstadoOrden
+    //  POST: api/EstadoOrden
     [HttpPost]
     public async Task<ActionResult<EstadoOrdenDto>> CreateAsync([FromBody] CreateEstadoOrdenDto dto, CancellationToken ct)
     {
@@ -73,7 +75,7 @@ public sealed class EstadosOrdenController : BaseApiController
         }
     }
 
-    // ✅ PUT: api/EstadoOrden/{id}
+    //  PUT: api/EstadoOrden/{id}
     [HttpPut("{id:int}")]
     public async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateEstadoOrdenDto dto, CancellationToken ct)
     {
@@ -96,7 +98,7 @@ public sealed class EstadosOrdenController : BaseApiController
         }
     }
 
-    // ✅ DELETE: api/EstadoOrden/{id}
+    //  DELETE: api/EstadoOrden/{id}
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteAsync(int id, CancellationToken ct)
     {

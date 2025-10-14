@@ -3,10 +3,12 @@ using Api.Services.Interfaces;
 using AutoMapper;
 using Domain.Entities;
 using Domain.ValueObjects;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
+[Authorize(Roles = "Administrador")]
 public class MetodosPagoController : BaseApiController
 {
     private readonly IMetodoPagoService _service;
@@ -18,7 +20,7 @@ public class MetodosPagoController : BaseApiController
         _mapper = mapper;
     }
 
-    // ✅ GET: api/MetodoPago/all
+    //  GET: api/MetodoPago/all
     [HttpGet("all")]
     public async Task<ActionResult<IEnumerable<MetodoPagoDto>>> GetAllAsync(CancellationToken ct)
     {
@@ -27,7 +29,7 @@ public class MetodosPagoController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ GET: api/MetodoPago/{id}
+    //  GET: api/MetodoPago/{id}
     [HttpGet("{id:int}")]
     public async Task<ActionResult<MetodoPagoDto>> GetByIdAsync(int id, CancellationToken ct)
     {
@@ -51,7 +53,7 @@ public class MetodosPagoController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ POST: api/MetodoPago
+    //  POST: api/MetodoPago
     [HttpPost]
     public async Task<ActionResult<MetodoPagoDto>> CreateAsync([FromBody] CreateMetodoPagoDto dto, CancellationToken ct)
     {
@@ -69,7 +71,7 @@ public class MetodosPagoController : BaseApiController
         return CreatedAtAction(nameof(GetByIdAsync), new { id = metodo.Id.Value }, result);
     }
 
-    // ✅ PUT: api/MetodoPago/{id}
+    //  PUT: api/MetodoPago/{id}
     [HttpPut("{id:int}")]
     public async Task<ActionResult> UpdateAsync(int id, [FromBody] UpdateMetodoPagoDto dto, CancellationToken ct)
     {
@@ -89,7 +91,7 @@ public class MetodosPagoController : BaseApiController
         return NoContent();
     }
 
-    // ✅ DELETE: api/MetodoPago/{id}
+    //  DELETE: api/MetodoPago/{id}
     [HttpDelete("{id:int}")]
     public async Task<ActionResult> DeleteAsync(int id, CancellationToken ct)
     {

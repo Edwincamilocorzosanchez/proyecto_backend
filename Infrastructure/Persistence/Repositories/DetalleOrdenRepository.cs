@@ -29,7 +29,7 @@ public sealed class DetalleOrdenRepository : IDetalleOrdenRepository
             .Include(d => d.OrdenServicio)
             .Include(d => d.Repuesto)
             .AsNoTracking()
-            .Where(d => d.OrdenServicioId == ordenServicioId) // ✅ sin .Value
+            .Where(d => d.OrdenServicioId == ordenServicioId) //  sin .Value
             .ToListAsync(ct);
     }
 
@@ -39,7 +39,7 @@ public sealed class DetalleOrdenRepository : IDetalleOrdenRepository
             .Include(d => d.OrdenServicio)
             .Include(d => d.Repuesto)
             .AsNoTracking()
-            .Where(d => d.RepuestoId == repuestoId) // ✅ sin .Value
+            .Where(d => d.RepuestoId == repuestoId) //  sin .Value
             .ToListAsync(ct);
     }
 

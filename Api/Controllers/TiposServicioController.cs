@@ -3,6 +3,7 @@ using Api.Services.Interfaces;
 using AutoMapper;
 using Domain.Entities;
 using Domain.ValueObjects;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
@@ -18,8 +19,9 @@ public class TiposServicioController : BaseApiController
         _mapper = mapper;
     }
 
-    // ✅ GET: api/TipoServicio/all
+    // GET: api/TipoServicio/all
     [HttpGet("all")]
+    [Authorize(Roles = "Mecanico, Administrador")]
     public async Task<ActionResult<IEnumerable<TipoServicioDto>>> GetAllAsync(CancellationToken ct)
     {
         var tipos = await _service.GetAllAsync(ct);
@@ -27,8 +29,9 @@ public class TiposServicioController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ GET: api/TipoServicio/{id}
+    // GET: api/TipoServicio/{id}
     [HttpGet("{id:int}")]
+    [Authorize(Roles = "Mecanico, Administrador")]
     public async Task<ActionResult<TipoServicioDetailDto>> GetByIdAsync(int id, CancellationToken ct)
     {
         var tipo = await _service.GetByIdAsync(new IdVO(id), ct);
@@ -39,8 +42,9 @@ public class TiposServicioController : BaseApiController
         return Ok(dto);
     }
 
-    // ✅ GET: api/TipoServicio/nombre/{nombre}
+    // GET: api/TipoServicio/nombre/{nombre}
     [HttpGet("nombre/{nombre}")]
+    [Authorize(Roles = "Mecanico, Administrador")]
     public async Task<ActionResult<TipoServicioDetailDto>> GetByNombreAsync(string nombre, CancellationToken ct)
     {
         var tipo = await _service.GetByNombreAsync(new NombreVO(nombre), ct);
@@ -51,8 +55,9 @@ public class TiposServicioController : BaseApiController
         return Ok(dto);
     }
 
-    // ✅ POST: api/TipoServicio
+    // POST: api/TipoServicio
     [HttpPost]
+    [Authorize(Roles = "Administrador")]
     public async Task<ActionResult<TipoServicioDetailDto>> CreateAsync([FromBody] CreateTipoServicioDto dto, CancellationToken ct)
     {
         if (dto == null)
@@ -73,8 +78,9 @@ public class TiposServicioController : BaseApiController
         return CreatedAtAction(nameof(GetByIdAsync), new { id = tipo.Id.Value }, result);
     }
 
-    // ✅ PUT: api/TipoServicio/{id}
+    //  PUT: api/TipoServicio/{id}
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Administrador")]
     public async Task<ActionResult> UpdateAsync(int id, [FromBody] UpdateTipoServicioDto dto, CancellationToken ct)
     {
         if (dto == null)
@@ -93,8 +99,9 @@ public class TiposServicioController : BaseApiController
         return NoContent();
     }
 
-    // ✅ DELETE: api/TipoServicio/{id}
+    //  DELETE: api/TipoServicio/{id}
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Administrador")]
     public async Task<ActionResult> DeleteAsync(int id, CancellationToken ct)
     {
         var deleted = await _service.DeleteAsync(new IdVO(id), ct);

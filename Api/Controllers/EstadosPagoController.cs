@@ -3,10 +3,12 @@ using Api.Services.Interfaces;
 using AutoMapper;
 using Domain.Entities;
 using Domain.ValueObjects;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
+[Authorize(Roles = "Administrador")]
 public sealed class EstadosPagoController : BaseApiController
 {
     private readonly IEstadoPagoService _estadoPagoService;
@@ -18,7 +20,7 @@ public sealed class EstadosPagoController : BaseApiController
         _mapper = mapper;
     }
 
-    // ✅ GET: api/EstadoPago/all
+    //  GET: api/EstadoPago/all
     [HttpGet("all")]
     public async Task<ActionResult<IEnumerable<EstadoPagoDto>>> GetAllAsync(CancellationToken ct)
     {
@@ -27,7 +29,7 @@ public sealed class EstadosPagoController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ GET: api/EstadoPago/{id}
+    //  GET: api/EstadoPago/{id}
     [HttpGet("{id:int}")]
     public async Task<ActionResult<EstadoPagoDto>> GetByIdAsync(int id, CancellationToken ct)
     {
@@ -39,7 +41,7 @@ public sealed class EstadosPagoController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ GET: api/EstadoPago/nombre/{nombre}
+    //  GET: api/EstadoPago/nombre/{nombre}
     [HttpGet("nombre/{nombre}")]
     public async Task<ActionResult<EstadoPagoDto>> GetByNombreAsync(string nombre, CancellationToken ct)
     {
@@ -51,7 +53,7 @@ public sealed class EstadosPagoController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ POST: api/EstadoPago
+    //  POST: api/EstadoPago
     [HttpPost]
     public async Task<ActionResult<EstadoPagoDto>> CreateAsync([FromBody] CreateEstadoPagoDto dto, CancellationToken ct)
     {
@@ -73,7 +75,7 @@ public sealed class EstadosPagoController : BaseApiController
         }
     }
 
-    // ✅ PUT: api/EstadoPago/{id}
+    //  PUT: api/EstadoPago/{id}
     [HttpPut("{id:int}")]
     public async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateEstadoPagoDto dto, CancellationToken ct)
     {
@@ -96,7 +98,7 @@ public sealed class EstadosPagoController : BaseApiController
         }
     }
 
-    // ✅ DELETE: api/EstadoPago/{id}
+    //  DELETE: api/EstadoPago/{id}
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteAsync(int id, CancellationToken ct)
     {

@@ -3,10 +3,12 @@ using Api.Services.Interfaces;
 using AutoMapper;
 using Domain.Entities;
 using Domain.ValueObjects;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
+[Authorize(Roles = "Administrador")]
 public sealed class EstadosCitaController : BaseApiController
 {
     private readonly IEstadoCitaService _estadoCitaService;
@@ -18,7 +20,7 @@ public sealed class EstadosCitaController : BaseApiController
         _mapper = mapper;
     }
 
-    // ✅ GET: api/EstadoCita/all
+    //  GET: api/EstadoCita/all
     [HttpGet("all")]
     public async Task<ActionResult<IEnumerable<EstadoCitaDto>>> GetAllAsync(CancellationToken ct)
     {
@@ -27,7 +29,7 @@ public sealed class EstadosCitaController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ GET: api/EstadoCita/{id}
+    //  GET: api/EstadoCita/{id}
     [HttpGet("{id:int}")]
     public async Task<ActionResult<EstadoCitaDto>> GetByIdAsync(int id, CancellationToken ct)
     {
@@ -39,7 +41,7 @@ public sealed class EstadosCitaController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ GET: api/EstadoCita/nombre/{nombre}
+    //  GET: api/EstadoCita/nombre/{nombre}
     [HttpGet("nombre/{nombre}")]
     public async Task<ActionResult<EstadoCitaDto>> GetByNombreAsync(string nombre, CancellationToken ct)
     {
@@ -51,7 +53,7 @@ public sealed class EstadosCitaController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ POST: api/EstadoCita
+    //  POST: api/EstadoCita
     [HttpPost]
     public async Task<ActionResult<EstadoCitaDto>> CreateAsync([FromBody] CreateEstadoCitaDto dto, CancellationToken ct)
     {
@@ -73,7 +75,7 @@ public sealed class EstadosCitaController : BaseApiController
         }
     }
 
-    // ✅ PUT: api/EstadoCita/{id}
+    //  PUT: api/EstadoCita/{id}
     [HttpPut("{id:int}")]
     public async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateEstadoCitaDto dto, CancellationToken ct)
     {
@@ -96,7 +98,7 @@ public sealed class EstadosCitaController : BaseApiController
         }
     }
 
-    // ✅ DELETE: api/EstadoCita/{id}
+    //  DELETE: api/EstadoCita/{id}
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteAsync(int id, CancellationToken ct)
     {

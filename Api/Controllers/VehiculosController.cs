@@ -3,6 +3,7 @@ using Api.Services.Interfaces;
 using AutoMapper;
 using Domain.Entities;
 using Domain.ValueObjects;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
@@ -18,10 +19,9 @@ public class VehiculosController : BaseApiController
         _mapper = mapper;
     }
 
-    // ============================================================
     // GET: api/vehiculos/all
-    // ============================================================
     [HttpGet("all")]
+    [Authorize]
     public async Task<ActionResult<IEnumerable<VehiculoDto>>> GetAll(CancellationToken ct)
     {
         var vehiculos = await _vehiculoService.GetAllAsync(ct);
@@ -29,10 +29,9 @@ public class VehiculosController : BaseApiController
         return Ok(dto);
     }
 
-    // ============================================================
     // GET: api/vehiculos/{id}
-    // ============================================================
     [HttpGet("{id:int}")]
+    [Authorize]
     public async Task<ActionResult<VehiculoDetailDto>> GetById(int id, CancellationToken ct)
     {
         var vehiculo = await _vehiculoService.GetByIdAsync(new IdVO(id), ct);
@@ -43,10 +42,9 @@ public class VehiculosController : BaseApiController
         return Ok(dto);
     }
 
-    // ============================================================
     // GET: api/vehiculos/vin/{vin}
-    // ============================================================
     [HttpGet("vin/{vin}")]
+    [Authorize]
     public async Task<ActionResult<VehiculoDetailDto>> GetByVin(string vin, CancellationToken ct)
     {
         var vinVo = new VinVO(vin);
@@ -60,10 +58,9 @@ public class VehiculosController : BaseApiController
         return Ok(dto);
     }
 
-    // ============================================================
     // GET: api/vehiculos/cliente/{clienteId}
-    // ============================================================
     [HttpGet("cliente/{clienteId:int}")]
+    [Authorize]
     public async Task<ActionResult<IEnumerable<VehiculoDto>>> GetByClienteId(int clienteId, CancellationToken ct)
     {
         var vehiculos = await _vehiculoService.GetByClienteIdAsync(new IdVO(clienteId), ct);
@@ -71,10 +68,9 @@ public class VehiculosController : BaseApiController
         return Ok(dto);
     }
 
-    // ============================================================
     // POST: api/vehiculos
-    // ============================================================
     [HttpPost]
+    [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> Create([FromBody] CreateVehiculoDto body, CancellationToken ct)
     {
         try
@@ -100,10 +96,9 @@ public class VehiculosController : BaseApiController
         }
     }
 
-    // ============================================================
     // PUT: api/vehiculos/{id}
-    // ============================================================
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateVehiculoDto body, CancellationToken ct)
     {
         var existing = await _vehiculoService.GetByIdAsync(new IdVO(id), ct);
@@ -131,10 +126,9 @@ public class VehiculosController : BaseApiController
         }
     }
 
-    // ============================================================
     // DELETE: api/vehiculos/{id}
-    // ============================================================
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> Delete(int id, CancellationToken ct)
     {
         var deleted = await _vehiculoService.DeleteAsync(new IdVO(id), ct);

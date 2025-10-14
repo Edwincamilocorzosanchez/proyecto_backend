@@ -40,7 +40,7 @@ public class ProveedorRepository : IProveedorRepository
 
     public async Task<bool> ExistsByNombreAsync(NombreVO nombre, CancellationToken ct = default)
     {
-        // ✅ comparar el valor primitivo, no el VO directamente
+        //  comparar el valor primitivo, no el VO directamente
         return await _context.Proveedores
             .AnyAsync(p => p.Nombre.Value == nombre.Value, ct);
     }
@@ -57,7 +57,7 @@ public class ProveedorRepository : IProveedorRepository
 
     public async Task<Proveedor?> GetByIdAsync(IdVO id, CancellationToken ct = default)
     {
-        // ✅ comparar por el valor interno
+        //  comparar por el valor interno
         return await _context.Proveedores
             .Include(p => p.Repuestos)
             .FirstOrDefaultAsync(p => p.Id.Value == id.Value, ct);
@@ -65,7 +65,7 @@ public class ProveedorRepository : IProveedorRepository
 
     public async Task<Proveedor?> GetByNombreAsync(NombreVO nombre, CancellationToken ct = default)
     {
-        // ✅ comparar por el valor interno
+        //  comparar por el valor interno
         return await _context.Proveedores
             .Include(p => p.Repuestos)
             .FirstOrDefaultAsync(p => p.Nombre.Value == nombre.Value, ct);

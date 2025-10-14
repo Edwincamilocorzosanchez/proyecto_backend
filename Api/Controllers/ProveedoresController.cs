@@ -3,6 +3,7 @@ using Api.Services.Interfaces;
 using AutoMapper;
 using Domain.Entities;
 using Domain.ValueObjects;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
@@ -18,8 +19,9 @@ public class ProveedoresController : BaseApiController
         _mapper = mapper;
     }
 
-    // ✅ GET: api/Proveedor/all
+    //  GET: api/Proveedor/all
     [HttpGet("all")]
+    [Authorize(Roles = "Proveedor, Administrador")]
     public async Task<ActionResult<IEnumerable<ProveedorDto>>> GetAllAsync(CancellationToken ct)
     {
         var proveedores = await _service.GetAllAsync(ct);
@@ -27,8 +29,9 @@ public class ProveedoresController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ GET: api/Proveedor/activos
+    //  GET: api/Proveedor/activos
     [HttpGet("activos")]
+    [Authorize(Roles = "Proveedor, Administrador")]
     public async Task<ActionResult<IEnumerable<ProveedorDto>>> GetActivosAsync(CancellationToken ct)
     {
         var proveedores = await _service.GetActivosAsync(ct);
@@ -36,8 +39,9 @@ public class ProveedoresController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ GET: api/Proveedor/{id}
+    //  GET: api/Proveedor/{id}
     [HttpGet("{id:int}")]
+    [Authorize(Roles = "Proveedor, Administrador")]
     public async Task<ActionResult<ProveedorDetailDto>> GetByIdAsync(int id, CancellationToken ct)
     {
         var proveedor = await _service.GetByIdAsync(new IdVO(id), ct);
@@ -48,8 +52,9 @@ public class ProveedoresController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ POST: api/Proveedor
+    //  POST: api/Proveedor
     [HttpPost]
+    [Authorize(Roles = "Administrador")]
     public async Task<ActionResult<ProveedorDto>> CreateAsync([FromBody] CreateProveedorDto dto, CancellationToken ct)
     {
         if (dto == null)
@@ -79,8 +84,9 @@ public class ProveedoresController : BaseApiController
         return CreatedAtAction(nameof(GetByIdAsync), new { id = proveedor.Id.Value }, result);
     }
 
-    // ✅ PUT: api/Proveedor/{id}
+    //  PUT: api/Proveedor/{id}
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Administrador")]
     public async Task<ActionResult> UpdateAsync(int id, [FromBody] UpdateProveedorDto dto, CancellationToken ct)
     {
         if (dto == null)
@@ -111,8 +117,9 @@ public class ProveedoresController : BaseApiController
         }
     }
 
-    // ✅ DELETE: api/Proveedor/{id}
+    //  DELETE: api/Proveedor/{id}
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Administrador")]
     public async Task<ActionResult> DeleteAsync(int id, CancellationToken ct)
     {
         try

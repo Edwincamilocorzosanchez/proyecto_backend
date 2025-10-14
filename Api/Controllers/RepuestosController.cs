@@ -3,6 +3,7 @@ using Api.Services.Interfaces;
 using AutoMapper;
 using Domain.Entities;
 using Domain.ValueObjects;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
@@ -18,8 +19,9 @@ public class RepuestosController : BaseApiController
         _mapper = mapper;
     }
 
-    // ✅ GET: api/Repuesto/all
+    //  GET: api/Repuesto/all
     [HttpGet("all")]
+    [Authorize(Roles = "Mecanico, Proveedor, Administrador")]
     public async Task<ActionResult<IEnumerable<RepuestoDto>>> GetAllAsync(CancellationToken ct)
     {
         var repuestos = await _service.GetAllAsync(ct);
@@ -27,8 +29,9 @@ public class RepuestosController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ GET: api/Repuesto/{id}
+    //  GET: api/Repuesto/{id}
     [HttpGet("{id:int}")]
+    [Authorize(Roles = "Mecanico, Proveedor, Administrador")]
     public async Task<ActionResult<RepuestoDetailDto>> GetByIdAsync(int id, CancellationToken ct)
     {
         var repuesto = await _service.GetByIdAsync(new IdVO(id), ct);
@@ -39,8 +42,9 @@ public class RepuestosController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ POST: api/Repuesto
+    //  POST: api/Repuesto
     [HttpPost]
+    [Authorize(Roles = "Proveedor, Administrador")]
     public async Task<ActionResult<RepuestoDto>> CreateAsync([FromBody] CreateRepuestoDto dto, CancellationToken ct)
     {
         if (dto == null)
@@ -69,8 +73,9 @@ public class RepuestosController : BaseApiController
         return CreatedAtAction(nameof(GetByIdAsync), new { id = repuesto.Id.Value }, result);
     }
 
-    // ✅ PUT: api/Repuesto/{id}
+    //  PUT: api/Repuesto/{id}
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Proveedor, Administrador")]
     public async Task<ActionResult> UpdateAsync(int id, [FromBody] UpdateRepuestoDto dto, CancellationToken ct)
     {
         if (dto == null)
@@ -100,8 +105,9 @@ public class RepuestosController : BaseApiController
         }
     }
 
-    // ✅ DELETE: api/Repuesto/{id}
+    //  DELETE: api/Repuesto/{id}
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Proveedor, Administrador")]
     public async Task<ActionResult> DeleteAsync(int id, CancellationToken ct)
     {
         try
@@ -118,8 +124,9 @@ public class RepuestosController : BaseApiController
         }
     }
 
-    // ✅ PATCH: api/Repuesto/{id}/stock
+    //  PATCH: api/Repuesto/{id}/stock
     [HttpPatch("{id:int}/stock")]
+    [Authorize(Roles = "Proveedor, Administrador")]
     public async Task<ActionResult> UpdateStockAsync(int id, [FromQuery] int cantidad, CancellationToken ct)
     {
         try

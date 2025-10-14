@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Api.Controllers;
 
-[Authorize(Roles = "Cliente, Administrador")]
+// [Authorize(Roles = "Cliente, Administrador")]
 public class CitasController : BaseApiController
 {
     private readonly ICitaService _service;

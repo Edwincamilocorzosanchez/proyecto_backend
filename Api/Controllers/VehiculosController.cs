@@ -21,7 +21,7 @@ public class VehiculosController : BaseApiController
 
     // GET: api/vehiculos/all
     [HttpGet("all")]
-    [Authorize]
+    // [Authorize]
     public async Task<ActionResult<IEnumerable<VehiculoDto>>> GetAll(CancellationToken ct)
     {
         var vehiculos = await _vehiculoService.GetAllAsync(ct);
@@ -31,7 +31,7 @@ public class VehiculosController : BaseApiController
 
     // GET: api/vehiculos/{id}
     [HttpGet("{id:int}")]
-    [Authorize]
+    // [Authorize]
     public async Task<ActionResult<VehiculoDetailDto>> GetById(int id, CancellationToken ct)
     {
         var vehiculo = await _vehiculoService.GetByIdAsync(new IdVO(id), ct);
@@ -44,7 +44,7 @@ public class VehiculosController : BaseApiController
 
     // GET: api/vehiculos/vin/{vin}
     [HttpGet("vin/{vin}")]
-    [Authorize]
+    // [Authorize]
     public async Task<ActionResult<VehiculoDetailDto>> GetByVin(string vin, CancellationToken ct)
     {
         var vinVo = new VinVO(vin);
@@ -60,7 +60,7 @@ public class VehiculosController : BaseApiController
 
     // GET: api/vehiculos/cliente/{clienteId}
     [HttpGet("cliente/{clienteId:int}")]
-    [Authorize]
+    // [Authorize]
     public async Task<ActionResult<IEnumerable<VehiculoDto>>> GetByClienteId(int clienteId, CancellationToken ct)
     {
         var vehiculos = await _vehiculoService.GetByClienteIdAsync(new IdVO(clienteId), ct);
@@ -70,7 +70,7 @@ public class VehiculosController : BaseApiController
 
     // POST: api/vehiculos
     [HttpPost]
-    [Authorize(Roles = "Administrador")]
+    // [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> Create([FromBody] CreateVehiculoDto body, CancellationToken ct)
     {
         try
@@ -98,7 +98,7 @@ public class VehiculosController : BaseApiController
 
     // PUT: api/vehiculos/{id}
     [HttpPut("{id:int}")]
-    [Authorize(Roles = "Administrador")]
+    // [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateVehiculoDto body, CancellationToken ct)
     {
         var existing = await _vehiculoService.GetByIdAsync(new IdVO(id), ct);
@@ -128,7 +128,7 @@ public class VehiculosController : BaseApiController
 
     // DELETE: api/vehiculos/{id}
     [HttpDelete("{id:int}")]
-    [Authorize(Roles = "Administrador")]
+    // [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> Delete(int id, CancellationToken ct)
     {
         var deleted = await _vehiculoService.DeleteAsync(new IdVO(id), ct);

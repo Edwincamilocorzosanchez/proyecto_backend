@@ -22,7 +22,7 @@ public class ClientesController : BaseApiController
 
     // GET /api/clientes/all
     [HttpGet("all")]
-    [Authorize(Roles = "Cliente, Administrador")]
+    // [Authorize(Roles = "Cliente, Administrador")]
     public async Task<ActionResult<IEnumerable<ClienteDto>>> GetAll(CancellationToken ct)
     {
         var clientes = await _service.GetAllAsync();
@@ -31,7 +31,7 @@ public class ClientesController : BaseApiController
 
     // GET /api/clientes/{id}
     [HttpGet("{id:int}")]
-    [Authorize(Roles = "Cliente, Administrador")]
+    // [Authorize(Roles = "Cliente, Administrador")]
     public async Task<ActionResult<ClienteDto>> GetById(int id)
     {
         try
@@ -47,7 +47,7 @@ public class ClientesController : BaseApiController
 
     // POST /api/clientes
     [HttpPost]
-    [Authorize(Roles = "Cliente, Administrador")]
+    // [Authorize(Roles = "Cliente, Administrador")]
     public async Task<ActionResult> Create([FromBody] CreateClienteDto dto)
     {
         try
@@ -67,7 +67,7 @@ public class ClientesController : BaseApiController
 
     // PUT /api/clientes/{id}
     [HttpPut("{id:int}")]
-    [Authorize(Roles = "Administrador")]
+    // [Authorize(Roles = "Administrador")]
     public async Task<ActionResult> Update(int id, [FromBody] UpdateClienteDto dto)
     {
         try
@@ -91,7 +91,7 @@ public class ClientesController : BaseApiController
 
     // DELETE /api/clientes/{id}
     [HttpDelete("{id:int}")]
-    [Authorize(Roles = "Administrador")]
+    // [Authorize(Roles = "Administrador")]
     public async Task<ActionResult> Delete(int id)
     {
         try
@@ -108,7 +108,7 @@ public class ClientesController : BaseApiController
         }
     }
         // esto es un enpoint de prueba para probar el JWT
-    [Authorize]
+    // [Authorize]
     [HttpGet("check-auth")]
     public IActionResult CheckAuth()
     {

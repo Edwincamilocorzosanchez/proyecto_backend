@@ -21,7 +21,7 @@ public class TiposMovimientoController : BaseApiController
 
     //  GET: api/TipoMovimiento/all
     [HttpGet("all")]
-    [Authorize(Roles = "Proveedor, Administrador")]
+    // [Authorize(Roles = "Proveedor, Administrador")]
     public async Task<ActionResult<IEnumerable<TipoMovimientoDto>>> GetAllAsync(CancellationToken ct)
     {
         var tipos = await _service.ObtenerTodosAsync(ct);
@@ -31,7 +31,7 @@ public class TiposMovimientoController : BaseApiController
 
     //  GET: api/TipoMovimiento/{id}
     [HttpGet("{id:int}")]
-    [Authorize(Roles = "Proveedor, Administrador")]
+    // [Authorize(Roles = "Proveedor, Administrador")]
     public async Task<ActionResult<TipoMovimientoDto>> GetByIdAsync(int id, CancellationToken ct)
     {
         var tipo = await _service.ObtenerPorIdAsync(new IdVO(id), ct);
@@ -44,7 +44,7 @@ public class TiposMovimientoController : BaseApiController
 
     //  POST: api/TipoMovimiento
     [HttpPost]
-    [Authorize(Roles = "Administrador")]
+    // [Authorize(Roles = "Administrador")]
     public async Task<ActionResult<TipoMovimientoDto>> CreateAsync([FromBody] CreateTipoMovimientoDto dto, CancellationToken ct)
     {
         if (dto == null)
@@ -67,7 +67,7 @@ public class TiposMovimientoController : BaseApiController
 
     //  PUT: api/TipoMovimiento/{id}
     [HttpPut("{id:int}")]
-    [Authorize(Roles = "Administrador")]
+    // [Authorize(Roles = "Administrador")]
     public async Task<ActionResult> UpdateAsync(int id, [FromBody] UpdateTipoMovimientoDto dto, CancellationToken ct)
     {
         if (dto == null)
@@ -88,7 +88,7 @@ public class TiposMovimientoController : BaseApiController
 
     //  DELETE: api/TipoMovimiento/{id}
     [HttpDelete("{id:int}")]
-    [Authorize(Roles = "Administrador")]
+    // [Authorize(Roles = "Administrador")]
     public async Task<ActionResult> DeleteAsync(int id, CancellationToken ct)
     {
         var deleted = await _service.EliminarAsync(new IdVO(id), ct);

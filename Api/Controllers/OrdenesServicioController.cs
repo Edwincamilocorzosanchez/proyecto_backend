@@ -3,10 +3,12 @@ using Api.Services.Interfaces;
 using AutoMapper;
 using Domain.Entities;
 using Domain.ValueObjects;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
+[Authorize(Roles = "Mecanico, Administrador")]
 public class OrdenesServicioController : BaseApiController
 {
     private readonly IOrdenServicioService _service;
@@ -18,7 +20,7 @@ public class OrdenesServicioController : BaseApiController
         _mapper = mapper;
     }
 
-    // ✅ GET: api/OrdenServicio/all
+    // GET: api/OrdenServicio/all
     [HttpGet("all")]
     public async Task<ActionResult<IEnumerable<OrdenServicioDto>>> GetAllAsync(CancellationToken ct)
     {
@@ -27,7 +29,7 @@ public class OrdenesServicioController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ GET: api/OrdenServicio/{id}
+    // GET: api/OrdenServicio/{id}
     [HttpGet("{id:int}")]
     public async Task<ActionResult<OrdenServicioDetailDto>> GetByIdAsync(int id, CancellationToken ct)
     {
@@ -39,7 +41,7 @@ public class OrdenesServicioController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ GET: api/OrdenServicio/vehiculo/{vehiculoId}
+    // GET: api/OrdenServicio/vehiculo/{vehiculoId}
     [HttpGet("vehiculo/{vehiculoId:int}")]
     public async Task<ActionResult<IEnumerable<OrdenServicioDto>>> GetByVehiculoAsync(int vehiculoId, CancellationToken ct)
     {
@@ -48,7 +50,7 @@ public class OrdenesServicioController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ GET: api/OrdenServicio/mecanico/{mecanicoId}
+    // GET: api/OrdenServicio/mecanico/{mecanicoId}
     [HttpGet("mecanico/{mecanicoId:int}")]
     public async Task<ActionResult<IEnumerable<OrdenServicioDto>>> GetByMecanicoAsync(int mecanicoId, CancellationToken ct)
     {
@@ -57,7 +59,7 @@ public class OrdenesServicioController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ POST: api/OrdenServicio
+    // POST: api/OrdenServicio
     [HttpPost]
     public async Task<ActionResult<OrdenServicioDto>> CreateAsync([FromBody] CreateOrdenServicioDto dto, CancellationToken ct)
     {
@@ -87,7 +89,7 @@ public class OrdenesServicioController : BaseApiController
         return CreatedAtAction(nameof(GetByIdAsync), new { id = orden.Id.Value }, result);
     }
 
-    // ✅ PUT: api/OrdenServicio/{id}
+    //PUT: api/OrdenServicio/{id}
     [HttpPut("{id:int}")]
     public async Task<ActionResult> UpdateAsync(int id, [FromBody] UpdateOrdenServicioDto dto, CancellationToken ct)
     {
@@ -119,7 +121,7 @@ public class OrdenesServicioController : BaseApiController
         return NoContent();
     }
 
-    // ✅ DELETE: api/OrdenServicio/{id}
+    // DELETE: api/OrdenServicio/{id}
     [HttpDelete("{id:int}")]
     public async Task<ActionResult> DeleteAsync(int id, CancellationToken ct)
     {

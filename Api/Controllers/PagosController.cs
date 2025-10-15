@@ -3,12 +3,11 @@ using Api.Services.Interfaces;
 using AutoMapper;
 using Domain.Entities;
 using Domain.ValueObjects;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
 public class PagosController : BaseApiController
 {
     private readonly IPagoService _service;
@@ -20,8 +19,9 @@ public class PagosController : BaseApiController
         _mapper = mapper;
     }
 
-    // ✅ GET: api/Pago/all
+    //  GET: api/Pago/all
     [HttpGet("all")]
+    [Authorize(Roles = "Cliente, Administrador")]
     public async Task<ActionResult<IEnumerable<PagoDto>>> GetAllAsync(CancellationToken ct)
     {
         var pagos = await _service.GetAllAsync(ct);
@@ -29,8 +29,9 @@ public class PagosController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ GET: api/Pago/{id}
+    //  GET: api/Pago/{id}
     [HttpGet("{id:int}")]
+    [Authorize(Roles = "Cliente, Administrador")]
     public async Task<ActionResult<PagoDetailDto>> GetByIdAsync(int id, CancellationToken ct)
     {
         var pago = await _service.GetByIdAsync(new IdVO(id), ct);
@@ -41,8 +42,9 @@ public class PagosController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ GET: api/Pago/factura/{facturaId}
+    //  GET: api/Pago/factura/{facturaId}
     [HttpGet("factura/{facturaId:int}")]
+    [Authorize(Roles = "Cliente, Administrador")]
     public async Task<ActionResult<IEnumerable<PagoDto>>> GetByFacturaAsync(int facturaId, CancellationToken ct)
     {
         var pagos = await _service.GetByFacturaIdAsync(new IdVO(facturaId), ct);
@@ -50,8 +52,9 @@ public class PagosController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ POST: api/Pago
+    //  POST: api/Pago
     [HttpPost]
+    [Authorize(Roles = "Administrador")]
     public async Task<ActionResult<PagoDto>> CreateAsync([FromBody] CreatePagoDto dto, CancellationToken ct)
     {
         if (dto == null)
@@ -80,8 +83,9 @@ public class PagosController : BaseApiController
         return CreatedAtAction(nameof(GetByIdAsync), new { id = pago.Id.Value }, result);
     }
 
-    // ✅ PUT: api/Pago/{id}
+    //  PUT: api/Pago/{id}
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Administrador")]
     public async Task<ActionResult> UpdateAsync(int id, [FromBody] UpdatePagoDto dto, CancellationToken ct)
     {
         if (dto == null)
@@ -114,8 +118,9 @@ public class PagosController : BaseApiController
         }
     }
 
-    // ✅ DELETE: api/Pago/{id}
+    //  DELETE: api/Pago/{id}
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Administrador")]
     public async Task<ActionResult> DeleteAsync(int id, CancellationToken ct)
     {
         try

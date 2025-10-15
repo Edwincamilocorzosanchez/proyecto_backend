@@ -28,7 +28,7 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default)
         {
             var entity = await _context.EstadosPago
-                .FirstOrDefaultAsync(e => e.Id.Value == id.Value, ct);
+                .FirstOrDefaultAsync(e => e.Id == id, ct);
 
             if (entity == null) return false;
 

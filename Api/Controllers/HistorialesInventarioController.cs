@@ -3,9 +3,11 @@ using Api.Services.Interfaces;
 using AutoMapper;
 using Domain.Entities;
 using Domain.ValueObjects;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
+
 public class HistorialesInventarioController : BaseApiController
 {
     private readonly IHistorialInventarioService _historialInventarioService;
@@ -19,8 +21,9 @@ public class HistorialesInventarioController : BaseApiController
         _mapper = mapper;
     }
 
-    // ✅ GET: api/HistorialesInventario/all
+    //  GET: api/HistorialesInventario/all
     [HttpGet("all")]
+    [Authorize(Roles = "Proveedor, Mecanico, Administrador")]
     public async Task<ActionResult<IEnumerable<HistorialInventarioDto>>> GetAll(CancellationToken ct)
     {
         var historiales = await _historialInventarioService.GetAllAsync(ct);
@@ -28,8 +31,9 @@ public class HistorialesInventarioController : BaseApiController
         return Ok(historialesDto);
     }
 
-    // ✅ GET: api/HistorialesInventario/{id}
+    //  GET: api/HistorialesInventario/{id}
     [HttpGet("{id:int}")]
+    [Authorize(Roles = "Proveedor, Mecanico, Administrador")]
     public async Task<ActionResult<HistorialInventarioDto>> GetById(int id, CancellationToken ct)
     {
         var historial = await _historialInventarioService.GetByIdAsync(new IdVO(id), ct);
@@ -40,8 +44,9 @@ public class HistorialesInventarioController : BaseApiController
         return Ok(dto);
     }
 
-    // ✅ GET: api/HistorialesInventario/repuesto/{repuestoId}
+    //  GET: api/HistorialesInventario/repuesto/{repuestoId}
     [HttpGet("repuesto/{repuestoId:int}")]
+    [Authorize(Roles = "Proveedor, Mecanico, Administrador")]
     public async Task<ActionResult<IEnumerable<HistorialInventarioDto>>> GetByRepuestoId(int repuestoId, CancellationToken ct)
     {
         var historiales = await _historialInventarioService.GetByRepuestoIdAsync(new IdVO(repuestoId), ct);
@@ -49,8 +54,9 @@ public class HistorialesInventarioController : BaseApiController
         return Ok(dto);
     }
 
-    // ✅ GET: api/HistorialesInventario/admin/{adminId}
+    //  GET: api/HistorialesInventario/admin/{adminId}
     [HttpGet("admin/{adminId:int}")]
+    [Authorize(Roles = "Proveedor, Mecanico, Administrador")]
     public async Task<ActionResult<IEnumerable<HistorialInventarioDto>>> GetByAdminId(int adminId, CancellationToken ct)
     {
         var historiales = await _historialInventarioService.GetByAdminIdAsync(new IdVO(adminId), ct);
@@ -58,8 +64,9 @@ public class HistorialesInventarioController : BaseApiController
         return Ok(dto);
     }
 
-    // ✅ POST: api/HistorialesInventario
+    //  POST: api/HistorialesInventario
     [HttpPost]
+    [Authorize(Roles = "Administrador")]
     public async Task<ActionResult<int>> Create([FromBody] CreateHistorialInventarioDto dto, CancellationToken ct)
     {
         var historial = new HistorialInventario(
@@ -76,8 +83,9 @@ public class HistorialesInventarioController : BaseApiController
         return CreatedAtAction(nameof(GetById), new { id = newId }, newId);
     }
 
-    // ✅ PUT: api/HistorialesInventario/{id}
+    //  PUT: api/HistorialesInventario/{id}
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Administrador")]
     public async Task<ActionResult> Update(int id, [FromBody] UpdateHistorialInventarioDto dto, CancellationToken ct)
     {
         var historialExistente = await _historialInventarioService.GetByIdAsync(new IdVO(id), ct);
@@ -97,8 +105,9 @@ public class HistorialesInventarioController : BaseApiController
         return NoContent();
     }
 
-    // ✅ DELETE: api/HistorialesInventario/{id}
+    //  DELETE: api/HistorialesInventario/{id}
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Administrador")]
     public async Task<ActionResult> Delete(int id, CancellationToken ct)
     {
         var eliminado = await _historialInventarioService.DeleteAsync(new IdVO(id), ct);

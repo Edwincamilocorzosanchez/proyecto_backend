@@ -36,7 +36,7 @@ public sealed class MecanicosController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ GET: api/Mecanicos/{id}
+    //  GET: api/Mecanicos/{id}
     [HttpGet("{id:int}")]
     public async Task<ActionResult<MecanicoDetailDto>> GetByIdAsync(int id, CancellationToken ct)
     {
@@ -48,7 +48,7 @@ public sealed class MecanicosController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ POST: api/Mecanicos
+    //  POST: api/Mecanicos
     [HttpPost]
     public async Task<ActionResult<MecanicoDto>> CreateAsync([FromBody] CreateMecanicoDto dto, CancellationToken ct)
     {
@@ -72,7 +72,7 @@ public sealed class MecanicosController : BaseApiController
         return CreatedAtAction(nameof(GetByIdAsync), new { id }, result);
     }
 
-    // ✅ PUT: api/Mecanicos/{id}
+    //  PUT: api/Mecanicos/{id}
     [HttpPut("{id:int}")]
     public async Task<ActionResult> UpdateAsync(int id, [FromBody] UpdateMecanicoDto dto, CancellationToken ct)
     {
@@ -92,7 +92,7 @@ public sealed class MecanicosController : BaseApiController
         return NoContent();
     }
 
-    // ✅ DELETE: api/Mecanicos/{id}
+    //  DELETE: api/Mecanicos/{id}
     [HttpDelete("{id:int}")]
     public async Task<ActionResult> DeleteAsync(int id, CancellationToken ct)
     {

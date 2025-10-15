@@ -251,7 +251,7 @@ public class UserService : IUserService
         var roleClaims = new List<Claim>();
         foreach (var role in roles)
         {
-            roleClaims.Add(new Claim("roles", role.Name));
+            roleClaims.Add(new Claim(ClaimTypes.Role, role.Name));
         }
         var claims = new[]
         {
@@ -265,8 +265,7 @@ public class UserService : IUserService
         {
             throw new InvalidOperationException("JWT Key cannot be null or empty.");
         }
-        var keyBytes = Convert.FromBase64String(_jwt.Key);
-        var symmetricSecurityKey = new SymmetricSecurityKey(keyBytes);
+        var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwt.Key));
         var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
         var jwtSecurityToken = new JwtSecurityToken(
             issuer: _jwt.Issuer,

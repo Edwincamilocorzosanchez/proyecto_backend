@@ -15,7 +15,7 @@ public sealed class CitaProfile : Profile
 
         // Entidad ->  DTO
         CreateMap<Cita, CitaDto>()
-            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.Value))
             .ForMember(dest => dest.ClienteNombre, opt => opt.MapFrom(src => src.Cliente.Nombre.Value))
             .ForMember(dest => dest.VehiculoPlaca, opt => opt.MapFrom(src => src.Vehiculo.Vin.Value))
             .ForMember(dest => dest.FechaCita, opt => opt.MapFrom(src => src.FechaCita)) // AutoMapper usará el ConvertUsing

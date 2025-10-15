@@ -164,4 +164,16 @@ public class AdministradoresController : BaseApiController
             return StatusCode(500, new { message = "Error al obtener los administradores por nivel de acceso.", detail = ex.Message });
         }
     }
+    // esto es un enpoint de prueba para probar el JWT
+    [Authorize]
+    [HttpGet("check-auth")]
+    public IActionResult CheckAuth()
+    {
+        return Ok(new
+        {
+            message = " Token válido y autenticado.",
+            user = User.Identity?.Name,
+            claims = User.Claims.Select(c => new { c.Type, c.Value })
+        });
+    }
 }

@@ -3,6 +3,7 @@ using Api.Services.Interfaces;
 using AutoMapper;
 using Domain.Entities;
 using Domain.ValueObjects;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
@@ -18,10 +19,9 @@ public class DetallesOrdenController : BaseApiController
         _mapper = mapper;
     }
 
-    // ============================================================
     // GET /api/detalleorden/orden/{ordenServicioId}
-    // ============================================================
     [HttpGet("orden/{ordenServicioId:int}")]
+    [Authorize(Roles = "Mecanico, Administrador")]
     public async Task<ActionResult<IEnumerable<DetalleOrdenDto>>> GetByOrdenServicio(int ordenServicioId, CancellationToken ct)
     {
         var detalles = await _detalleOrdenService.GetByOrdenIdAsync(new IdVO(ordenServicioId), ct);
@@ -30,6 +30,7 @@ public class DetallesOrdenController : BaseApiController
     }
 
     [HttpGet("repuesto/{repuestoId:int}")]
+    [Authorize(Roles = "Mecanico, Administrador")]
     public async Task<ActionResult<IEnumerable<DetalleOrdenDto>>> GetByRepuesto(int repuestoId, CancellationToken ct)
     {
         var detalles = await _detalleOrdenService.GetByRepuestoIdAsync(new IdVO(repuestoId), ct);
@@ -37,10 +38,9 @@ public class DetallesOrdenController : BaseApiController
         return Ok(result);
     }
 
-    // ============================================================
     // GET /api/detalleorden/{ordenServicioId}/{repuestoId}
-    // ============================================================
     [HttpGet("{ordenServicioId:int}/{repuestoId:int}")]
+    [Authorize(Roles = "Mecanico, Administrador")]
     public async Task<ActionResult<DetalleOrdenDto>> GetByIds(int ordenServicioId, int repuestoId, CancellationToken ct)
     {
         var detalle = await _detalleOrdenService.GetByIdAsync(new IdVO(ordenServicioId), new IdVO(repuestoId), ct);
@@ -52,10 +52,9 @@ public class DetallesOrdenController : BaseApiController
         return Ok(dto);
     }
 
-    // ============================================================
     // POST /api/detalleorden
-    // ============================================================
     [HttpPost]
+    [Authorize(Roles = "Administrador")]
     public async Task<ActionResult> Create([FromBody] CreateDetalleOrdenDto dto, CancellationToken ct)
     {
         var detalle = _mapper.Map<DetalleOrden>(dto);
@@ -66,10 +65,9 @@ public class DetallesOrdenController : BaseApiController
             new { dto.OrdenServicioId, dto.RepuestoId });
     }
 
-    // ============================================================
     // PUT /api/detalleorden/{ordenServicioId}/{repuestoId}
-    // ============================================================
     [HttpPut("{ordenServicioId:int}/{repuestoId:int}")]
+    [Authorize(Roles = "Administrador")]
     public async Task<ActionResult> Update(int ordenServicioId, int repuestoId, [FromBody] UpdateDetalleOrdenDto dto, CancellationToken ct)
     {
         var existing = await _detalleOrdenService.GetByIdAsync(new IdVO(ordenServicioId), new IdVO(repuestoId), ct);
@@ -85,10 +83,9 @@ public class DetallesOrdenController : BaseApiController
         return NoContent();
     }
 
-    // ============================================================
     // DELETE /api/detalleorden/{ordenServicioId}/{repuestoId}
-    // ============================================================
     [HttpDelete("{ordenServicioId:int}/{repuestoId:int}")]
+    [Authorize(Roles = "Administrador")]
     public async Task<ActionResult> Delete(int ordenServicioId, int repuestoId, CancellationToken ct)
     {
         var deleted = await _detalleOrdenService.DeleteAsync(new IdVO(ordenServicioId), new IdVO(repuestoId), ct);

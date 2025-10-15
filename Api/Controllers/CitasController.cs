@@ -8,9 +8,11 @@ using Domain.Entities;
 using Domain.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Api.Controllers;
 
+[Authorize(Roles = "Cliente, Administrador")]
 public class CitasController : BaseApiController
 {
     private readonly ICitaService _service;
@@ -22,9 +24,7 @@ public class CitasController : BaseApiController
         _mapper = mapper;
     }
 
-    // ============================================================
     // GET /api/citas/all
-    // ============================================================
     [HttpGet("all")]
     public async Task<ActionResult<IEnumerable<CitaDto>>> GetAll(CancellationToken ct)
     {
@@ -40,9 +40,7 @@ public class CitasController : BaseApiController
         }
     }
 
-    // ============================================================
     // GET /api/citas/{id}
-    // ============================================================
     [HttpGet("{id:int}")]
     public async Task<ActionResult<CitaDto>> GetById(int id, CancellationToken ct)
     {
@@ -75,9 +73,7 @@ public class CitasController : BaseApiController
         }
     }
 
-    // ============================================================
     // GET /api/citas/cliente/{clienteId}
-    // ============================================================
     [HttpGet("cliente/{clienteId:int}")]
     public async Task<ActionResult<IEnumerable<CitaDto>>> GetByCliente(int clienteId, CancellationToken ct)
     {
@@ -86,9 +82,7 @@ public class CitasController : BaseApiController
         return Ok(result);
     }
 
-    // ============================================================
     // GET /api/citas/vehiculo/{vehiculoId}
-    // ============================================================
     [HttpGet("vehiculo/{vehiculoId:int}")]
     public async Task<ActionResult<IEnumerable<CitaDto>>> GetByVehiculo(int vehiculoId, CancellationToken ct)
     {
@@ -97,9 +91,7 @@ public class CitasController : BaseApiController
         return Ok(result);
     }
 
-    // ============================================================
     // POST /api/citas
-    // ============================================================
     [HttpPost]
     public async Task<ActionResult> Create([FromBody] CreateCitaDto dto, CancellationToken ct)
     {
@@ -116,9 +108,7 @@ public class CitasController : BaseApiController
         }
     }
 
-    // ============================================================
     // PUT /api/citas/{id}
-    // ============================================================
     [HttpPut("{id:int}")]
     public async Task<ActionResult> Update(int id, [FromBody] UpdateCitaDto dto, CancellationToken ct)
     {
@@ -142,9 +132,7 @@ public class CitasController : BaseApiController
         }
     }
 
-    // ============================================================
     // DELETE /api/citas/{id}
-    // ============================================================
     [HttpDelete("{id:int}")]
     public async Task<ActionResult> Delete(int id, CancellationToken ct)
     {

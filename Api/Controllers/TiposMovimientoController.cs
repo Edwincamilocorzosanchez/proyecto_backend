@@ -3,6 +3,7 @@ using Api.Services.Interfaces;
 using AutoMapper;
 using Domain.Entities;
 using Domain.ValueObjects;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
@@ -18,8 +19,9 @@ public class TiposMovimientoController : BaseApiController
         _mapper = mapper;
     }
 
-    // ✅ GET: api/TipoMovimiento/all
+    //  GET: api/TipoMovimiento/all
     [HttpGet("all")]
+    [Authorize(Roles = "Proveedor, Administrador")]
     public async Task<ActionResult<IEnumerable<TipoMovimientoDto>>> GetAllAsync(CancellationToken ct)
     {
         var tipos = await _service.ObtenerTodosAsync(ct);
@@ -27,8 +29,9 @@ public class TiposMovimientoController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ GET: api/TipoMovimiento/{id}
+    //  GET: api/TipoMovimiento/{id}
     [HttpGet("{id:int}")]
+    [Authorize(Roles = "Proveedor, Administrador")]
     public async Task<ActionResult<TipoMovimientoDto>> GetByIdAsync(int id, CancellationToken ct)
     {
         var tipo = await _service.ObtenerPorIdAsync(new IdVO(id), ct);
@@ -39,8 +42,9 @@ public class TiposMovimientoController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ POST: api/TipoMovimiento
+    //  POST: api/TipoMovimiento
     [HttpPost]
+    [Authorize(Roles = "Administrador")]
     public async Task<ActionResult<TipoMovimientoDto>> CreateAsync([FromBody] CreateTipoMovimientoDto dto, CancellationToken ct)
     {
         if (dto == null)
@@ -61,8 +65,9 @@ public class TiposMovimientoController : BaseApiController
         return CreatedAtAction(nameof(GetByIdAsync), new { id = tipo.Id.Value }, result);
     }
 
-    // ✅ PUT: api/TipoMovimiento/{id}
+    //  PUT: api/TipoMovimiento/{id}
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Administrador")]
     public async Task<ActionResult> UpdateAsync(int id, [FromBody] UpdateTipoMovimientoDto dto, CancellationToken ct)
     {
         if (dto == null)
@@ -81,8 +86,9 @@ public class TiposMovimientoController : BaseApiController
         return NoContent();
     }
 
-    // ✅ DELETE: api/TipoMovimiento/{id}
+    //  DELETE: api/TipoMovimiento/{id}
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Administrador")]
     public async Task<ActionResult> DeleteAsync(int id, CancellationToken ct)
     {
         var deleted = await _service.EliminarAsync(new IdVO(id), ct);

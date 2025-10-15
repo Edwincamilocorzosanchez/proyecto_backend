@@ -3,6 +3,7 @@ using Api.Services.Interfaces;
 using AutoMapper;
 using Domain.Entities;
 using Domain.ValueObjects;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
@@ -18,8 +19,9 @@ public sealed class FacturasController : BaseApiController
         _mapper = mapper;
     }
 
-    // ✅ GET: api/facturas/all
+    //  GET: api/facturas/all
     [HttpGet("all")]
+    [Authorize(Roles = "Cliente, Administrador")]
     public async Task<ActionResult<IEnumerable<FacturaDto>>> GetAllAsync(CancellationToken ct)
     {
         var facturas = await _facturaService.GetAllAsync(ct);
@@ -27,8 +29,9 @@ public sealed class FacturasController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ GET: api/facturas/{id}
+    //  GET: api/facturas/{id}
     [HttpGet("{id:int}")]
+    [Authorize(Roles = "Cliente, Administrador")]
     public async Task<ActionResult<FacturaDto>> GetByIdAsync(int id, CancellationToken ct)
     {
         var factura = await _facturaService.GetByIdAsync(new IdVO(id), ct);
@@ -39,8 +42,9 @@ public sealed class FacturasController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ GET: api/facturas/orden/{ordenServicioId}
+    //  GET: api/facturas/orden/{ordenServicioId}
     [HttpGet("orden/{ordenServicioId:int}")]
+    [Authorize(Roles = "Cliente, Administrador")]
     public async Task<ActionResult<IEnumerable<FacturaDto>>> GetByOrdenServicioIdAsync(int ordenServicioId, CancellationToken ct)
     {
         var facturas = await _facturaService.GetByOrdenServicioIdAsync(new IdVO(ordenServicioId), ct);
@@ -48,8 +52,9 @@ public sealed class FacturasController : BaseApiController
         return Ok(result);
     }
 
-    // ✅ POST: api/facturas
+    //  POST: api/facturas
     [HttpPost]
+    [Authorize(Roles = "Administrador")]
     public async Task<ActionResult> CreateAsync([FromBody] CreateFacturaDto dto, CancellationToken ct)
     {
         var factura = _mapper.Map<Factura>(dto);
@@ -62,8 +67,9 @@ public sealed class FacturasController : BaseApiController
         return CreatedAtAction(nameof(GetByIdAsync), new { id = factura.Id.Value }, createdDto);
     }
 
-    // ✅ PUT: api/facturas/{id}
+    //  PUT: api/facturas/{id}
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Administrador")]
     public async Task<ActionResult> UpdateAsync(int id, UpdateFacturaDto dto, CancellationToken ct)
     {
         var existing = await _facturaService.GetByIdAsync(new IdVO(id), ct);
@@ -79,8 +85,9 @@ public sealed class FacturasController : BaseApiController
         return NoContent();
     }
 
-    // ✅ DELETE: api/facturas/{id}
+    //  DELETE: api/facturas/{id}
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Administrador")]
     public async Task<ActionResult> DeleteAsync(int id, CancellationToken ct)
     {
         var deleted = await _facturaService.DeleteAsync(new IdVO(id), ct);
@@ -90,8 +97,9 @@ public sealed class FacturasController : BaseApiController
         return NoContent();
     }
 
-    // ✅ GET: api/facturas/{id}/calcular-total
+    //  GET: api/facturas/{id}/calcular-total
     [HttpGet("{id:int}/calcular-total")]
+    [Authorize]
     public async Task<ActionResult<decimal>> CalcularTotalAsync(int id, CancellationToken ct)
     {
         var total = await _facturaService.CalcularTotalAsync(new IdVO(id), ct);

@@ -5,10 +5,10 @@ using Api.Services.Interfaces;
 using Api.Services.Interfaces.Auth;
 using AutoMapper;
 using Domain.Entities.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers.Auth;
-
 public class UserController : BaseApiController
 {
     private readonly IUserService _userService;
@@ -56,8 +56,6 @@ public class UserController : BaseApiController
             SetRefreshTokenInCookie(response.RefreshToken);
         return Ok(response);
     }
-
-
     private void SetRefreshTokenInCookie(string refreshToken)
     {
         var cookieOptions = new CookieOptions

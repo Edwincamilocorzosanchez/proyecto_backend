@@ -44,7 +44,7 @@ public class MecanicoRepository: IMecanicoRepository
     public async Task<bool> UpdateAsync(Mecanico mecanico, CancellationToken ct = default)
     {
         var existing = await _context.Mecanicos
-            .FirstOrDefaultAsync(m => m.Id.Value == mecanico.Id.Value, ct);
+            .FirstOrDefaultAsync(m => m.Id == mecanico.Id, ct);
 
         if (existing is null)
             return false;
@@ -63,7 +63,7 @@ public class MecanicoRepository: IMecanicoRepository
     public async Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default)
     {
         var existing = await _context.Mecanicos
-            .FirstOrDefaultAsync(m => m.Id.Value == id.Value, ct);
+            .FirstOrDefaultAsync(m => m.Id == id, ct);
 
         if (existing is null)
             return false;

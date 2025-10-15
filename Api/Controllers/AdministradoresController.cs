@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace Api.Controllers;
 
 // el autorizado sirve para que el usuario al realizar la solicitud deba de validar el token
-// [Authorize(Roles = "Administrador")]
+[Authorize(Roles = "Administrador")]
 public class AdministradoresController : BaseApiController
 {
     private readonly IAdministradorService _service;

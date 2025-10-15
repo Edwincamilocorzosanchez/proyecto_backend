@@ -1,8 +1,5 @@
 ## Entidades estandar
-<!-- mark as md -->
 ### Domain
-Cliente: propietario de uno o varios vehículos, con datos de contacto (nombre, teléfono, correo).
-
 Vehículo: asociado a un cliente; registra datos como marca, modelo, año, número de serie (VIN) y kilometraje.
 
 OrdenServicio: representa una solicitud de trabajo que incluye referencia al vehículo, tipo de servicio (mantenimiento preventivo, reparación, diagnóstico), mecánico asignado, fecha de ingreso y fecha estimada de entrega.
@@ -213,17 +210,5 @@ ReportesController
 
 
 ## TODO por ahora 
-- debugear endpoints, primero mirar GET, despues POST, PUT, DELETE
-- refactorizar los seeder para que no tenga un archivo muy grande, esto se refacotriza en la carpeta HELPERS
-- hacer lo de los CORS y RateLimiter
-- mirar lo de Johlver y saber que metodos requieren autenticación
+- mirar los POST, PUT, DELETE, y colocar el JWT. 
 
-implementar el GET all en usuarios
-
-arreglar todo cita
-
-arreglar mecanicos por id
-
-### metodos GET que debo arreglar 
-
-orden servicio id 

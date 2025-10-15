@@ -21,7 +21,7 @@ public class ProveedoresController : BaseApiController
 
     //  GET: api/Proveedor/all
     [HttpGet("all")]
-    // [Authorize(Roles = "Proveedor, Administrador")]
+    [Authorize(Roles = "Proveedor, Administrador")]
     public async Task<ActionResult<IEnumerable<ProveedorDto>>> GetAllAsync(CancellationToken ct)
     {
         var proveedores = await _service.GetAllAsync(ct);
@@ -31,7 +31,7 @@ public class ProveedoresController : BaseApiController
 
     //  GET: api/Proveedor/activos
     [HttpGet("activos")]
-    // [Authorize(Roles = "Proveedor, Administrador")]
+    [Authorize(Roles = "Proveedor, Administrador")]
     public async Task<ActionResult<IEnumerable<ProveedorDto>>> GetActivosAsync(CancellationToken ct)
     {
         var proveedores = await _service.GetActivosAsync(ct);
@@ -41,7 +41,7 @@ public class ProveedoresController : BaseApiController
 
     //  GET: api/Proveedor/{id}
     [HttpGet("{id:int}")]
-    // [Authorize(Roles = "Proveedor, Administrador")]
+    [Authorize(Roles = "Proveedor, Administrador")]
     public async Task<ActionResult<ProveedorDetailDto>> GetByIdAsync(int id, CancellationToken ct)
     {
         var proveedor = await _service.GetByIdAsync(new IdVO(id), ct);
@@ -54,7 +54,7 @@ public class ProveedoresController : BaseApiController
 
     //  POST: api/Proveedor
     [HttpPost]
-    // [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = "Administrador")]
     public async Task<ActionResult<ProveedorDto>> CreateAsync([FromBody] CreateProveedorDto dto, CancellationToken ct)
     {
         if (dto == null)
@@ -86,7 +86,7 @@ public class ProveedoresController : BaseApiController
 
     //  PUT: api/Proveedor/{id}
     [HttpPut("{id:int}")]
-    // [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = "Administrador")]
     public async Task<ActionResult> UpdateAsync(int id, [FromBody] UpdateProveedorDto dto, CancellationToken ct)
     {
         if (dto == null)
@@ -119,7 +119,7 @@ public class ProveedoresController : BaseApiController
 
     //  DELETE: api/Proveedor/{id}
     [HttpDelete("{id:int}")]
-    // [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = "Administrador")]
     public async Task<ActionResult> DeleteAsync(int id, CancellationToken ct)
     {
         try

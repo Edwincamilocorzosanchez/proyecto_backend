@@ -56,8 +56,6 @@ public class UserController : BaseApiController
             SetRefreshTokenInCookie(response.RefreshToken);
         return Ok(response);
     }
-
-
     private void SetRefreshTokenInCookie(string refreshToken)
     {
         var cookieOptions = new CookieOptions

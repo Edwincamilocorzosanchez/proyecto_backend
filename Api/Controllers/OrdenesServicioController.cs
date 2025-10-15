@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
-// [Authorize(Roles = "Mecanico, Administrador")]
+[Authorize(Roles = "Mecanico, Administrador")]
 public class OrdenesServicioController : BaseApiController
 {
     private readonly IOrdenServicioService _service;

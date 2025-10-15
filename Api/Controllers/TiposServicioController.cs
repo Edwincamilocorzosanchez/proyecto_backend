@@ -21,7 +21,7 @@ public class TiposServicioController : BaseApiController
 
     // GET: api/TipoServicio/all
     [HttpGet("all")]
-    // [Authorize(Roles = "Mecanico, Administrador")]
+    [Authorize(Roles = "Mecanico, Administrador")]
     public async Task<ActionResult<IEnumerable<TipoServicioDto>>> GetAllAsync(CancellationToken ct)
     {
         var tipos = await _service.GetAllAsync(ct);
@@ -31,7 +31,7 @@ public class TiposServicioController : BaseApiController
 
     // GET: api/TipoServicio/{id}
     [HttpGet("{id:int}")]
-    // [Authorize(Roles = "Mecanico, Administrador")]
+    [Authorize(Roles = "Mecanico, Administrador")]
     public async Task<ActionResult<TipoServicioDetailDto>> GetByIdAsync(int id, CancellationToken ct)
     {
         var tipo = await _service.GetByIdAsync(new IdVO(id), ct);
@@ -44,7 +44,7 @@ public class TiposServicioController : BaseApiController
 
     // GET: api/TipoServicio/nombre/{nombre}
     [HttpGet("nombre/{nombre}")]
-    // [Authorize(Roles = "Mecanico, Administrador")]
+    [Authorize(Roles = "Mecanico, Administrador")]
     public async Task<ActionResult<TipoServicioDetailDto>> GetByNombreAsync(string nombre, CancellationToken ct)
     {
         var tipo = await _service.GetByNombreAsync(new NombreVO(nombre), ct);
@@ -57,7 +57,7 @@ public class TiposServicioController : BaseApiController
 
     // POST: api/TipoServicio
     [HttpPost]
-    // [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = "Administrador")]
     public async Task<ActionResult<TipoServicioDetailDto>> CreateAsync([FromBody] CreateTipoServicioDto dto, CancellationToken ct)
     {
         if (dto == null)
@@ -80,7 +80,7 @@ public class TiposServicioController : BaseApiController
 
     //  PUT: api/TipoServicio/{id}
     [HttpPut("{id:int}")]
-    // [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = "Administrador")]
     public async Task<ActionResult> UpdateAsync(int id, [FromBody] UpdateTipoServicioDto dto, CancellationToken ct)
     {
         if (dto == null)
@@ -101,7 +101,7 @@ public class TiposServicioController : BaseApiController
 
     //  DELETE: api/TipoServicio/{id}
     [HttpDelete("{id:int}")]
-    // [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = "Administrador")]
     public async Task<ActionResult> DeleteAsync(int id, CancellationToken ct)
     {
         var deleted = await _service.DeleteAsync(new IdVO(id), ct);

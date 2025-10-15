@@ -67,5 +67,12 @@ public class VehiculoService : IVehiculoService
     }
 
     public async Task<bool> ExistsByVinAsync(VinVO vin, CancellationToken ct = default)
-        => await _unitOfWork.Vehiculos.ExistsByVinAsync(vin, ct);
+    {
+        var existing = await _unitOfWork.Vehiculos.GetByVinAsync(vin, ct);
+        if (existing == null)
+            return false;
+
+        var result = await _unitOfWork.Vehiculos.ExistsByVinAsync(vin, ct);
+        return result;
+    }
 }

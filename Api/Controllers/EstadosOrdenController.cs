@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
-// [Authorize(Roles = "Administrador")]
+[Authorize(Roles = "Administrador")]
 public sealed class EstadosOrdenController : BaseApiController
 {
     private readonly IEstadoOrdenService _estadoOrdenService;

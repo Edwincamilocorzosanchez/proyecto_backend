@@ -44,7 +44,7 @@ public sealed class EstadoCitaRepository : IEstadoCitaRepository
     public async Task<bool> UpdateAsync(EstadoCita estado, CancellationToken ct = default)
     {
         var existing = await _context.EstadosCita
-            .FirstOrDefaultAsync(e => e.Id.Value == estado.Id.Value, ct);
+            .FirstOrDefaultAsync(e => e.Id == estado.Id, ct);
 
         if (existing is null)
             return false;
@@ -57,7 +57,7 @@ public sealed class EstadoCitaRepository : IEstadoCitaRepository
     public async Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default)
     {
         var existing = await _context.EstadosCita
-            .FirstOrDefaultAsync(e => e.Id.Value == id.Value, ct);
+            .FirstOrDefaultAsync(e => e.Id == id, ct);
 
         if (existing is null)
             return false;

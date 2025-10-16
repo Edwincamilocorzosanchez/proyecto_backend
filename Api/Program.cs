@@ -3,6 +3,7 @@ using Api.Mappings;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using AspNetCoreRateLimit;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddCustomRateLimiter();
+builder.Services.AddOptions();
+builder.Services.AddMemoryCache();
+builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
+builder.Services.Configure<ClientRateLimitOptions>(builder.Configuration.GetSection("ClientRateLimiting"));
+builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 
 // 🔸 Swagger con configuración JWT integrada
 builder.Services.AddSwaggerGen(options =>
@@ -85,8 +91,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-// Esto es para agregar los Seeders de la base de datos
-await app.SeedDatabaseAsync();
+
 
 // Agregar CORS y RateLimiter
 app.UseCors("CorsPolicy");

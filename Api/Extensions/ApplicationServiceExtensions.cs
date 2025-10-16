@@ -1,4 +1,3 @@
-
 using FluentValidation;
 using MediatR;
 using Application.Abstractions;
@@ -96,10 +95,12 @@ public static class ApplicationServiceExtensions
         {
             options.OnRejected = async (context, token) =>
             {
-                var ip = context.HttpContext.Connection.RemoteIpAddress?.ToString() ?? "desconocida";
+                var role = context.HttpContext.User.FindFirst("http://schemas.microsoft.com/ws/2008/06/identity/claims/role")?.Value ?? "unknown";
+                var ip = context.HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+                var timestamp = DateTime.UtcNow.ToString("o");
                 context.HttpContext.Response.StatusCode = 429;
                 context.HttpContext.Response.ContentType = "application/json";
-                var mensaje = $"{{\"message\": \"Demasiadas peticiones desde la IP {ip}. Intenta más tarde.\"}}";
+                var mensaje = $"{{\"message\": \"Demasiadas peticiones. Rol: {role}, IP: {ip}\", \"timestamp\": \"{timestamp}\"}}";
                 await context.HttpContext.Response.WriteAsync(mensaje, token);
             };
 
@@ -115,38 +116,54 @@ public static class ApplicationServiceExtensions
                     QueueProcessingOrder = QueueProcessingOrder.OldestFirst
                 });
             });
-            // Fixed Window Limiter
-            // options.AddFixedWindowLimiter("fixed", opt =>
-            // {
-            //     opt.Window = TimeSpan.FromSeconds(10);
-            //     opt.PermitLimit = 5;
-            //     opt.QueueLimit = 0;
-            //     opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-            // });
 
-            // Sliding Window Limiter
-            // options.AddSlidingWindowLimiter("sliding", opt =>
-            // {
-            //     opt.Window = TimeSpan.FromSeconds(10);
-            //     opt.SegmentsPerWindow = 3;
-            //     opt.PermitLimit = 6;
-            //     opt.QueueLimit = 0;
-            //     opt.QueueProcessingOrder = QueueProcessingOrder.NewestFirst;
-            //     // Aquí se personaliza la respuesta cuando se excede el límite
-            // });
+            // Rate Limiter basado en rol JWT
+            options.AddPolicy("roleBasedLimiter", httpContext =>
+            {
+                var role = httpContext.User.FindFirst("http://schemas.microsoft.com/ws/2008/06/identity/claims/role")?.Value;
+                var ip = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
 
-            // Token Bucket Limiter
-            // options.AddTokenBucketLimiter("token", opt =>
-            // {
-            //     opt.TokenLimit = 20;
-            //     opt.TokensPerPeriod = 4;
-            //     opt.ReplenishmentPeriod = TimeSpan.FromSeconds(10);
-            //     opt.QueueLimit = 2;
-            //     opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-            //     opt.AutoReplenishment = true;
-            // });
+                // Si no hay rol (token inválido o anónimo), usar IP como clave
+                var partitionKey = role ?? ip;
+
+                return RateLimitPartition.GetFixedWindowLimiter(partitionKey, _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = GetLimitForRole(role, httpContext.Request.Method, httpContext.Request.Path),
+                    Window = TimeSpan.FromMinutes(1),
+                    QueueLimit = 0,
+                    QueueProcessingOrder = QueueProcessingOrder.OldestFirst
+                });
+            });
         });
         return services;
+    }
+
+    // Método auxiliar para determinar el límite basado en rol y ruta
+    private static int GetLimitForRole(string? role, string method, string path)
+    {
+        // Rutas de escritura sensibles
+        var writePaths = new[] { "/api/ordenesservicio", "/api/repuestos" };
+        var isWrite = new[] { "POST", "PUT", "DELETE" }.Contains(method.ToUpper());
+        var isSensitivePath = writePaths.Any(p => path.StartsWith(p, StringComparison.OrdinalIgnoreCase));
+
+        if (isWrite && isSensitivePath)
+        {
+            return role switch
+            {
+                "Admin" => 20,
+                "Recepcionista" => 5,
+                _ => 5 // Fallback para IP o roles desconocidos
+            };
+        }
+
+        // Rutas de lectura (GET)
+        if (method.ToUpper() == "GET")
+        {
+            return 50; // Límite común para lecturas
+        }
+
+        // Otros casos
+        return 10;
     }
     // este es el metodo para agregar el JWT
     public static void AddJwt(this IServiceCollection services, IConfiguration configuration)
